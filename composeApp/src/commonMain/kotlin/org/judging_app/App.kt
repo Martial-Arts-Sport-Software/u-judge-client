@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -52,7 +53,10 @@ fun App() {
                 contentScale = ContentScale.Crop
             )
             Box(
-                Modifier.padding(10.dp)
+                Modifier
+                    .padding(10.dp)
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
                 NavHost(
                     navController = navController,
