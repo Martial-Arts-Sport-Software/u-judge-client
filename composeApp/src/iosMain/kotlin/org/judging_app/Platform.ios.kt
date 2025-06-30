@@ -7,14 +7,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import judging_app_client.composeapp.generated.resources.Montserrat
 import judging_app_client.composeapp.generated.resources.Res
 import org.jetbrains.compose.resources.Font
 import platform.Foundation.NSLocale
 import platform.Foundation.currentLocale
-import platform.Foundation.localeIdentifier
+import platform.Foundation.languageCode
 import platform.UIKit.UIDevice
 
 class IOSPlatform: Platform {
@@ -22,7 +21,7 @@ class IOSPlatform: Platform {
 }
 
 actual fun getPlatform(): Platform = IOSPlatform()
-actual fun getLocale(): String = NSLocale.currentLocale.localeIdentifier
+actual fun getLocale(): String = NSLocale.currentLocale.languageCode
 
 @Composable
 actual fun getTypography(): Typography {

@@ -44,38 +44,46 @@ object EntryScreen: Screen {
                 .clip(RoundedCornerShape(15.dp))
                 .background(Color(0xFFEFD4FF)),
         ) {
-            Box(
-                Modifier
-                    .width(percentWidth(0.5f))
-                    .height(percentHeight(0.8f))
-                    .clip(RoundedCornerShape(
-                        topStart = 15.dp,
-                        bottomStart = 15.dp
-                    ))
-                    .background(Color(0xFF7C45E2)),
-                contentAlignment = Alignment.Center
-            ) {
-                Column {
-                    Text(
-                        Localization.getString("entry_club_name"),
-                        style = MaterialTheme.typography.titleLarge,
-                    )
-                    Spacer(Modifier.height(20.dp))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(
-                            painter = painterResource(Res.drawable.club_logo),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.size(percentWidth(0.1f))
-                        )
-                        Spacer(Modifier.width(20.dp))
+            Row {
+                Box(
+                    Modifier
+                        .width(percentWidth(0.5f))
+                        .height(percentHeight(0.8f))
+                        .clip(RoundedCornerShape(
+                            topStart = 15.dp,
+                            bottomStart = 15.dp
+                        ))
+                        .background(Color(0xFF7C45E2)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column {
                         Text(
-                            Localization.getString("entry_club_description"),
-                            style = MaterialTheme.typography.titleSmall
+                            Localization.getString("entry_club_name"),
+                            style = MaterialTheme.typography.titleLarge,
                         )
+                        Spacer(Modifier.height(20.dp))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                painter = painterResource(Res.drawable.club_logo),
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.size(percentWidth(0.1f))
+                            )
+                            Spacer(Modifier.width(20.dp))
+                            Text(
+                                Localization.getString("entry_club_description"),
+                                style = MaterialTheme.typography.titleSmall
+                            )
+                        }
                     }
+                }
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    ButtonComponent.render("Change lang")
                 }
             }
         }

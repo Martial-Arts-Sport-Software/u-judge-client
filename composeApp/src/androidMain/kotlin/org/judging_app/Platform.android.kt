@@ -19,7 +19,7 @@ class AndroidPlatform : Platform {
 }
 
 actual fun getPlatform(): Platform = AndroidPlatform()
-actual fun getLocale(): String = Locale.getDefault().toLanguageTag()
+actual fun getLocale(): String = Locale.getDefault().language
 
 @Composable
 actual fun getTypography(): Typography {
