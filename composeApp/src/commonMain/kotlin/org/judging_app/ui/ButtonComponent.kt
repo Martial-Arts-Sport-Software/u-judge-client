@@ -22,5 +22,6 @@ object ButtonComponent {
     private fun onclick(controller: NavController? = null, route: State.Routes? = null) {
         if (route != null) controller?.navigate(route.path)
         else controller?.navigate(State.Routes.ENTRY)
+        State.currentLocale.value = "en"
     }
 }
