@@ -15,6 +15,7 @@ import platform.Foundation.NSLocale
 import platform.Foundation.currentLocale
 import platform.Foundation.languageCode
 import platform.UIKit.UIDevice
+import platform.posix.exit
 
 class IOSPlatform: Platform {
     override val name: String = UIDevice.currentDevice.systemName() + " " + UIDevice.currentDevice.systemVersion
@@ -22,7 +23,6 @@ class IOSPlatform: Platform {
 
 actual fun getPlatform(): Platform = IOSPlatform()
 actual fun getLocale(): String = NSLocale.currentLocale.languageCode
-
 @Composable
 actual fun getTypography(): Typography {
     val montserratVariable = FontFamily(

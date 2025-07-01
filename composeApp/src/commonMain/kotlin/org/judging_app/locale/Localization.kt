@@ -7,12 +7,16 @@ object Localization {
         "en" to mapOf(
             "entry_club_name" to "U'PITER\nSPORT CLUB",
             "entry_club_description" to "Olympic Taekwondo\n" +
-                    "Sport and combat Hapkido"
+                    "Sport and combat Hapkido",
+            "entry_login" to "Enter system",
+            "entry_offline" to "Offline mode"
         ),
         "ru" to mapOf(
             "entry_club_name" to "СПОРТИВНЫЙ\nКЛУБ Ю'ПИТЕР",
             "entry_club_description" to "Олимпийское Тхэквондо\n" +
-                    "Спортивное и боевое Хапкидо"
+                    "Спортивное и боевое Хапкидо",
+            "entry_login" to "Войти в систему",
+            "entry_offline" to "Офлайн режим"
         )
     )
     fun getString(key: String): String {

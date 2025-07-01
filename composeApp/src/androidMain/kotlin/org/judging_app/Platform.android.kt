@@ -13,6 +13,7 @@ import judging_app_client.composeapp.generated.resources.Montserrat
 import judging_app_client.composeapp.generated.resources.Res
 import org.jetbrains.compose.resources.Font
 import java.util.Locale
+import kotlin.system.exitProcess
 
 class AndroidPlatform : Platform {
     override val name: String = "Android ${Build.VERSION.SDK_INT}"
@@ -34,19 +35,20 @@ actual fun getTypography(): Typography {
     return Typography(
         titleLarge = TextStyle(
             fontFamily = montserratVariable,
-            fontSize = 10.em,
+            fontSize = 9.em,
             fontWeight = FontWeight.Bold,
             color = Color.White,
             lineHeight = 1.em,
         ),
         titleSmall = TextStyle(
             fontFamily = montserratVariable,
-            fontSize = 4.em,
+            fontSize = 3.5.em,
             fontWeight = FontWeight.Bold,
             color = Color.White
         ),
         bodyLarge = TextStyle(
-            fontFamily = montserratVariable
+            fontFamily = montserratVariable,
+            fontSize = 3.em
         )
     )
 }

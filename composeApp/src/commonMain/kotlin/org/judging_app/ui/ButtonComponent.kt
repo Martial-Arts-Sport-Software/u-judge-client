@@ -1,31 +1,93 @@
 package org.judging_app.ui
 
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import org.judging_app.State
 
-object ButtonComponent {
-    var clicked = mutableStateOf(false)
-    @Composable
-    fun render(text: String, controller: NavController? = null, clickRoute: State.Routes? = null) {
-        Button(
-            modifier = Modifier.padding(5.dp),
-            onClick = { onclick(controller, clickRoute) },
-            content = { Text(text) }
-        )
-    }
+enum class Styles() {
+    Primary,
+    Secondary,
+    Plain
+}
 
-    private fun onclick(controller: NavController? = null, route: State.Routes? = null) {
-        if (route != null) controller?.navigate(route.path)
-        else controller?.navigate(State.Routes.ENTRY)
-        if (clicked.value) State.currentLocale.value = "en"
-        else State.currentLocale.value = "ru"
-        clicked.value = !clicked.value
+@Composable
+fun ButtonComponent(
+    text: String,
+    style: Styles = Styles.Primary,
+    modifier: Modifier = Modifier,
+    onclick: () -> Unit
+) {
+    when(style) {
+        Styles.Primary -> {
+            Button(
+                modifier = modifier.fillMaxWidth(0.8f),
+                onClick = {
+                    if (!State.isAnimating.value) {
+                        onclick()
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF7C45E2)
+                ),
+                shape = RoundedCornerShape(5.dp),
+                content = {
+                    Text(
+                        style = MaterialTheme.typography.bodyLarge,
+                        text = text
+                    )
+                },
+            )
+        }
+        Styles.Secondary -> {
+            Button(
+                modifier = modifier.fillMaxWidth(0.8f),
+                onClick = {
+                    if (!State.isAnimating.value) {
+                        onclick()
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White.copy(0.48f)
+                ),
+                shape = RoundedCornerShape(5.dp),
+                content = {
+                    Text(
+                        text,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color(0xFF7C45E2)
+                    )
+                }
+            )
+        }
+        Styles.Plain -> {
+            Button(
+                modifier = modifier.fillMaxWidth(0.8f),
+                onClick = {
+                    if (!State.isAnimating.value) {
+                        onclick()
+                    }
+                },
+                border = BorderStroke(0.dp, Color.Transparent),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent
+                ),
+                content = {
+                    Text(
+                        style = MaterialTheme.typography.bodyLarge,
+                        text = text,
+                        color = Color(0xFF7C45E2)
+                    )
+                },
+            )
+        }
     }
 }
