@@ -49,6 +49,10 @@ actual fun getTypography(): Typography {
         bodyLarge = TextStyle(
             fontFamily = montserratVariable,
             fontSize = 3.em
+        ),
+        bodyMedium = TextStyle(
+            fontFamily = montserratVariable,
+            fontSize = 2.5.em
         )
     )
 }

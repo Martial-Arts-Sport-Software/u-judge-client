@@ -14,7 +14,7 @@ object State {
     var screenWidthPx: Float? = null
     var screenHeightPx: Float? = null
     var isAnimating = mutableStateOf(false)
-
+    var judgeSurname: String = ""
     enum class Routes(val path: String) {
         ENTRY("entry"),
         DISCIPLINE_MODE("discipline_mode");

@@ -6,7 +6,7 @@ import androidx.compose.runtime.remember
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import org.judging_app.State
-import org.judging_app.ui.ButtonComponent
+import org.judging_app.ui.button.ButtonComponent
 
 object DisciplineModeScreen: Screen {
     @Composable
