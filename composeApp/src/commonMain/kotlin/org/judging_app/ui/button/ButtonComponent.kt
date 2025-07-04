@@ -40,9 +40,7 @@ fun ButtonComponent(
                 Button(
                     modifier = modifier.fillMaxWidth(0.8f),
                     onClick = {
-                        if (!State.isAnimating.value) {
-                            onclick()
-                        }
+                        if (!State.isAnimating.value) onclick()
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF7C45E2)
@@ -101,4 +99,11 @@ fun ButtonComponent(
             }
         }
     }
+}
+
+fun clickWithTransition(
+    route: State.Routes
+) {
+    State.isAnimating.value = true
+    State.navController!!.navigate(route.path)
 }

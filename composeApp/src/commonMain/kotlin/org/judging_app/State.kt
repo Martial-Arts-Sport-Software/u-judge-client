@@ -6,9 +6,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.Density
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 
 object State {
+    var navController: NavHostController? = null
     var currentLocale = mutableStateOf(getLocale())
     var density: Density? = null
     var screenWidthPx: Float? = null

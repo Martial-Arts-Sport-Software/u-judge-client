@@ -32,24 +32,17 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import judging_app_client.composeapp.generated.resources.Res
 import judging_app_client.composeapp.generated.resources.club_logo
-import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
 import org.judging_app.State
 import org.judging_app.locale.Localization
 import org.judging_app.ui.button.ButtonComponent
 import org.judging_app.ui.button.Styles
+import org.judging_app.ui.button.clickWithTransition
 import org.judging_app.ui.input.TextInputComponent
 
 object EntryScreen: Screen {
     @Composable
     override fun load(controller: NavController) {
-        LaunchedEffect(State.isAnimating) {
-            if (State.isAnimating.value) {
-                delay(400)
-                State.isAnimating.value = false
-            }
-        }
-
         Box(
             Modifier
                 .fillMaxWidth(0.9f)
@@ -104,19 +97,25 @@ object EntryScreen: Screen {
                     Spacer(Modifier.weight(0.8f))
 
                     TextInputComponent(
-                        Localization.getString("entry_server_address")
+                        Localization.getString("entry_server_address"),
+                        inputValue = State.judgeSurname,
+                        onChange = { inputValue ->  
+                            State.judgeSurname = inputValue
+                        }
                     )
                     TextInputComponent(
-                        Localization.getString("entry_judge_surname")
+                        Localization.getString("entry_judge_surname"),
+                        inputValue = State.judgeSurname,
+                        onChange = { inputValue ->
+                            State.judgeSurname = inputValue
+                        }
                     )
 
                     val loginOnClick = remember { {
-                        State.isAnimating.value = true
-                        controller.navigate(State.Routes.DISCIPLINE_MODE.path)
+                        clickWithTransition(State.Routes.DISCIPLINE_MODE)
                     } }
                     val offlineOnClick = remember { {
-                        State.isAnimating.value = true
-                        controller.navigate(State.Routes.DISCIPLINE_MODE.path)
+                        clickWithTransition(State.Routes.DISCIPLINE_MODE)
                     } }
 
                     Spacer(Modifier.weight(0.3f))

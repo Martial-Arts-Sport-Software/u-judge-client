@@ -11,13 +11,6 @@ import org.judging_app.ui.button.ButtonComponent
 object DisciplineModeScreen: Screen {
     @Composable
     override fun load(controller: NavController) {
-        LaunchedEffect(State.isAnimating) {
-            if (State.isAnimating.value) {
-                delay(400)
-                State.isAnimating.value = false
-            }
-        }
-
         val goBackOnclick = remember { {
             State.isAnimating.value = true
             val back = controller.popBackStack()

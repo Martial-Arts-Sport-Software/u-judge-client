@@ -12,20 +12,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import org.judging_app.State
 
 @Composable
 fun TextInputComponent(
-    labelText: String? = null
+    labelText: String? = null,
+    inputValue: String = "",
+    onChange: (inputValue: String) -> Unit
 ) {
     Column(
         Modifier
@@ -39,13 +37,12 @@ fun TextInputComponent(
             )
             Spacer(Modifier.height(5.dp))
         }
-        val input = remember { mutableStateOf(State.judgeSurname) }
+        val input = remember { mutableStateOf(inputValue) }
         BasicTextField(
             value = input.value,
-            onValueChange = {
-                    it: String ->
-                        State.judgeSurname = it
-                        input.value = it
+            onValueChange = { it: String ->
+                input.value = it
+                onChange(input.value)
             },
             singleLine = true,
             modifier = Modifier

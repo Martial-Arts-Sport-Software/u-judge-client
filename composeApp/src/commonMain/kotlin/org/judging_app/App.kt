@@ -28,6 +28,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 import judging_app_client.composeapp.generated.resources.Res
 import judging_app_client.composeapp.generated.resources.app_background
+import kotlinx.coroutines.delay
 import org.judging_app.screens.DisciplineModeScreen
 import org.judging_app.screens.EntryScreen
 
@@ -35,7 +36,7 @@ import org.judging_app.screens.EntryScreen
 @Composable
 @Preview
 fun App() {
-    val navController = rememberNavController()
+    State.navController = rememberNavController()
     State.screenWidthPx = LocalWindowInfo.current.containerSize.width.toFloat()
     State.screenHeightPx = LocalWindowInfo.current.containerSize.height.toFloat()
     State.density = LocalDensity.current
@@ -66,15 +67,15 @@ fun App() {
                     contentAlignment = Alignment.Center
                 ) {
                     NavHost(
-                        navController = navController,
+                        navController = State.navController!!,
                         startDestination = State.Routes.ENTRY.path,
                         contentAlignment = Alignment.Center,
                     ) {
                         animatedComposable(State.Routes.ENTRY.path) {
-                            EntryScreen.load(navController)
+                            EntryScreen.load(State.navController!!)
                         }
                         animatedComposable(State.Routes.DISCIPLINE_MODE.path) {
-                            DisciplineModeScreen.load(navController)
+                            DisciplineModeScreen.load(State.navController!!)
                         }
                     }
                 }
@@ -93,6 +94,14 @@ fun NavGraphBuilder.animatedComposable(
         exitTransition = { fadeOut(tween(300)) },
         popEnterTransition = { fadeIn(tween(300)) },
         popExitTransition = { fadeOut(tween(300)) },
-        content = { content() }
+        content = {
+            LaunchedEffect(State.isAnimating) {
+                if (State.isAnimating.value) {
+                    delay(400)
+                    State.isAnimating.value = false
+                }
+            }
+            content()
+        }
     )
 }
