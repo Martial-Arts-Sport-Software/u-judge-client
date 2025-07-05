@@ -1,19 +1,15 @@
 package org.judging_app
 
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.Density
 import androidx.navigation.NavHostController
-import org.judging_app.locale.Localization
 
 object State {
     var navController: NavHostController? = null
     var currentLocale = mutableStateOf(getLocale())
     var currentDiscipline: Disciplines? = null
+    var currentCategory: Categories? = null
     var density: Density? = null
     var screenWidthPx: Float? = null
     var screenHeightPx: Float? = null
@@ -23,8 +19,10 @@ object State {
 
     enum class Routes(val path: String) {
         ENTRY("entry"),
-        DISCIPLINE_MODE("discipline_mode"),
-        CATEGORY_MODE("category_mode"),
+
+        DISCIPLINE_SELECT("discipline_select"),
+        CATEGORY_SELECT("category_select"),
+
         BACK("");
 
 
@@ -43,5 +41,10 @@ object State {
     enum class Colors(val color: Color) {
         PRIMARY(Color(0xFF7C45E2)),
         SECONDARY(Color(0xFFEFD4FF))
+    }
+
+    enum class Categories(val value: String) {
+        JUNIORS("category_juniors"),
+        ADULTS("category_adults")
     }
 }

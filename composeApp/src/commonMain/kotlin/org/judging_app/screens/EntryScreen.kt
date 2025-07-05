@@ -18,7 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,7 +25,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import judging_app_client.composeapp.generated.resources.Res
 import judging_app_client.composeapp.generated.resources.club_logo
 import org.jetbrains.compose.resources.painterResource
@@ -39,7 +37,7 @@ import org.judging_app.ui.input.TextInputComponent
 
 object EntryScreen: Screen {
     @Composable
-    override fun load(controller: NavController) {
+    override fun load() {
         Box(
             Modifier
                 .fillMaxWidth(0.9f)
@@ -109,10 +107,10 @@ object EntryScreen: Screen {
                     )
 
                     val loginOnClick = remember { {
-                        clickWithTransition(State.Routes.DISCIPLINE_MODE)
+                        clickWithTransition(State.Routes.DISCIPLINE_SELECT)
                     } }
                     val offlineOnClick = remember { {
-                        clickWithTransition(State.Routes.DISCIPLINE_MODE)
+                        clickWithTransition(State.Routes.DISCIPLINE_SELECT)
                     } }
 
                     Spacer(Modifier.weight(0.3f))

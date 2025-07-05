@@ -3,8 +3,6 @@ package org.judging_app
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,7 +27,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import judging_app_client.composeapp.generated.resources.Res
 import judging_app_client.composeapp.generated.resources.app_background
 import kotlinx.coroutines.delay
-import org.judging_app.screens.DisciplineModeScreen
+import org.judging_app.screens.CategorySelectScreen
+import org.judging_app.screens.DisciplineSelectScreen
 import org.judging_app.screens.EntryScreen
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -71,11 +70,14 @@ fun App() {
                         startDestination = State.Routes.ENTRY.path,
                         contentAlignment = Alignment.Center,
                     ) {
-                        animatedComposable(State.Routes.ENTRY.path) {
-                            EntryScreen.load(State.navController!!)
+                        animatedComposable(State.Routes.ENTRY) {
+                            EntryScreen.load()
                         }
-                        animatedComposable(State.Routes.DISCIPLINE_MODE.path) {
-                            DisciplineModeScreen.load(State.navController!!)
+                        animatedComposable(State.Routes.DISCIPLINE_SELECT) {
+                            DisciplineSelectScreen.load()
+                        }
+                        animatedComposable(State.Routes.CATEGORY_SELECT) {
+                            CategorySelectScreen.load()
                         }
                     }
                 }
@@ -85,11 +87,11 @@ fun App() {
 }
 
 fun NavGraphBuilder.animatedComposable(
-    route: String,
+    route: State.Routes,
     content: @Composable () -> Unit
 ) {
     composable(
-        route = route,
+        route = route.path,
         enterTransition = { fadeIn(tween(300)) },
         exitTransition = { fadeOut(tween(300)) },
         popEnterTransition = { fadeIn(tween(300)) },

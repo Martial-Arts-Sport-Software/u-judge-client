@@ -19,7 +19,11 @@ object Localization {
             "discipline_tanbon" to "Tanbon",
             "discipline_freestyle_weapon" to "Freestyle with weapon",
             "discipline_freestyle_pair" to "Pair freestyle",
-            "discipline_freestyle_group" to "Group freestyle"
+            "discipline_freestyle_group" to "Group freestyle",
+
+            "category_title" to "Choose category",
+            "category_juniors" to "Younger juniors / cadets",
+            "category_adults" to "Juniors / Adults",
         ),
         "ru" to mapOf(
             "entry_club_name" to "СПОРТИВНЫЙ\nКЛУБ Ю'ПИТЕР",
@@ -36,10 +40,15 @@ object Localization {
             "discipline_tanbon" to "Танбон",
             "discipline_freestyle_weapon" to "Комплекс свободный",
             "discipline_freestyle_pair" to "Поединок постановочный - пара",
-            "discipline_freestyle_group" to "Поединок постановочный - группа"
+            "discipline_freestyle_group" to "Поединок постановочный - группа",
+
+            "category_title" to "Выберите категорию",
+            "category_juniors" to "Младшие юноши / Кадеты",
+            "category_adults" to "Юниоры / Взрослые",
         )
     )
     fun getString(key: String): String {
-        return strings[State.currentLocale.value]?.get(key) ?: strings["ru"]?.get(key) ?: key
+        return strings[State.currentLocale.value]
+            ?.get(key) ?: strings["ru"]?.get(key) ?: key
     }
 }

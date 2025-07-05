@@ -10,14 +10,7 @@ import org.judging_app.State
 interface Screen {
     /**
      * Function for drawing screen's UI
-     * @param controller - app's [NavController] for navigation between screens
      */
     @Composable
-    fun load(controller: NavController)
-
-    @Composable
-    fun pxToDp(px: Int): Dp {
-        val density = LocalDensity.current
-        return with(density) { px.toDp() }
-    }
+    fun load()
 }

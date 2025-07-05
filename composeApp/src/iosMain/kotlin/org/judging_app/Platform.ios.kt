@@ -41,6 +41,13 @@ actual fun getTypography(): Typography {
             color = Color.White,
             lineHeight = 40.sp,
         ),
+        titleMedium = TextStyle(
+            fontFamily = montserratVariable,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+            lineHeight = 40.sp,
+        ),
         titleSmall = TextStyle(
             fontFamily = montserratVariable,
             fontSize = 15.sp,
