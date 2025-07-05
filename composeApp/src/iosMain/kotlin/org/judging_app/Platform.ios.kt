@@ -36,7 +36,7 @@ actual fun getTypography(): Typography {
     return Typography(
         titleLarge = TextStyle(
             fontFamily = montserratVariable,
-            fontSize = 42.sp,
+            fontSize = 38.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,
             lineHeight = 40.sp,

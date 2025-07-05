@@ -2,7 +2,6 @@ package org.judging_app.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,8 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -140,9 +137,7 @@ object EntryScreen: Screen {
                             modifier = Modifier.weight(1f)
                         )
                     }
-
                     Spacer(Modifier.weight(0.6f))
-
                     Row(
                         Modifier
                             .padding(bottom = 5.dp)
@@ -155,8 +150,7 @@ object EntryScreen: Screen {
                             "Русский",
                             Styles.Plain,
                             onclick = { State.currentLocale.value = "ru" },
-                            modifier = Modifier
-                                .weight(1f)
+                            modifier = Modifier.weight(1f)
                         )
                         VerticalDivider(
                             color = Color(0xFF7C45E2),
@@ -169,8 +163,7 @@ object EntryScreen: Screen {
                             "English",
                             Styles.Plain,
                             onclick = { State.currentLocale.value = "en" },
-                            modifier = Modifier
-                                .weight(1f)
+                            modifier = Modifier.weight(1f)
                         )
                     }
                 }

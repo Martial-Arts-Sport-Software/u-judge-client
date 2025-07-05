@@ -42,6 +42,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.navigation.compose)
             implementation(libs.ui.backhandler)
+            implementation(libs.androidx.annotation)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
