@@ -25,7 +25,7 @@ import judging_app_client.composeapp.generated.resources.back_icon
 import org.judging_app.State
 import org.judging_app.locale.Localization
 import org.judging_app.ui.button.ButtonComponent
-import org.judging_app.ui.button.Styles
+import org.judging_app.ui.button.ButtonStyles
 import org.judging_app.ui.button.clickWithTransition
 
 object DisciplineSelectScreen: Screen {
@@ -47,7 +47,7 @@ object DisciplineSelectScreen: Screen {
                     .fillMaxWidth()
             ) {
                 ButtonComponent(
-                    style = Styles.Icon,
+                    style = ButtonStyles.Icon,
                     iconSrc = Res.drawable.back_icon,
                     onclick = goBackOnclick,
                     modifier = Modifier

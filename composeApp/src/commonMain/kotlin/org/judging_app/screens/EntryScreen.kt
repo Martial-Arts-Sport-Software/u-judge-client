@@ -31,7 +31,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.judging_app.State
 import org.judging_app.locale.Localization
 import org.judging_app.ui.button.ButtonComponent
-import org.judging_app.ui.button.Styles
+import org.judging_app.ui.button.ButtonStyles
 import org.judging_app.ui.button.clickWithTransition
 import org.judging_app.ui.input.TextInputComponent
 
@@ -131,7 +131,7 @@ object EntryScreen: Screen {
                         ButtonComponent(
                             Localization.getString("entry_offline"),
                             onclick = offlineOnClick,
-                            style = Styles.Secondary,
+                            style = ButtonStyles.Secondary,
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -146,7 +146,7 @@ object EntryScreen: Screen {
                     ) {
                         ButtonComponent(
                             "Русский",
-                            Styles.Plain,
+                            ButtonStyles.Plain,
                             onclick = { State.currentLocale.value = "ru" },
                             modifier = Modifier.weight(1f)
                         )
@@ -159,7 +159,7 @@ object EntryScreen: Screen {
                         )
                         ButtonComponent(
                             "English",
-                            Styles.Plain,
+                            ButtonStyles.Plain,
                             onclick = { State.currentLocale.value = "en" },
                             modifier = Modifier.weight(1f)
                         )

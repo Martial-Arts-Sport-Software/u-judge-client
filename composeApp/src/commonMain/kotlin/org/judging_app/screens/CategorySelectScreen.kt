@@ -26,7 +26,7 @@ import judging_app_client.composeapp.generated.resources.back_icon
 import org.judging_app.State
 import org.judging_app.locale.Localization
 import org.judging_app.ui.button.ButtonComponent
-import org.judging_app.ui.button.Styles
+import org.judging_app.ui.button.ButtonStyles
 import org.judging_app.ui.button.clickWithTransition
 
 object CategorySelectScreen : Screen {
@@ -48,7 +48,7 @@ object CategorySelectScreen : Screen {
                     .fillMaxWidth()
             ) {
                 ButtonComponent(
-                    style = Styles.Icon,
+                    style = ButtonStyles.Icon,
                     iconSrc = Res.drawable.back_icon,
                     onclick = goBackOnclick,
                     modifier = Modifier
@@ -90,6 +90,12 @@ object CategorySelectScreen : Screen {
                             categories[i + 1] else null
                         val firstOnclick = {
                             State.currentCategory = first
+                            clickWithTransition(
+                                State.Routes.valueOf(
+                                    "${State.currentDiscipline!!
+                                        .value.split("_")[1].uppercase()}_MODE"
+                                )
+                            )
                         }
                         Column(
                             Modifier.weight(1f),
@@ -107,6 +113,12 @@ object CategorySelectScreen : Screen {
                             if (second != null) {
                                 val secondOnclick = {
                                     State.currentCategory = second
+                                    clickWithTransition(
+                                        State.Routes.valueOf(
+                                            "${State.currentDiscipline!!
+                                                .value.split("_")[1].uppercase()}_MODE"
+                                        )
+                                    )
                                 }
                                 Spacer(Modifier.weight(0.2f))
                                 ButtonComponent(

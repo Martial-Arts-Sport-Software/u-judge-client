@@ -23,6 +23,11 @@ object State {
         DISCIPLINE_SELECT("discipline_select"),
         CATEGORY_SELECT("category_select"),
 
+        KERUGI_MODE("kerugi_mode"),
+        TANBON_MODE("tanbon_mode"),
+        HOSINSOOL_MODE("hosinsool_mode"),
+        FREESTYLE_MODE("freestyle_mode"),
+
         BACK("");
 
 
@@ -40,7 +45,10 @@ object State {
 
     enum class Colors(val color: Color) {
         PRIMARY(Color(0xFF7C45E2)),
-        SECONDARY(Color(0xFFEFD4FF))
+        SECONDARY(Color(0xFFEFD4FF)),
+        BUTTON_BLUE(Color(0x5500FFBF)),
+        BUTTON_RED(Color(0xBB0042BF)),
+        BUTTON_GRAY(Color(0x525151BF))
     }
 
     enum class Categories(val value: String) {

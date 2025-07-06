@@ -2,8 +2,11 @@ package org.judging_app.ui.button
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -12,10 +15,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
@@ -24,7 +28,7 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.judging_app.State
 
-enum class Styles() {
+enum class ButtonStyles {
     Primary,
     Secondary,
     Plain,
@@ -37,16 +41,16 @@ enum class Styles() {
 @Composable
 fun ButtonComponent(
     text: String? = null,
-    style: Styles = Styles.Primary,
+    style: ButtonStyles = ButtonStyles.Primary,
     modifier: Modifier = Modifier,
     onclick: () -> Unit,
     iconSrc: DrawableResource? = null
 ) {
-    if (style == Styles.Icon) require(iconSrc != null)
+    if (style == ButtonStyles.Icon) require(iconSrc != null)
     else require(text != null)
     CompositionLocalProvider(LocalRippleConfiguration provides null) {
         when(style) {
-            Styles.Primary -> {
+            ButtonStyles.Primary -> {
                 Button(
                     modifier = modifier
                         .fillMaxWidth(0.8f),
@@ -66,7 +70,7 @@ fun ButtonComponent(
                     },
                 )
             }
-            Styles.Secondary -> {
+            ButtonStyles.Secondary -> {
                 Button(
                     modifier = modifier.fillMaxWidth(0.8f),
                     onClick = {
@@ -87,7 +91,7 @@ fun ButtonComponent(
                     }
                 )
             }
-            Styles.Plain -> {
+            ButtonStyles.Plain -> {
                 Button(
                     modifier = modifier
                         .fillMaxWidth(0.8f),
@@ -107,18 +111,20 @@ fun ButtonComponent(
                     },
                 )
             }
-            Styles.Icon -> {
-                IconButton(
+            ButtonStyles.Icon -> {
+                TextButton(
+                    modifier = Modifier
+                        .fillMaxHeight(),
                     onClick = {
                         if (!State.isAnimating.value) { onclick() }
                     },
                 ) {
                     Image(
                         modifier = Modifier
-                            .fillMaxSize(0.9f),
+                            .fillMaxHeight(0.9f),
                         painter = painterResource(iconSrc!!),
                         contentDescription = null,
-                        contentScale = ContentScale.Fit
+                        contentScale = ContentScale.FillHeight,
                     )
                 }
             }

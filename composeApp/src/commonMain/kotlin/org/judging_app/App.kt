@@ -30,6 +30,10 @@ import kotlinx.coroutines.delay
 import org.judging_app.screens.CategorySelectScreen
 import org.judging_app.screens.DisciplineSelectScreen
 import org.judging_app.screens.EntryScreen
+import org.judging_app.screens.FreestyleModeScreen
+import org.judging_app.screens.HosinsoolModeScreen
+import org.judging_app.screens.KerugiModeScreen
+import org.judging_app.screens.TanbonModeScreen
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -78,6 +82,18 @@ fun App() {
                         }
                         animatedComposable(State.Routes.CATEGORY_SELECT) {
                             CategorySelectScreen.load()
+                        }
+                        animatedComposable(State.Routes.KERUGI_MODE) {
+                            KerugiModeScreen.load()
+                        }
+                        animatedComposable(State.Routes.TANBON_MODE) {
+                            TanbonModeScreen.load()
+                        }
+                        animatedComposable(State.Routes.HOSINSOOL_MODE) {
+                            HosinsoolModeScreen.load()
+                        }
+                        animatedComposable(State.Routes.FREESTYLE_MODE) {
+                            FreestyleModeScreen.load()
                         }
                     }
                 }

@@ -24,6 +24,8 @@ object Localization {
             "category_title" to "Choose category",
             "category_juniors" to "Younger juniors / cadets",
             "category_adults" to "Juniors / Adults",
+
+            "kerugi_bout" to "Bout",
         ),
         "ru" to mapOf(
             "entry_club_name" to "СПОРТИВНЫЙ\nКЛУБ Ю'ПИТЕР",
@@ -45,6 +47,8 @@ object Localization {
             "category_title" to "Выберите категорию",
             "category_juniors" to "Младшие юноши / Кадеты",
             "category_adults" to "Юниоры / Взрослые",
+
+            "kerugi_bout" to "Поединок",
         )
     )
     fun getString(key: String): String {
