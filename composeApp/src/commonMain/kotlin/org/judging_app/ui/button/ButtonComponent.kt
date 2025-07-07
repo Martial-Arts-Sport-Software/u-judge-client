@@ -58,7 +58,7 @@ fun ButtonComponent(
                         if (!State.isAnimating.value) onclick()
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF7C45E2)
+                        containerColor = State.Colors.PRIMARY.color
                     ),
                     shape = RoundedCornerShape(5.dp),
                     content = {
@@ -86,7 +86,7 @@ fun ButtonComponent(
                         Text(
                             text!!,
                             style = MaterialTheme.typography.bodyLarge,
-                            color = Color(0xFF7C45E2)
+                            color = State.Colors.PRIMARY.color
                         )
                     }
                 )
@@ -106,7 +106,7 @@ fun ButtonComponent(
                         Text(
                             style = MaterialTheme.typography.bodyMedium,
                             text = text!!,
-                            color = Color(0xFF7C45E2)
+                            color = State.Colors.PRIMARY.color
                         )
                     },
                 )

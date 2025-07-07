@@ -1,29 +1,18 @@
 package org.judging_app.ui.button
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import judging_app_client.composeapp.generated.resources.Res
-import judging_app_client.composeapp.generated.resources.kerugi_chestplate
-import judging_app_client.composeapp.generated.resources.kerugi_helmet
-import judging_app_client.composeapp.generated.resources.tanbon_body
-import judging_app_client.composeapp.generated.resources.tanbon_cross
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.judging_app.State
-
-enum class KerugiButtonStyles(val icon: DrawableResource) {
-    HELMET(Res.drawable.kerugi_helmet),
-    CHESTPLATE(Res.drawable.kerugi_chestplate),
-    BODY(Res.drawable.tanbon_body),
-    TANBON_CROSS(Res.drawable.tanbon_cross)
-}
 
 enum class KerugiButtonPositions {
     LEFT,
@@ -32,26 +21,31 @@ enum class KerugiButtonPositions {
 
 @Composable
 fun KerugiButtonComponent(
-    style: KerugiButtonStyles,
     position: KerugiButtonPositions,
     color: State.Colors,
     icon: DrawableResource,
-    onclick: () -> Unit
+    onclick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Button(
-        modifier = Modifier,
+    OutlinedButton(
+        modifier = modifier
+            .fillMaxSize(),
+        border = BorderStroke(3.dp, State.Colors.BUTTON_BROWN.color),
         shape = if (position == KerugiButtonPositions.LEFT)
             RoundedCornerShape(
-                topStart = 0.dp,
-                topEnd = 15.dp,
-                bottomStart = 15.dp,
-                bottomEnd = 0.dp
+                topStart = 10.dp,
+                topEnd = 20.dp,
+                bottomStart = 10.dp,
+                bottomEnd = 20.dp
             ) else RoundedCornerShape(
-                topStart = 0.dp,
-                topEnd = 15.dp,
-                bottomStart = 15.dp,
-                bottomEnd = 0.dp
+                topStart = 20.dp,
+                topEnd = 10.dp,
+                bottomStart = 20.dp,
+                bottomEnd = 10.dp
             ),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = color.color
+        ),
         onClick = { onclick() },
     ) {
         Image(

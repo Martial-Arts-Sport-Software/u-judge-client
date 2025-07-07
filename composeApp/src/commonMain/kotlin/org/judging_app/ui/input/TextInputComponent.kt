@@ -2,7 +2,6 @@ package org.judging_app.ui.input
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,7 +32,7 @@ fun TextInputComponent(
         if (labelText != null) {
             Text(
                 labelText,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.labelLarge
             )
             Spacer(Modifier.height(5.dp))
         }

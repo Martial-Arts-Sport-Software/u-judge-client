@@ -46,9 +46,10 @@ object State {
     enum class Colors(val color: Color) {
         PRIMARY(Color(0xFF7C45E2)),
         SECONDARY(Color(0xFFEFD4FF)),
-        BUTTON_BLUE(Color(0x5500FFBF)),
-        BUTTON_RED(Color(0xBB0042BF)),
-        BUTTON_GRAY(Color(0x525151BF))
+        BUTTON_BLUE(Color(0xBF5500FF)),
+        BUTTON_RED(Color(0xBFBB0042)),
+        BUTTON_GRAY(Color(0xBF525151)),
+        BUTTON_BROWN(Color(0xFF2C2C2C))
     }
 
     enum class Categories(val value: String) {

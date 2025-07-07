@@ -26,6 +26,8 @@ object Localization {
             "category_adults" to "Juniors / Adults",
 
             "kerugi_bout" to "Bout",
+            "kerugi_judge" to "Judge",
+            "kerugi_judge_empty" to "Not specified",
         ),
         "ru" to mapOf(
             "entry_club_name" to "СПОРТИВНЫЙ\nКЛУБ Ю'ПИТЕР",
@@ -49,6 +51,8 @@ object Localization {
             "category_adults" to "Юниоры / Взрослые",
 
             "kerugi_bout" to "Поединок",
+            "kerugi_judge" to "Судья",
+            "kerugi_judge_empty" to "Не указан",
         )
     )
     fun getString(key: String): String {

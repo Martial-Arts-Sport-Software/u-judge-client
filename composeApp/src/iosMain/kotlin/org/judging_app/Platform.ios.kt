@@ -43,7 +43,7 @@ actual fun getTypography(): Typography {
         ),
         titleMedium = TextStyle(
             fontFamily = montserratVariable,
-            fontSize = 24.sp,
+            fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,
             lineHeight = 40.sp,
@@ -55,11 +55,17 @@ actual fun getTypography(): Typography {
             color = Color.White
         ),
         bodyLarge = TextStyle(
-            fontFamily = montserratVariable
+            fontFamily = montserratVariable,
+            fontSize = 12.sp,
+            color = Color.White
         ),
         bodyMedium = TextStyle(
             fontFamily = montserratVariable,
             fontSize = 9.sp
-        )
+        ),
+        labelLarge = TextStyle(
+            fontFamily = montserratVariable,
+            fontSize = 15.sp,
+        ),
     )
 }
