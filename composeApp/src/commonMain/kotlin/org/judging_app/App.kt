@@ -35,7 +35,6 @@ import org.judging_app.screens.HosinsoolModeScreen
 import org.judging_app.screens.KerugiModeScreen
 import org.judging_app.screens.TanbonModeScreen
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 @Preview
 fun App() {
@@ -43,8 +42,6 @@ fun App() {
     State.screenWidthPx = LocalWindowInfo.current.containerSize.width.toFloat()
     State.screenHeightPx = LocalWindowInfo.current.containerSize.height.toFloat()
     State.density = LocalDensity.current
-
-    BackHandler(enabled = false) {}
 
     MaterialTheme(
          typography = getTypography()
@@ -102,6 +99,7 @@ fun App() {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 fun NavGraphBuilder.animatedComposable(
     route: State.Routes,
     content: @Composable () -> Unit
@@ -118,6 +116,16 @@ fun NavGraphBuilder.animatedComposable(
                     delay(400)
                     State.isAnimating.value = false
                 }
+            }
+            BackHandler {
+                if (State.navController!!.currentBackStackEntry?.destination?.route !in arrayOf(
+                        State.Routes.KERUGI_MODE.path,
+                        State.Routes.TANBON_MODE.path,
+                        State.Routes.HOSINSOOL_MODE.path,
+                        State.Routes.FREESTYLE_MODE.path,
+                        State.Routes.ENTRY.path
+                    )
+                ) State.navController!!.popBackStack()
             }
             content()
         }
