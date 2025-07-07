@@ -56,7 +56,7 @@ fun TextInputComponent(
                 )
                 .padding(10.dp, 11.dp)
                 .fillMaxWidth(),
-            textStyle = MaterialTheme.typography.bodyLarge
+            textStyle = MaterialTheme.typography.labelLarge
         )
     }
 }

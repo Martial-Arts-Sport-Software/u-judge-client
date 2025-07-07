@@ -63,7 +63,7 @@ actual fun getTypography(): Typography {
         ),
         labelLarge = TextStyle(
             fontFamily = montserratVariable,
-            fontSize = 3.5.em,
+            fontSize = 3.em,
         ),
     )
 }
