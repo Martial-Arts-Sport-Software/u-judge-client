@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,8 +21,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import judging_app_client.composeapp.generated.resources.Res
-import judging_app_client.composeapp.generated.resources.cross_icon
 import org.judging_app.State
 import org.judging_app.locale.Localization
 import org.judging_app.ui.button.ButtonComponent
@@ -31,82 +28,55 @@ import org.judging_app.ui.button.ButtonStyles
 import org.judging_app.ui.button.clickWithTransition
 
 @Composable
-fun SettingsPopupComponent() {
+fun WarningPopupComponent() {
     Box(
         Modifier
-            .fillMaxHeight()
+            .fillMaxHeight(0.8f)
             .fillMaxWidth(0.45f)
             .clip(RoundedCornerShape(25.dp))
             .background(State.Colors.SECONDARY.color)
             .padding(horizontal = 5.dp)
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .padding(top = 10.dp)
+                .fillMaxHeight()
         ) {
-            Box(
-                Modifier
-                    .fillMaxHeight(0.2f)
+            Text(
+                text = Localization.getString("warning_title"),
+                style = MaterialTheme.typography.displayLarge,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
                     .fillMaxWidth()
-            ) {
-                Text(
-                    text = Localization.getString("settings_title"),
-                    style = MaterialTheme.typography.displayLarge,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.align(Alignment.BottomCenter)
-                )
-                ButtonComponent(
-                    style = ButtonStyles.Icon,
-                    iconSrc = Res.drawable.cross_icon,
-                    onclick = {
-                        State.currentPopupMode.value = State.PopupMode.NONE
-                    },
-                    modifier = Modifier.align(Alignment.TopEnd)
-                )
-            }
+                    .padding(vertical = 10.dp)
+            )
             Column(
                 Modifier
-                    .fillMaxSize(),
+                    .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Spacer(Modifier.fillMaxHeight(0.05f))
                 ButtonComponent(
-                    text = if (
-                        State.currentDiscipline in arrayOf(
-                            State.Disciplines.KERUGI,
-                            State.Disciplines.TANBON
-                        )
-                    ) Localization.getString(
+                    text = Localization.getString(
+                        "warning_continue"
+                    ),
+                    onclick = {
+                        State.currentPopupMode.value = State.PopupMode.NONE
+                    },
+                )
+                Spacer(Modifier.fillMaxHeight(0.05f))
+                ButtonComponent(
+                    text = Localization.getString(
                         "settings_start_fight"
-                    ) else Localization.getString(
-                        "settings_start_performance"
                     ),
                     onclick = {
                         State.currentPopupMode.value = State.PopupMode.NONE
                     },
                 )
-                Spacer(Modifier.fillMaxHeight(0.05f))
-                ButtonComponent(
-                    text = Localization.getString(
-                        "settings_choose_category"
-                    ),
-                    onclick = {
-                        State.currentPopupMode.value = State.PopupMode.NONE
-                        clickWithTransition(State.Routes.BACK)
-                    },
-                )
-                Spacer(Modifier.fillMaxHeight(0.05f))
-                ButtonComponent(
-                    text = Localization.getString(
-                        "settings_choose_discipline"
-                    ),
-                    onclick = {
-                        State.currentPopupMode.value = State.PopupMode.NONE
-                        clickWithTransition(State.Routes.BACK)
-                        clickWithTransition(State.Routes.BACK)
-                    },
-                )
-                Spacer(Modifier.fillMaxHeight(0.05f))
+                Spacer(Modifier.fillMaxHeight(0.25f))
                 Row(
                     Modifier
                         .fillMaxWidth(0.6f)

@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.unit.dp
 import judging_app_client.composeapp.generated.resources.Res
 import judging_app_client.composeapp.generated.resources.settings_icon
@@ -54,7 +55,6 @@ fun NavbarComponent(
             ) {
                 Row(
                     Modifier
-                        .padding(5.dp)
                         .fillMaxSize(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -63,10 +63,14 @@ fun NavbarComponent(
                         style = ButtonStyles.Icon,
                         iconSrc = Res.drawable.settings_icon,
                         onclick = {
-                            State.isShowingSettings.value =
-                                !State.isShowingSettings.value
+                            State.currentPopupMode.value =
+                                if (State.currentPopupMode.value == State.PopupMode.SETTINGS)
+                                    State.PopupMode.NONE
+                                else State.PopupMode.SETTINGS
                         },
-                        colorFilter = if (State.isShowingSettings.value)
+                        colorFilter = if (
+                                State.currentPopupMode.value == State.PopupMode.SETTINGS
+                            )
                             ColorFilter.tint(State.Colors.PRIMARY.color)
                         else null
                     )
@@ -78,7 +82,24 @@ fun NavbarComponent(
                     ButtonComponent(
                         style = ButtonStyles.Icon,
                         iconSrc = Res.drawable.warning_icon,
-                        onclick = {},
+                        onclick = {
+                            State.currentPopupMode.value =
+                                if (State.currentPopupMode.value == State.PopupMode.WARNING)
+                                    State.PopupMode.NONE
+                                else State.PopupMode.WARNING
+                        },
+                        colorFilter = if (
+                            State.currentPopupMode.value == State.PopupMode.WARNING
+                        )
+                            ColorFilter.colorMatrix(ColorMatrix(
+                                floatArrayOf(
+                                    1f, 0f, 0f, 0f, 0f,
+                                    0f, 1f, 0f, 0f, 0f,
+                                    0f, 0f, 1f, 0f, 0f,
+                                    0f, 0f, 0f, 0.6f, 0f
+                                )
+                            ))
+                        else null
                     )
                 }
             }

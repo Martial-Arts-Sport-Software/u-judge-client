@@ -10,11 +10,11 @@ object State {
     var currentLocale = mutableStateOf(getLocale())
     var currentDiscipline: Disciplines? = null
     var currentCategory: Categories? = null
+    var currentPopupMode = mutableStateOf(PopupMode.NONE)
     var density: Density? = null
     var screenWidthPx: Float? = null
     var screenHeightPx: Float? = null
     var isAnimating = mutableStateOf(false)
-    var isShowingSettings = mutableStateOf(false)
     var judgeSurname: String = ""
 
 
@@ -56,5 +56,11 @@ object State {
     enum class Categories(val value: String) {
         JUNIORS("category_juniors"),
         ADULTS("category_adults")
+    }
+
+    enum class PopupMode() {
+        NONE,
+        SETTINGS,
+        WARNING
     }
 }

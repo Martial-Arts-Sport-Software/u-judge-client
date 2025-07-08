@@ -30,6 +30,7 @@ import org.judging_app.ui.button.KerugiButtonPositions
 import org.judging_app.ui.navbar.NavbarComponent
 import org.judging_app.ui.navbar.NavbarStyles
 import org.judging_app.ui.popup.SettingsPopupComponent
+import org.judging_app.ui.popup.WarningPopupComponent
 
 
 object KerugiModeScreen : Screen {
@@ -64,76 +65,89 @@ object KerugiModeScreen : Screen {
                     textAlign = TextAlign.Right
                 )
             }
+            Spacer(Modifier.height(15.dp))
             AnimatedContent(
-                targetState = State.isShowingSettings.value,
+                targetState = State.currentPopupMode.value,
                 transitionSpec = {
                     fadeIn(animationSpec = tween(300)) togetherWith
                             fadeOut(animationSpec = tween(300))
                 }
             ) { target ->
-                if (!target) {
-                    Column(
-                        Modifier
-                            .fillMaxHeight(0.95f)
-                            .fillMaxWidth()
-                    ) {
-                        Spacer(Modifier.height(15.dp))
-                        Row(
+                when (target) {
+                    State.PopupMode.SETTINGS -> {
+                        Column(
                             Modifier
-                                .weight(0.38f)
+                                .fillMaxHeight(0.95f)
+                                .fillMaxWidth(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            KerugiButtonComponent(
-                                position = KerugiButtonPositions.LEFT,
-                                color = State.Colors.BUTTON_BLUE,
-                                icon = Res.drawable.kerugi_helmet,
-                                onclick = {},
-                                modifier = Modifier
-                                    .weight(1f)
-                            )
-                            Spacer(Modifier.weight(0.02f))
-                            KerugiButtonComponent(
-                                position = KerugiButtonPositions.RIGHT,
-                                color = State.Colors.BUTTON_RED,
-                                icon = Res.drawable.kerugi_helmet,
-                                onclick = {},
-                                modifier = Modifier
-                                    .weight(1f)
-                            )
-                        }
-                        Spacer(Modifier.weight(0.02f))
-                        Row(
-                            Modifier
-                                .weight(0.38f)
-                        ) {
-                            KerugiButtonComponent(
-                                position = KerugiButtonPositions.LEFT,
-                                color = State.Colors.BUTTON_BLUE,
-                                icon = Res.drawable.kerugi_chestplate,
-                                onclick = {},
-                                modifier = Modifier
-                                    .weight(1f)
-                            )
-                            Spacer(Modifier.weight(0.02f))
-                            KerugiButtonComponent(
-                                position = KerugiButtonPositions.RIGHT,
-                                color = State.Colors.BUTTON_RED,
-                                icon = Res.drawable.kerugi_chestplate,
-                                onclick = {},
-                                modifier = Modifier
-                                    .weight(1f)
-                            )
+                            SettingsPopupComponent()
                         }
                     }
-                } else {
-                    Column(
-                        Modifier
-                            .fillMaxHeight(0.95f)
-                            .fillMaxWidth(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Spacer(Modifier.height(10.dp))
-                        SettingsPopupComponent()
+                    State.PopupMode.WARNING -> {
+                        Column(
+                            Modifier
+                                .fillMaxHeight(0.95f)
+                                .fillMaxWidth(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            WarningPopupComponent()
+                        }
+                    }
+                    else -> {
+                        Column(
+                            Modifier
+                                .fillMaxHeight(0.95f)
+                                .fillMaxWidth()
+                        ) {
+                            Row(
+                                Modifier
+                                    .weight(0.38f)
+                            ) {
+                                KerugiButtonComponent(
+                                    position = KerugiButtonPositions.LEFT,
+                                    color = State.Colors.BUTTON_BLUE,
+                                    icon = Res.drawable.kerugi_helmet,
+                                    onclick = {},
+                                    modifier = Modifier
+                                        .weight(1f)
+                                )
+                                Spacer(Modifier.weight(0.02f))
+                                KerugiButtonComponent(
+                                    position = KerugiButtonPositions.RIGHT,
+                                    color = State.Colors.BUTTON_RED,
+                                    icon = Res.drawable.kerugi_helmet,
+                                    onclick = {},
+                                    modifier = Modifier
+                                        .weight(1f)
+                                )
+                            }
+                            Spacer(Modifier.weight(0.02f))
+                            Row(
+                                Modifier
+                                    .weight(0.38f)
+                            ) {
+                                KerugiButtonComponent(
+                                    position = KerugiButtonPositions.LEFT,
+                                    color = State.Colors.BUTTON_BLUE,
+                                    icon = Res.drawable.kerugi_chestplate,
+                                    onclick = {},
+                                    modifier = Modifier
+                                        .weight(1f)
+                                )
+                                Spacer(Modifier.weight(0.02f))
+                                KerugiButtonComponent(
+                                    position = KerugiButtonPositions.RIGHT,
+                                    color = State.Colors.BUTTON_RED,
+                                    icon = Res.drawable.kerugi_chestplate,
+                                    onclick = {},
+                                    modifier = Modifier
+                                        .weight(1f)
+                                )
+                            }
+                        }
                     }
                 }
             }

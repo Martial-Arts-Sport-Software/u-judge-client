@@ -33,6 +33,9 @@ object Localization {
             "settings_start_fight" to "Start a new fight",
             "settings_choose_category" to "Choose category",
             "settings_choose_discipline" to "Choose discipline",
+
+            "warning_title" to "Arbitrator's attention",
+            "warning_continue" to "Continue",
         ),
         "ru" to mapOf(
             "entry_club_name" to "СПОРТИВНЫЙ\nКЛУБ Ю'ПИТЕР",
@@ -63,6 +66,9 @@ object Localization {
             "settings_start_fight" to "Начать новый поединок",
             "settings_choose_category" to "Выбрать категорию",
             "settings_choose_discipline" to "Выбрать дисциплину",
+
+            "warning_title" to "Поднятая рука",
+            "warning_continue" to "Продолжить",
         )
     )
     fun getString(key: String): String {
