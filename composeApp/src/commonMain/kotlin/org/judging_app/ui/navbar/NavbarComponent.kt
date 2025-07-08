@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
 import judging_app_client.composeapp.generated.resources.Res
 import judging_app_client.composeapp.generated.resources.settings_icon
@@ -61,7 +62,13 @@ fun NavbarComponent(
                     ButtonComponent(
                         style = ButtonStyles.Icon,
                         iconSrc = Res.drawable.settings_icon,
-                        onclick = {},
+                        onclick = {
+                            State.isShowingSettings.value =
+                                !State.isShowingSettings.value
+                        },
+                        colorFilter = if (State.isShowingSettings.value)
+                            ColorFilter.tint(State.Colors.PRIMARY.color)
+                        else null
                     )
                     Text(
                         text = Localization.getString("kerugi_bout") +

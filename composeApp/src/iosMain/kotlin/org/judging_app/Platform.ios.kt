@@ -67,5 +67,10 @@ actual fun getTypography(): Typography {
             fontFamily = montserratVariable,
             fontSize = 15.sp,
         ),
+        displayLarge = TextStyle(
+            fontFamily = montserratVariable,
+            fontSize = 25.sp,
+            color = State.Colors.PRIMARY.color
+        )
     )
 }

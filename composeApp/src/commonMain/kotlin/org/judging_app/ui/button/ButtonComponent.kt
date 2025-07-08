@@ -18,12 +18,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.judging_app.State
@@ -44,7 +47,8 @@ fun ButtonComponent(
     style: ButtonStyles = ButtonStyles.Primary,
     modifier: Modifier = Modifier,
     onclick: () -> Unit,
-    iconSrc: DrawableResource? = null
+    iconSrc: DrawableResource? = null,
+    colorFilter: ColorFilter? = null
 ) {
     if (style == ButtonStyles.Icon) require(iconSrc != null)
     else require(text != null)
@@ -113,7 +117,7 @@ fun ButtonComponent(
             }
             ButtonStyles.Icon -> {
                 TextButton(
-                    modifier = Modifier
+                    modifier = modifier
                         .fillMaxHeight(),
                     onClick = {
                         if (!State.isAnimating.value) { onclick() }
@@ -125,6 +129,7 @@ fun ButtonComponent(
                         painter = painterResource(iconSrc!!),
                         contentDescription = null,
                         contentScale = ContentScale.FillHeight,
+                        colorFilter = colorFilter
                     )
                 }
             }

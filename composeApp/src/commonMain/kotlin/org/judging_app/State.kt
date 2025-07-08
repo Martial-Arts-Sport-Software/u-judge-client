@@ -14,6 +14,7 @@ object State {
     var screenWidthPx: Float? = null
     var screenHeightPx: Float? = null
     var isAnimating = mutableStateOf(false)
+    var isShowingSettings = mutableStateOf(false)
     var judgeSurname: String = ""
 
 

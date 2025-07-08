@@ -10,6 +10,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.sensitiveContent
 import androidx.compose.ui.unit.dp
@@ -34,7 +35,11 @@ fun KerugiButtonComponent(
 ) {
     OutlinedButton(
         modifier = modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .graphicsLayer {
+                if (position == KerugiButtonPositions.RIGHT)
+                    scaleX = -1f
+            },
         border = BorderStroke(3.dp, State.Colors.BUTTON_BROWN.color),
         shape = when (position) {
             KerugiButtonPositions.LEFT -> RoundedCornerShape(

@@ -28,6 +28,11 @@ object Localization {
             "kerugi_bout" to "Bout",
             "kerugi_judge" to "Judge",
             "kerugi_judge_empty" to "Not specified",
+
+            "settings_title" to "Settings",
+            "settings_start_fight" to "Start a new fight",
+            "settings_choose_category" to "Choose category",
+            "settings_choose_discipline" to "Choose discipline",
         ),
         "ru" to mapOf(
             "entry_club_name" to "СПОРТИВНЫЙ\nКЛУБ Ю'ПИТЕР",
@@ -53,6 +58,11 @@ object Localization {
             "kerugi_bout" to "Поединок",
             "kerugi_judge" to "Судья",
             "kerugi_judge_empty" to "Не указан",
+
+            "settings_title" to "Настройки",
+            "settings_start_fight" to "Начать новый поединок",
+            "settings_choose_category" to "Выбрать категорию",
+            "settings_choose_discipline" to "Выбрать дисциплину",
         )
     )
     fun getString(key: String): String {
