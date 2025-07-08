@@ -2,20 +2,19 @@ package org.judging_app
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.Density
 import androidx.navigation.NavHostController
 
 object State {
     var navController: NavHostController? = null
-    var currentLocale = mutableStateOf(getLocale())
     var currentDiscipline: Disciplines? = null
     var currentCategory: Categories? = null
-    var currentPopupMode = mutableStateOf(PopupMode.NONE)
-    var density: Density? = null
-    var screenWidthPx: Float? = null
-    var screenHeightPx: Float? = null
-    var isAnimating = mutableStateOf(false)
     var judgeSurname: String = ""
+
+    val currentLocale = mutableStateOf(getLocale())
+    val currentPopupMode = mutableStateOf(PopupMode.NONE)
+    val isConnectedToServer = mutableStateOf(false)
+    val isAnimating = mutableStateOf(false)
+    val isOffline = mutableStateOf(true)
 
 
     enum class Routes(val path: String) {
@@ -30,7 +29,6 @@ object State {
         FREESTYLE_MODE("freestyle_mode"),
 
         BACK("");
-
 
         override fun toString(): String = path
     }

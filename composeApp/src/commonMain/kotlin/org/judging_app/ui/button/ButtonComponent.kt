@@ -140,8 +140,10 @@ fun ButtonComponent(
 fun clickWithTransition(
     route: State.Routes
 ) {
-    State.isAnimating.value = true
-    if (route == State.Routes.BACK) {
-        State.navController!!.popBackStack()
-    } else State.navController!!.navigate(route.path)
+    if (State.isOffline.value || State.isConnectedToServer.value) {
+        State.isAnimating.value = true
+        if (route == State.Routes.BACK) {
+            State.navController!!.popBackStack()
+        } else State.navController!!.navigate(route.path)
+    } else State.isConnectedToServer.value = false
 }

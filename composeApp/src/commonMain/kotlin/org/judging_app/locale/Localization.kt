@@ -36,6 +36,10 @@ object Localization {
 
             "warning_title" to "Arbitrator's attention",
             "warning_continue" to "Continue",
+
+            "connection_lost_title" to "Lost connection",
+            "connection_lost_reconnect" to "Re-connect",
+            "connection_lost_change_server" to "Changer server address",
         ),
         "ru" to mapOf(
             "entry_club_name" to "СПОРТИВНЫЙ\nКЛУБ Ю'ПИТЕР",
@@ -69,6 +73,10 @@ object Localization {
 
             "warning_title" to "Поднятая рука",
             "warning_continue" to "Продолжить",
+
+            "connection_lost_title" to "Ошибка подключения",
+            "connection_lost_reconnect" to "Переподключиться",
+            "connection_lost_change_server" to "Изменить адрес сервера",
         )
     )
     fun getString(key: String): String {

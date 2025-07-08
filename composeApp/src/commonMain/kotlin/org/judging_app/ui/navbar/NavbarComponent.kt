@@ -55,7 +55,8 @@ fun NavbarComponent(
             ) {
                 Row(
                     Modifier
-                        .fillMaxSize(),
+                        .fillMaxSize()
+                        .padding(2.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
