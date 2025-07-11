@@ -31,6 +31,7 @@ object Localization {
 
             "settings_title" to "Settings",
             "settings_start_fight" to "Start a new fight",
+            "settings_start_performance" to "Start a new performance",
             "settings_choose_category" to "Choose category",
             "settings_choose_discipline" to "Choose discipline",
 
@@ -40,6 +41,9 @@ object Localization {
             "connection_lost_title" to "Lost connection",
             "connection_lost_reconnect" to "Re-connect",
             "connection_lost_change_server" to "Changer server address",
+
+            "hosinsool_technique" to "Technique",
+            "hosinsool_presentation" to "Presentation",
         ),
         "ru" to mapOf(
             "entry_club_name" to "СПОРТИВНЫЙ\nКЛУБ Ю'ПИТЕР",
@@ -68,6 +72,7 @@ object Localization {
 
             "settings_title" to "Настройки",
             "settings_start_fight" to "Начать новый поединок",
+            "settings_start_performance" to "Начать новое выступление",
             "settings_choose_category" to "Выбрать категорию",
             "settings_choose_discipline" to "Выбрать дисциплину",
 
@@ -77,6 +82,9 @@ object Localization {
             "connection_lost_title" to "Ошибка подключения",
             "connection_lost_reconnect" to "Переподключиться",
             "connection_lost_change_server" to "Изменить адрес сервера",
+
+            "hosinsool_technique" to "Техника",
+            "hosinsool_presentation" to "Презентация",
         )
     )
     fun getString(key: String): String {

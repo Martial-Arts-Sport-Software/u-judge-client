@@ -2,9 +2,12 @@ package org.judging_app
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Density
 import androidx.navigation.NavHostController
 
 object State {
+    var density: Density? = null
+
     var navController: NavHostController? = null
     var currentDiscipline: Disciplines? = null
     var currentCategory: Categories? = null
@@ -45,6 +48,7 @@ object State {
     enum class Colors(val color: Color) {
         PRIMARY(Color(0xFF7C45E2)),
         SECONDARY(Color(0xFFEFD4FF)),
+        SLIDER_TRACK_ACTIVE(Color(0xFFBC9DF6)),
         BUTTON_BLUE(Color(0xBF5500FF)),
         BUTTON_RED(Color(0xBFBB0042)),
         BUTTON_GRAY(Color(0xBF525151)),
@@ -59,6 +63,7 @@ object State {
     enum class PopupMode() {
         NONE,
         SETTINGS,
-        WARNING
+        WARNING,
+        INFORMATION
     }
 }

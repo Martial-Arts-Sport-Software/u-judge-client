@@ -3,10 +3,14 @@ package org.judging_app.ui.button
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -23,8 +27,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.DrawableResource
@@ -48,7 +54,8 @@ fun ButtonComponent(
     modifier: Modifier = Modifier,
     onclick: () -> Unit,
     iconSrc: DrawableResource? = null,
-    colorFilter: ColorFilter? = null
+    colorFilter: ColorFilter? = null,
+    iconPadding: Dp = 10.dp
 ) {
     if (style == ButtonStyles.Icon) require(iconSrc != null)
     else require(text != null)
@@ -118,17 +125,18 @@ fun ButtonComponent(
             ButtonStyles.Icon -> {
                 TextButton(
                     modifier = modifier
-                        .fillMaxHeight(),
+                        .aspectRatio(1f),
                     onClick = {
                         if (!State.isAnimating.value) { onclick() }
                     },
+                    contentPadding = PaddingValues(iconPadding)
                 ) {
                     Image(
                         modifier = Modifier
-                            .fillMaxHeight(0.9f),
+                            .aspectRatio(1f),
                         painter = painterResource(iconSrc!!),
                         contentDescription = null,
-                        contentScale = ContentScale.FillHeight,
+                        contentScale = ContentScale.Fit,
                         colorFilter = colorFilter
                     )
                 }
