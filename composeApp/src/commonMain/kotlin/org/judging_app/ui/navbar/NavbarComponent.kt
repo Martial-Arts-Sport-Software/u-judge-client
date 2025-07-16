@@ -56,7 +56,10 @@ fun NavbarComponent(
                 contentAlignment = Alignment.Center
             ) {
                 Column(
-                    modifier = Modifier.padding(vertical = 10.dp),
+                    modifier = Modifier.padding(
+                        vertical = 10.dp,
+                        horizontal = 5.dp
+                    ),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     ButtonComponent(
@@ -101,7 +104,6 @@ fun NavbarComponent(
                         modifier = Modifier
                             .weight(1f)
                             .clip(RoundedCornerShape(15.dp))
-                            .fillMaxSize(0.7f)
                             .background(State.Colors.PRIMARY.color),
                         style = ButtonStyles.Icon,
                         iconSrc = Res.drawable.switch_icon,

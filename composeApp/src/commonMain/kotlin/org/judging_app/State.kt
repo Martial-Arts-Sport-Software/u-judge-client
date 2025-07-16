@@ -60,7 +60,7 @@ object State {
         ADULTS("category_adults")
     }
 
-    enum class PopupMode() {
+    enum class PopupMode {
         NONE,
         SETTINGS,
         WARNING,
