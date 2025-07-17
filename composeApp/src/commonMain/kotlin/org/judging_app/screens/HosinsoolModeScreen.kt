@@ -4,6 +4,8 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,11 +18,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,10 +45,37 @@ import org.judging_app.ui.input.RangeInputComponent
 import org.judging_app.ui.navbar.NavbarComponent
 import org.judging_app.ui.navbar.NavbarStyles
 import org.judging_app.ui.popup.SettingsPopupComponent
+import org.judging_app.screens.TechniqueScreen.DISPLAY
 
-object HosinsoolModeScreen : Screen {
+object HosinsoolModeScreen : TechniqueScreen {
     @Composable
     override fun load() {
+        var currentDisplay by remember { mutableStateOf(DISPLAY.TECHNIQUE) }
+        var direction by remember { mutableStateOf(1) }
+        var btnDirection by remember { mutableStateOf(1) }
+        fun switchDisplay() {
+            when(currentDisplay) {
+                DISPLAY.TECHNIQUE -> {
+                    direction = 1
+                    currentDisplay = DISPLAY.PRESENTATION
+                }
+                DISPLAY.PRESENTATION -> {
+                    if (direction == 1) {
+                        currentDisplay = DISPLAY.RESULT
+                        btnDirection = -1
+                    }
+                    else {
+                        currentDisplay = DISPLAY.TECHNIQUE
+                        btnDirection = 1
+                    }
+                }
+                DISPLAY.RESULT -> {
+                    direction = -1
+                    currentDisplay = DISPLAY.PRESENTATION
+                }
+            }
+        }
+
         Column(Modifier
             .fillMaxWidth(0.9f)
             .fillMaxHeight(0.9f)) {
@@ -112,68 +144,104 @@ object HosinsoolModeScreen : Screen {
                         ) {
                             NavbarComponent(
                                 style = NavbarStyles.VERTICAL,
-                                modifier = Modifier.weight(3f)
+                                modifier = Modifier.weight(3f),
+                                switchDisplay = { switchDisplay() },
+                                direction = btnDirection
                             )
                             Spacer(Modifier.weight(1f))
-                            Box(
-                                Modifier
+                            AnimatedContent(
+                                modifier = Modifier
                                     .fillMaxHeight()
                                     .weight(36f)
-                                    .clip(RoundedCornerShape(15.dp))
-                                    .background(State.Colors.BUTTON_GRAY.color)
-                            ) {
-                                Box(
-                                    Modifier
-                                        .padding(
-                                            start = 15.dp,
-                                            top = 10.dp,
-                                            end = 15.dp,
-                                            bottom = 15.dp
-                                        )
-                                ) {
-                                    RangeInputComponent(
-                                        currentValue = 0f,
-                                        onValueChange = {},
-                                        mode = Modes.NUMBERS_ONLY,
-                                        icon = Res.drawable.cross_icon
-                                    )
-                                    Column(
-                                        Modifier
-                                            .padding(top = 25.dp)
-                                            .fillMaxHeight(),
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.SpaceBetween
-                                    ) {
-                                        RangeInputComponent(
-                                            currentValue = 0f,
-                                            onValueChange = {},
-                                            icon = Res.drawable.wrist
-                                        )
-                                        RangeInputComponent(
-                                            currentValue = 0f,
-                                            onValueChange = {},
-                                            icon = Res.drawable.clothes
-                                        )
-                                        RangeInputComponent(
-                                            currentValue = 0f,
-                                            onValueChange = {},
-                                            icon = Res.drawable.fist
-                                        )
-                                        RangeInputComponent(
-                                            currentValue = 0f,
-                                            onValueChange = {},
-                                            icon = Res.drawable.foot
-                                        )
-                                        RangeInputComponent(
-                                            currentValue = 0f,
-                                            onValueChange = {},
-                                            icon = Res.drawable.knife
-                                        )
-                                        RangeInputComponent(
-                                            currentValue = 0f,
-                                            onValueChange = {},
-                                            icon = Res.drawable.belt
-                                        )
+                                    .clip(RoundedCornerShape(15.dp)),
+                                targetState = currentDisplay,
+                                transitionSpec = {
+                                    if (direction > 0) {
+                                        slideInHorizontally { width -> width } togetherWith
+                                                slideOutHorizontally { width -> -width }
+                                    } else {
+                                        slideInHorizontally { width -> -width } togetherWith
+                                                slideOutHorizontally { width -> width }
+                                    }
+                                }
+                            ) { target ->
+                                when(target) {
+                                    DISPLAY.TECHNIQUE -> {
+                                        Box(
+                                            Modifier
+                                                .fillMaxSize()
+                                                .background(State.Colors.BUTTON_GRAY.color)
+                                        ) {
+                                            Box(
+                                                Modifier
+                                                    .padding(
+                                                        start = 15.dp,
+                                                        top = 10.dp,
+                                                        end = 15.dp,
+                                                        bottom = 15.dp
+                                                    )
+                                            ) {
+                                                RangeInputComponent(
+                                                    currentValue = 0f,
+                                                    onValueChange = {},
+                                                    mode = Modes.NUMBERS_ONLY,
+                                                    icon = Res.drawable.cross_icon
+                                                )
+                                                Column(
+                                                    Modifier
+                                                        .padding(top = 25.dp)
+                                                        .fillMaxHeight(),
+                                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                                    verticalArrangement = Arrangement.SpaceBetween
+                                                ) {
+                                                    RangeInputComponent(
+                                                        currentValue = 0f,
+                                                        onValueChange = {},
+                                                        icon = Res.drawable.wrist
+                                                    )
+                                                    RangeInputComponent(
+                                                        currentValue = 0f,
+                                                        onValueChange = {},
+                                                        icon = Res.drawable.clothes
+                                                    )
+                                                    RangeInputComponent(
+                                                        currentValue = 0f,
+                                                        onValueChange = {},
+                                                        icon = Res.drawable.fist
+                                                    )
+                                                    RangeInputComponent(
+                                                        currentValue = 0f,
+                                                        onValueChange = {},
+                                                        icon = Res.drawable.foot
+                                                    )
+                                                    RangeInputComponent(
+                                                        currentValue = 0f,
+                                                        onValueChange = {},
+                                                        icon = Res.drawable.knife
+                                                    )
+                                                    RangeInputComponent(
+                                                        currentValue = 0f,
+                                                        onValueChange = {},
+                                                        icon = Res.drawable.belt
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    DISPLAY.PRESENTATION -> {
+                                        Box(
+                                            Modifier
+                                                .fillMaxSize()
+                                                .background(State.Colors.BUTTON_GRAY.color)
+                                        ) { Text(text = "pere")}
+                                    }
+                                    DISPLAY.RESULT -> {
+                                        Box(
+                                            Modifier
+                                                .fillMaxSize()
+                                                .background(State.Colors.BUTTON_GRAY.color)
+                                        ) { Text(text = "result")}
                                     }
                                 }
                             }

@@ -49,7 +49,7 @@ object KerugiModeScreen : Screen {
             ) {
                 NavbarComponent(
                     NavbarStyles.HORIZONTAL,
-                    Modifier.weight(0.45f)
+                    Modifier.weight(0.45f),
                 )
                 Spacer(Modifier.weight(0.25f))
                 Text(

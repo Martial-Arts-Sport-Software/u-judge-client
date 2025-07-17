@@ -1,5 +1,7 @@
 package org.judging_app.ui.navbar
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -17,9 +19,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
@@ -33,6 +40,7 @@ import judging_app_client.composeapp.generated.resources.switch_icon
 import judging_app_client.composeapp.generated.resources.warning_icon
 import org.judging_app.State
 import org.judging_app.locale.Localization
+import org.judging_app.screens.TechniqueScreen
 import org.judging_app.ui.button.ButtonComponent
 import org.judging_app.ui.button.ButtonStyles
 
@@ -44,10 +52,16 @@ enum class NavbarStyles {
 @Composable
 fun NavbarComponent(
     style: NavbarStyles,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    switchDisplay: () -> Unit = {},
+    direction: Int = 1
 ) {
     when (style) {
         NavbarStyles.VERTICAL -> {
+            val rotation by animateFloatAsState(
+                targetValue = if (direction == -1) 180f else 0f,
+                animationSpec = tween(300)
+            )
             Box(
                 modifier
                     .clip(RoundedCornerShape(15.dp))
@@ -57,8 +71,10 @@ fun NavbarComponent(
             ) {
                 Column(
                     modifier = Modifier.padding(
-                        vertical = 10.dp,
-                        horizontal = 5.dp
+                        top = 10.dp,
+                        bottom = 15.dp,
+                        start = 5.dp,
+                        end = 5.dp
                     ),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -102,14 +118,14 @@ fun NavbarComponent(
                     Spacer(Modifier.weight(1f))
                     ButtonComponent(
                         modifier = Modifier
-                            .weight(1f)
-                            .clip(RoundedCornerShape(15.dp))
+                            .weight(0.6f)
+                            .rotate(rotation)
+                            .clip(RoundedCornerShape(15))
                             .background(State.Colors.PRIMARY.color),
                         style = ButtonStyles.Icon,
                         iconSrc = Res.drawable.switch_icon,
-                        onclick = {
-                        },
-                        iconPadding = 12.dp
+                        onclick = { switchDisplay() },
+                        iconPadding = 8.dp
                     )
                 }
             }
