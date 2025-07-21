@@ -9,20 +9,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,22 +27,23 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import judging_app_client.composeapp.generated.resources.Res
-import judging_app_client.composeapp.generated.resources.back_icon
+import judging_app_client.composeapp.generated.resources.cross_icon
 import judging_app_client.composeapp.generated.resources.information_icon
 import judging_app_client.composeapp.generated.resources.settings_icon
 import judging_app_client.composeapp.generated.resources.switch_icon
 import judging_app_client.composeapp.generated.resources.warning_icon
 import org.judging_app.State
 import org.judging_app.locale.Localization
+import org.judging_app.screens.HosinsoolModeScreen
 import org.judging_app.screens.TechniqueScreen
 import org.judging_app.ui.button.ButtonComponent
 import org.judging_app.ui.button.ButtonStyles
 
 enum class NavbarStyles {
-    VERTICAL,
+    VERTICAL_LEFT,
+    VERTICAL_RIGHT,
     HORIZONTAL
 }
 
@@ -53,15 +51,9 @@ enum class NavbarStyles {
 fun NavbarComponent(
     style: NavbarStyles,
     modifier: Modifier = Modifier,
-    switchDisplay: () -> Unit = {},
-    direction: Int = 1
 ) {
     when (style) {
-        NavbarStyles.VERTICAL -> {
-            val rotation by animateFloatAsState(
-                targetValue = if (direction == -1) 180f else 0f,
-                animationSpec = tween(300)
-            )
+        NavbarStyles.VERTICAL_LEFT -> {
             Box(
                 modifier
                     .clip(RoundedCornerShape(15.dp))
@@ -70,16 +62,17 @@ fun NavbarComponent(
                 contentAlignment = Alignment.Center
             ) {
                 Column(
-                    modifier = Modifier.padding(
-                        top = 10.dp,
-                        bottom = 15.dp,
-                        start = 5.dp,
-                        end = 5.dp
-                    ),
+                    modifier = Modifier
+                        .padding(
+                            top = 10.dp,
+                            bottom = 15.dp,
+                            start = 5.dp,
+                            end = 5.dp
+                        )
+                        .fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     ButtonComponent(
-                        modifier = Modifier.weight(1f),
                         style = ButtonStyles.Icon,
                         iconSrc = Res.drawable.settings_icon,
                         onclick = {
@@ -95,7 +88,6 @@ fun NavbarComponent(
                         else null
                     )
                     ButtonComponent(
-                        modifier = Modifier.weight(1f),
                         style = ButtonStyles.Icon,
                         iconSrc = Res.drawable.information_icon,
                         onclick = {
@@ -110,22 +102,72 @@ fun NavbarComponent(
                             ColorFilter.tint(State.Colors.PRIMARY.color)
                         else null
                     )
-                    Spacer(Modifier.weight(0.3f))
+                    Spacer(Modifier.fillMaxHeight(0.2f))
                     Text(
                         text = "10.0",
                         style = MaterialTheme.typography.titleMedium,
                     )
-                    Spacer(Modifier.weight(1f))
+                }
+            }
+        }
+        NavbarStyles.VERTICAL_RIGHT -> {
+            Box(
+                modifier
+                    .clip(RoundedCornerShape(15.dp))
+                    .background(State.Colors.BUTTON_GRAY.color)
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column (
+                    modifier = Modifier
+                        .fillMaxHeight(0.9f)
+                        .fillMaxWidth(0.5f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
                     ButtonComponent(
                         modifier = Modifier
-                            .weight(0.6f)
-                            .rotate(rotation)
-                            .clip(RoundedCornerShape(15))
-                            .background(State.Colors.PRIMARY.color),
-                        style = ButtonStyles.Icon,
-                        iconSrc = Res.drawable.switch_icon,
-                        onclick = { switchDisplay() },
-                        iconPadding = 8.dp
+                            .weight(1f)
+                            .clip(RoundedCornerShape(50))
+                            .background(
+                                if (HosinsoolModeScreen.currentDisplay == TechniqueScreen.DISPLAY.TECHNIQUE)
+                                    State.Colors.SLIDER_TRACK_ACTIVE.color
+                                else Color.White.copy(0.75f)
+                            ),
+                        style = ButtonStyles.Solid,
+                        onclick = {
+                            HosinsoolModeScreen.nextDisplay = TechniqueScreen.DISPLAY.TECHNIQUE
+                        },
+                    )
+                    Spacer(Modifier.weight(0.3f))
+                    ButtonComponent(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(50))
+                            .background(
+                                if (HosinsoolModeScreen.currentDisplay == TechniqueScreen.DISPLAY.PRESENTATION)
+                                    State.Colors.SLIDER_TRACK_ACTIVE.color
+                                else Color.White.copy(0.75f)
+                            ),
+                        style = ButtonStyles.Solid,
+                        onclick = {
+                            HosinsoolModeScreen.nextDisplay = TechniqueScreen.DISPLAY.PRESENTATION
+                        },
+                    )
+                    Spacer(Modifier.weight(0.3f))
+                    ButtonComponent(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(50))
+                            .background(
+                                if (HosinsoolModeScreen.currentDisplay == TechniqueScreen.DISPLAY.RESULT)
+                                    State.Colors.SLIDER_TRACK_ACTIVE.color
+                                else Color.White.copy(0.75f)
+                            ),
+                        style = ButtonStyles.Solid,
+                        onclick = {
+                            HosinsoolModeScreen.nextDisplay = TechniqueScreen.DISPLAY.RESULT
+                        },
                     )
                 }
             }

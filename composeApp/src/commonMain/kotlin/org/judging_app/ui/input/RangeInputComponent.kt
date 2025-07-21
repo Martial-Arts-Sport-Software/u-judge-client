@@ -23,11 +23,13 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,10 +40,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -64,6 +65,7 @@ enum class Modes {
 fun RangeInputComponent(
     currentValue: Float,
     onValueChange: (Float) -> Unit,
+    modifier: Modifier = Modifier,
     steps: Int = 10,
     mode: Modes = Modes.DEFAULT,
     ratio: Float = 1f,
@@ -71,71 +73,60 @@ fun RangeInputComponent(
     text: String = ""
 ) {
     var trackSize by remember { mutableStateOf(IntSize.Zero)}
-    var thumbSize by remember { mutableStateOf(IntSize.Zero) }
-
-    val stepBoxSize by remember(trackSize, thumbSize) {
-        mutableStateOf((trackSize.width - thumbSize.width) / steps)
-    }
-    val edgeBoxSize by remember(stepBoxSize) {
-        mutableStateOf((thumbSize.width + stepBoxSize) / 2)
-    }
-    val markSizeDp = 5.dp
-    val coroutineScope = rememberCoroutineScope()
-
-    val stepPositions = remember(edgeBoxSize) {
-        mutableListOf<Float>().apply {
-            for (i in 0..< steps + 1) {
-                add(when(i) {
-                    0 -> 0f
-                    steps -> (edgeBoxSize + (steps - 1) * stepBoxSize +
-                            edgeBoxSize - thumbSize.width).toFloat()
-                    else -> i * stepBoxSize.toFloat()
-                })
+    val markSizeDp by remember(trackSize) {
+            derivedStateOf {
+                with(State.density!!) {
+                    (trackSize.height * 0.2f).toDp()
             }
         }
     }
-    val anchors = remember(stepPositions) { DraggableAnchors {
-        stepPositions.forEachIndexed { index, value ->
-            index.toFloat() at value
+    val stepBoxSize by remember(trackSize) {
+        derivedStateOf { (trackSize.width - trackSize.height) / steps + 1 }
+    }
+    val edgeBoxSize by remember(stepBoxSize) {
+        derivedStateOf { (stepBoxSize + trackSize.height) / 2 }
+    }
+    val coroutineScope = rememberCoroutineScope()
+
+    val stepPositions by remember(edgeBoxSize, stepBoxSize, steps, trackSize) {
+        derivedStateOf {
+            List(steps + 1) { i ->
+                when (i) {
+                    0 -> 0f
+                    steps -> (trackSize.width - trackSize.height).toFloat()
+                    else -> (edgeBoxSize + (i - 1) * stepBoxSize + (stepBoxSize - trackSize.height) / 2).toFloat()
+                }
+            }
         }
-    } }
-    val state = remember(anchors) {
+    }
+
+    val anchors = remember(stepPositions) {
+        DraggableAnchors {
+            stepPositions.forEachIndexed { index, value ->
+                index.toFloat() at value
+            }
+        }
+    }
+    val state = remember(anchors, currentValue) {
         AnchoredDraggableState(
             initialValue = currentValue,
             anchors = anchors,
         )
     }
-    fun getMarkModifier(i: Int, maxWidth: Dp, clip: Boolean = false): Modifier {
-        return Modifier
-            .offset(
-                x = with(State.density!!) {
-                    when(i) {
-                        0 -> (thumbSize.width.toDp() - markSizeDp) / 2
-                        steps -> maxWidth - (thumbSize.width.toDp() + markSizeDp) / 2
-                        else -> (maxWidth - markSizeDp) / 2
-                    }
-                }
-            )
-            .fillMaxHeight()
-            .width(markSizeDp)
-            .clip(if (clip) RoundedCornerShape(
-                topStartPercent = 50,
-                topEndPercent = 50
-            ) else RectangleShape)
-            .background(
-                if (state.currentValue >= i)
-                    State.Colors.SLIDER_TRACK_ACTIVE.color
-                else State.Colors.PRIMARY.color
-            )
-    }
 
+    LaunchedEffect(anchors) { state.updateAnchors(anchors) }
+    LaunchedEffect(currentValue) {
+        if (state.currentValue != currentValue) {
+            state.animateTo(currentValue)
+        }
+    }
     LaunchedEffect(state) {
         snapshotFlow { state.currentValue }.collect { value ->
             onValueChange(value)
         }
     }
     Row(
-        Modifier
+        modifier = modifier
             .fillMaxWidth(ratio),
         verticalAlignment = Alignment.Bottom
     ) {
@@ -155,7 +146,7 @@ fun RangeInputComponent(
                     contentDescription = null
                 )
             }
-            Spacer(Modifier.width(10.dp))
+            Spacer(Modifier.width(15.dp))
         }
         Column(
             verticalArrangement = Arrangement.SpaceBetween,
@@ -180,15 +171,18 @@ fun RangeInputComponent(
             Box(
                 Modifier
                     .fillMaxWidth()
-                    .aspectRatio(20 / 1f),
+                    .aspectRatio(22 / 1f),
             ) {
                 Row(
                     Modifier
                         .fillMaxWidth()
                         .onSizeChanged { trackSize = it },
-                    verticalAlignment = Alignment.Bottom
+                    verticalAlignment = Alignment.Bottom,
                 ){
-                    for (i in IntRange(0, steps)) {
+                    for (i in 0..steps) {
+                        val boxWidth = with(State.density!!) {
+                            if (i == 0 || i == steps) edgeBoxSize.toDp() else stepBoxSize.toDp()
+                        }
                         val stepModifier = Modifier
                             .clickable(
                                 interactionSource = null,
@@ -203,87 +197,99 @@ fun RangeInputComponent(
                                     }
                                 }
                             )
-                            .width(with(State.density!!) {
-                                when(i) {
-                                    0, steps -> edgeBoxSize.toDp()
-                                    else -> stepBoxSize.toDp()
-                                }
-                            })
+                            .width(boxWidth)
                         Column(
                             modifier = stepModifier
                         ) {
-                            BoxWithConstraints(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .fillMaxHeight(if (mode != Modes.NUMBERS_ONLY) 0.15f else 0.5f)
-                            ) {
-                                if (mode == Modes.NUMBERS_ONLY) {
+                            if (mode == Modes.NUMBERS_ONLY) {
+                                BoxWithConstraints(
+                                    Modifier.fillMaxSize()
+                                ) {
                                     Text(
                                         modifier = Modifier
                                             .offset(
                                                 x = with(State.density!!) {
                                                     when(i) {
-                                                        0 -> (thumbSize.width.toDp() - maxWidth) / 2
-                                                        steps -> maxWidth - (thumbSize.width.toDp() + maxWidth) / 2
-                                                        else -> (maxWidth - maxWidth) / 2
+                                                        0 -> (trackSize.height.toDp() - maxWidth) / 2
+                                                        steps -> maxWidth - (trackSize.height.toDp() + maxWidth) / 2
+                                                        else -> 0.dp
                                                     }
                                                 }
                                             )
                                             .fillMaxHeight()
-                                            .align(Alignment.Center)
                                             .width(maxWidth),
                                         text = "${floor(i / 10f).roundToInt()}.${i % 10}",
                                         textAlign = TextAlign.Center,
                                         style = MaterialTheme.typography.titleSmall
                                     )
-                                } else Box(modifier = getMarkModifier(i, maxWidth, true))
+                                }
+                            } else {
+                                BoxWithConstraints(
+                                    Modifier
+                                        .alpha(if (mode != Modes.NUMBERS_ONLY) 0.85f else 0f)
+                                        .fillMaxSize()
+                                        .clip(when(i) {
+                                            0 -> RoundedCornerShape(topStartPercent = 50, bottomStartPercent = 50)
+                                            steps -> RoundedCornerShape(topEndPercent = 50, bottomEndPercent = 50)
+                                            else -> RoundedCornerShape(0)
+                                        })
+                                        .background(State.Colors.PRIMARY.color),
+                                ) {
+                                    Box(
+                                        Modifier
+                                            .offset(
+                                                x = with(State.density!!) {
+                                                    when(i) {
+                                                        0 -> 0.dp
+                                                        steps -> maxWidth - (trackSize.height.toDp() + markSizeDp) / 2
+                                                        else -> (maxWidth - markSizeDp) / 2
+                                                    }
+                                                }
+                                            )
+                                            .width(markSizeDp)
+                                            .fillMaxHeight(0.5f)
+                                            .clip(CircleShape)
+                                            .align(Alignment.CenterStart)
+                                            .background(State.Colors.SLIDER_TRACK_ACTIVE.color)
+                                    )
+                                }
                             }
-                            BoxWithConstraints(
-                                Modifier
-                                    .alpha(if (mode != Modes.NUMBERS_ONLY) 1f else 0f)
-                                    .fillMaxSize()
-                                    .clip(when(i) {
-                                        0 -> RoundedCornerShape(topStartPercent = 25, bottomStartPercent = 25)
-                                        steps -> RoundedCornerShape(topEndPercent = 25, bottomEndPercent = 25)
-                                        else -> RoundedCornerShape(0)
-                                    })
-                                    .background(State.Colors.PRIMARY.color)
-                            ) { Box(modifier = getMarkModifier(i, maxWidth)) }
                         }
                     }
                 }
-                Box(
-                    Modifier
-                        .alpha(if (mode != Modes.NUMBERS_ONLY) 1f else 0f)
-                        .width(with(State.density!!) {
-                                (state.requireOffset().roundToInt() + thumbSize.width).toDp()
-                        })
-                        .fillMaxHeight(0.85f)
-                        .clip(RoundedCornerShape(25))
-                        .align(Alignment.BottomStart)
-                        .background(State.Colors.SLIDER_TRACK_ACTIVE.color)
-                )
-                Image(
-                    modifier = Modifier
-                        .alpha(if (mode != Modes.NUMBERS_ONLY) 1f else 0f)
-                        .fillMaxHeight(0.85f)
-                        .aspectRatio(1f)
-                        .offset {
-                            IntOffset(
-                                x = state.requireOffset().roundToInt(),
-                                y = 0,
-                            )
-                        }
-                        .align(Alignment.BottomStart)
-                        .anchoredDraggable(
-                            state,
-                            Orientation.Horizontal,
-                            enabled = mode != Modes.NUMBERS_ONLY,
-                        )
-                        .onSizeChanged { thumbSize = it },
-                    painter = painterResource(Res.drawable.range_input_point),
-                    contentDescription = null
-                )
+                if (mode != Modes.NUMBERS_ONLY) {
+                    Box(
+                        Modifier
+                            .width(with(State.density!!) {
+                                (state.requireOffset().roundToInt() + trackSize.height).toDp()
+                            })
+                            .fillMaxHeight()
+                            .clip(CircleShape)
+                            .align(Alignment.BottomStart)
+                            .background(State.Colors.SLIDER_TRACK_ACTIVE.color)
+                    ) {
+
+                    }
+                    Image(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .aspectRatio(1f)
+                            .offset {
+                                IntOffset(
+                                    x = state.requireOffset().roundToInt(),
+                                    y = 0,
+                                )
+                            }
+                            .align(Alignment.BottomStart)
+                            .anchoredDraggable(
+                                state,
+                                Orientation.Horizontal,
+                                enabled = mode != Modes.NUMBERS_ONLY,
+                            ),
+                        painter = painterResource(Res.drawable.range_input_point),
+                        contentDescription = null
+                    )
+                }
             }
         }
     }

@@ -1,13 +1,17 @@
 package org.judging_app.screens
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,7 +32,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import judging_app_client.composeapp.generated.resources.Res
 import judging_app_client.composeapp.generated.resources.belt
@@ -48,34 +54,11 @@ import org.judging_app.ui.popup.SettingsPopupComponent
 import org.judging_app.screens.TechniqueScreen.DISPLAY
 
 object HosinsoolModeScreen : TechniqueScreen {
+    var currentDisplay by mutableStateOf(DISPLAY.TECHNIQUE)
+    var nextDisplay by mutableStateOf(DISPLAY.TECHNIQUE)
+
     @Composable
     override fun load() {
-        var currentDisplay by remember { mutableStateOf(DISPLAY.TECHNIQUE) }
-        var direction by remember { mutableStateOf(1) }
-        var btnDirection by remember { mutableStateOf(1) }
-        fun switchDisplay() {
-            when(currentDisplay) {
-                DISPLAY.TECHNIQUE -> {
-                    direction = 1
-                    currentDisplay = DISPLAY.PRESENTATION
-                }
-                DISPLAY.PRESENTATION -> {
-                    if (direction == 1) {
-                        currentDisplay = DISPLAY.RESULT
-                        btnDirection = -1
-                    }
-                    else {
-                        currentDisplay = DISPLAY.TECHNIQUE
-                        btnDirection = 1
-                    }
-                }
-                DISPLAY.RESULT -> {
-                    direction = -1
-                    currentDisplay = DISPLAY.PRESENTATION
-                }
-            }
-        }
-
         Column(Modifier
             .fillMaxWidth(0.9f)
             .fillMaxHeight(0.9f)) {
@@ -143,25 +126,31 @@ object HosinsoolModeScreen : TechniqueScreen {
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             NavbarComponent(
-                                style = NavbarStyles.VERTICAL,
+                                style = NavbarStyles.VERTICAL_LEFT,
                                 modifier = Modifier.weight(3f),
-                                switchDisplay = { switchDisplay() },
-                                direction = btnDirection
                             )
                             Spacer(Modifier.weight(1f))
                             AnimatedContent(
                                 modifier = Modifier
                                     .fillMaxHeight()
-                                    .weight(36f)
+                                    .weight(32f)
                                     .clip(RoundedCornerShape(15.dp)),
-                                targetState = currentDisplay,
+                                targetState = nextDisplay,
                                 transitionSpec = {
-                                    if (direction > 0) {
-                                        slideInHorizontally { width -> width } togetherWith
-                                                slideOutHorizontally { width -> -width }
+                                    if (nextDisplay.ordinal > currentDisplay.ordinal) {
+                                        slideInVertically(
+                                            animationSpec = tween(500)
+                                        ) { height -> height } togetherWith
+                                                slideOutVertically(
+                                                    animationSpec = tween(500)
+                                                ) { height -> -height }
                                     } else {
-                                        slideInHorizontally { width -> -width } togetherWith
-                                                slideOutHorizontally { width -> width }
+                                        slideInVertically(
+                                            animationSpec = tween(500)
+                                        ) { height -> -height } togetherWith
+                                                slideOutVertically(
+                                                    animationSpec = tween(500)
+                                                ) { height -> height }
                                     }
                                 }
                             ) { target ->
@@ -174,14 +163,14 @@ object HosinsoolModeScreen : TechniqueScreen {
                                         ) {
                                             Box(
                                                 Modifier
+                                                    .fillMaxSize()
                                                     .padding(
-                                                        start = 15.dp,
-                                                        top = 10.dp,
-                                                        end = 15.dp,
-                                                        bottom = 15.dp
+                                                        vertical = 10.dp,
+                                                        horizontal = 15.dp
                                                     )
                                             ) {
                                                 RangeInputComponent(
+                                                    modifier = Modifier.align(Alignment.TopCenter),
                                                     currentValue = 0f,
                                                     onValueChange = {},
                                                     mode = Modes.NUMBERS_ONLY,
@@ -190,43 +179,48 @@ object HosinsoolModeScreen : TechniqueScreen {
                                                 Column(
                                                     Modifier
                                                         .padding(top = 25.dp)
+                                                        .align(Alignment.BottomCenter)
                                                         .fillMaxHeight(),
                                                     horizontalAlignment = Alignment.CenterHorizontally,
-                                                    verticalArrangement = Arrangement.SpaceBetween
+                                                    verticalArrangement = if (State.currentCategory == State.Categories.ADULTS)
+                                                        Arrangement.SpaceBetween else Arrangement.SpaceAround
                                                 ) {
                                                     RangeInputComponent(
-                                                        currentValue = 0f,
+                                                        currentValue = 1f,
                                                         onValueChange = {},
                                                         icon = Res.drawable.wrist
                                                     )
                                                     RangeInputComponent(
-                                                        currentValue = 0f,
+                                                        currentValue = 1f,
                                                         onValueChange = {},
                                                         icon = Res.drawable.clothes
                                                     )
                                                     RangeInputComponent(
-                                                        currentValue = 0f,
+                                                        currentValue = 1f,
                                                         onValueChange = {},
                                                         icon = Res.drawable.fist
                                                     )
                                                     RangeInputComponent(
-                                                        currentValue = 0f,
+                                                        currentValue = 1f,
                                                         onValueChange = {},
                                                         icon = Res.drawable.foot
                                                     )
-                                                    RangeInputComponent(
-                                                        currentValue = 0f,
-                                                        onValueChange = {},
-                                                        icon = Res.drawable.knife
-                                                    )
-                                                    RangeInputComponent(
-                                                        currentValue = 0f,
-                                                        onValueChange = {},
-                                                        icon = Res.drawable.belt
-                                                    )
+                                                    if (State.currentCategory == State.Categories.ADULTS) {
+                                                        RangeInputComponent(
+                                                            currentValue = 1f,
+                                                            onValueChange = {},
+                                                            icon = Res.drawable.knife
+                                                        )
+                                                        RangeInputComponent(
+                                                            currentValue = 1f,
+                                                            onValueChange = {},
+                                                            icon = Res.drawable.belt
+                                                        )
+                                                    }
                                                 }
                                             }
                                         }
+                                        currentDisplay = DISPLAY.TECHNIQUE
                                     }
 
                                     DISPLAY.PRESENTATION -> {
@@ -234,7 +228,61 @@ object HosinsoolModeScreen : TechniqueScreen {
                                             Modifier
                                                 .fillMaxSize()
                                                 .background(State.Colors.BUTTON_GRAY.color)
-                                        ) { Text(text = "pere")}
+                                        ) {
+                                            Box(
+                                                Modifier
+                                                    .fillMaxSize()
+                                                    .padding(
+                                                        vertical = 10.dp,
+                                                        horizontal = 15.dp
+                                                    )
+                                            ) {
+                                                RangeInputComponent(
+                                                    modifier = Modifier.align(Alignment.TopCenter),
+                                                    currentValue = 0f,
+                                                    onValueChange = {},
+                                                    mode = Modes.NUMBERS_ONLY,
+                                                )
+                                                Column(
+                                                    Modifier
+                                                        .padding(top = 20.dp)
+                                                        .align(Alignment.BottomCenter)
+                                                        .fillMaxHeight(),
+                                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                                    verticalArrangement = Arrangement.SpaceAround
+                                                ) {
+                                                    RangeInputComponent(
+                                                        currentValue = 1f,
+                                                        onValueChange = {},
+                                                        mode = Modes.WITH_TEXT,
+                                                        text = Localization
+                                                            .getString("hosinsool-presentation-criteria-1")
+                                                    )
+                                                    RangeInputComponent(
+                                                        currentValue = 1f,
+                                                        onValueChange = {},
+                                                        mode = Modes.WITH_TEXT,
+                                                        text = Localization
+                                                            .getString("hosinsool-presentation-criteria-2")
+                                                    )
+                                                    RangeInputComponent(
+                                                        currentValue = 1f,
+                                                        onValueChange = {},
+                                                        mode = Modes.WITH_TEXT,
+                                                        text = Localization
+                                                            .getString("hosinsool-presentation-criteria-3")
+                                                    )
+                                                    RangeInputComponent(
+                                                        currentValue = 1f,
+                                                        onValueChange = {},
+                                                        mode = Modes.WITH_TEXT,
+                                                        text = Localization
+                                                            .getString("hosinsool-presentation-criteria-4")
+                                                    )
+                                                }
+                                            }
+                                        }
+                                        currentDisplay = DISPLAY.PRESENTATION
                                     }
                                     DISPLAY.RESULT -> {
                                         Box(
@@ -242,9 +290,15 @@ object HosinsoolModeScreen : TechniqueScreen {
                                                 .fillMaxSize()
                                                 .background(State.Colors.BUTTON_GRAY.color)
                                         ) { Text(text = "result")}
+                                        currentDisplay = DISPLAY.RESULT
                                     }
                                 }
                             }
+                            Spacer(Modifier.weight(1f))
+                            NavbarComponent(
+                                style = NavbarStyles.VERTICAL_RIGHT,
+                                modifier = Modifier.weight(2f),
+                            )
                         }
                     }
                 }
