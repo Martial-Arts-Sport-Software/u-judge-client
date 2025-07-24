@@ -9,6 +9,7 @@ import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.gestures.animateTo
+import androidx.compose.foundation.gestures.snapTo
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -34,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -107,22 +109,22 @@ fun RangeInputComponent(
             }
         }
     }
-    val state = remember(anchors, currentValue) {
+    val state = remember(anchors) {
         AnchoredDraggableState(
-            initialValue = currentValue,
+            initialValue = currentValue * 10,
             anchors = anchors,
         )
     }
 
     LaunchedEffect(anchors) { state.updateAnchors(anchors) }
     LaunchedEffect(currentValue) {
-        if (state.currentValue != currentValue) {
-            state.animateTo(currentValue)
+        if (state.currentValue != currentValue && !state.isAnimationRunning) {
+            state.animateTo(currentValue * 10)
         }
     }
     LaunchedEffect(state) {
         snapshotFlow { state.currentValue }.collect { value ->
-            onValueChange(value)
+            onValueChange(value / 10)
         }
     }
     Row(

@@ -40,6 +40,7 @@ import org.judging_app.screens.HosinsoolModeScreen
 import org.judging_app.screens.TechniqueScreen
 import org.judging_app.ui.button.ButtonComponent
 import org.judging_app.ui.button.ButtonStyles
+import kotlin.math.roundToInt
 
 enum class NavbarStyles {
     VERTICAL_LEFT,
@@ -51,6 +52,7 @@ enum class NavbarStyles {
 fun NavbarComponent(
     style: NavbarStyles,
     modifier: Modifier = Modifier,
+    score: Float = 0f,
 ) {
     when (style) {
         NavbarStyles.VERTICAL_LEFT -> {
@@ -104,7 +106,7 @@ fun NavbarComponent(
                     )
                     Spacer(Modifier.fillMaxHeight(0.2f))
                     Text(
-                        text = "10.0",
+                        text = ((score * 10).roundToInt() / 10f).toString(),
                         style = MaterialTheme.typography.titleMedium,
                     )
                 }

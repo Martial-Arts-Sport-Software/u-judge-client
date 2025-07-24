@@ -1,9 +1,12 @@
 package org.judging_app
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Density
 import androidx.navigation.NavHostController
+import org.judging_app.entities.Rating
 
 object State {
     var density: Density? = null
@@ -19,6 +22,7 @@ object State {
     val isAnimating = mutableStateOf(false)
     val isOffline = mutableStateOf(true)
 
+    var currentRating by mutableStateOf(Rating("offline"))
 
     enum class Routes(val path: String) {
         ENTRY("entry"),

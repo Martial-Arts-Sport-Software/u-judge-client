@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,6 +46,10 @@ import judging_app_client.composeapp.generated.resources.foot
 import judging_app_client.composeapp.generated.resources.knife
 import judging_app_client.composeapp.generated.resources.wrist
 import org.judging_app.State
+import org.judging_app.entities.PresentationCriteria
+import org.judging_app.entities.Rating
+import org.judging_app.entities.TechniqueCriteria
+import org.judging_app.entities.TechniqueRating
 import org.judging_app.locale.Localization
 import org.judging_app.ui.input.Modes
 import org.judging_app.ui.input.RangeInputComponent
@@ -59,6 +64,22 @@ object HosinsoolModeScreen : TechniqueScreen {
 
     @Composable
     override fun load() {
+        val rating by remember { mutableStateOf(
+            if (State.currentRating is TechniqueRating) State.currentRating as TechniqueRating
+            else TechniqueRating(
+                State.currentRating.id,
+                techniqueCriteria = if (State.currentCategory == State.Categories.JUNIORS)
+                    TechniqueCriteria.Junior(0.1f, 0.1f, 0.1f, 0.1f)
+                else TechniqueCriteria.Adult(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f),
+                presentationCriteria = PresentationCriteria.HosinsoolPresentationCriteria(0.1f, 0.1f, 0.1f, 0.1f)
+            )
+        ) }
+        LaunchedEffect(rating) {
+            State.currentRating = rating
+        }
+        LaunchedEffect(State.currentCategory) {
+            State.currentRating = Rating("empty")
+        }
         Column(Modifier
             .fillMaxWidth(0.9f)
             .fillMaxHeight(0.9f)) {
@@ -127,6 +148,8 @@ object HosinsoolModeScreen : TechniqueScreen {
                         ) {
                             NavbarComponent(
                                 style = NavbarStyles.VERTICAL_LEFT,
+                                score = rating.techniqueCriteria.getTotalScore() +
+                                        rating.presentationCriteria.getTotalScore(),
                                 modifier = Modifier.weight(3f),
                             )
                             Spacer(Modifier.weight(1f))
@@ -186,34 +209,52 @@ object HosinsoolModeScreen : TechniqueScreen {
                                                         Arrangement.SpaceBetween else Arrangement.SpaceAround
                                                 ) {
                                                     RangeInputComponent(
-                                                        currentValue = 1f,
-                                                        onValueChange = {},
+                                                        currentValue = (rating.techniqueCriteria as TechniqueCriteria.Junior)
+                                                            .wristHold,
+                                                        onValueChange = { value ->
+                                                            (rating.techniqueCriteria as TechniqueCriteria.Junior).wristHold = value
+                                                        },
                                                         icon = Res.drawable.wrist
                                                     )
                                                     RangeInputComponent(
-                                                        currentValue = 1f,
-                                                        onValueChange = {},
+                                                        currentValue = (rating.techniqueCriteria as TechniqueCriteria.Junior)
+                                                            .clothesHold,
+                                                        onValueChange = { value ->
+                                                            (rating.techniqueCriteria as TechniqueCriteria.Junior).clothesHold = value
+                                                        },
                                                         icon = Res.drawable.clothes
                                                     )
                                                     RangeInputComponent(
-                                                        currentValue = 1f,
-                                                        onValueChange = {},
+                                                        currentValue = (rating.techniqueCriteria as TechniqueCriteria.Junior)
+                                                            .fistPunch,
+                                                        onValueChange = { value ->
+                                                            (rating.techniqueCriteria as TechniqueCriteria.Junior).fistPunch = value
+                                                        },
                                                         icon = Res.drawable.fist
                                                     )
                                                     RangeInputComponent(
-                                                        currentValue = 1f,
-                                                        onValueChange = {},
+                                                        currentValue = (rating.techniqueCriteria as TechniqueCriteria.Junior)
+                                                            .legKick,
+                                                        onValueChange = { value ->
+                                                            (rating.techniqueCriteria as TechniqueCriteria.Junior).legKick = value
+                                                        },
                                                         icon = Res.drawable.foot
                                                     )
                                                     if (State.currentCategory == State.Categories.ADULTS) {
                                                         RangeInputComponent(
-                                                            currentValue = 1f,
-                                                            onValueChange = {},
+                                                            currentValue = (rating.techniqueCriteria as TechniqueCriteria.Adult)
+                                                                .knifeLock,
+                                                            onValueChange = { value ->
+                                                                (rating.techniqueCriteria as TechniqueCriteria.Adult).knifeLock = value
+                                                            },
                                                             icon = Res.drawable.knife
                                                         )
                                                         RangeInputComponent(
-                                                            currentValue = 1f,
-                                                            onValueChange = {},
+                                                            currentValue = (rating.techniqueCriteria as TechniqueCriteria.Adult)
+                                                                .weaponLock,
+                                                            onValueChange = { value ->
+                                                                (rating.techniqueCriteria as TechniqueCriteria.Adult).weaponLock = value
+                                                            },
                                                             icon = Res.drawable.belt
                                                         )
                                                     }
@@ -252,29 +293,45 @@ object HosinsoolModeScreen : TechniqueScreen {
                                                     verticalArrangement = Arrangement.SpaceAround
                                                 ) {
                                                     RangeInputComponent(
-                                                        currentValue = 1f,
-                                                        onValueChange = {},
+                                                        currentValue = (rating.presentationCriteria as PresentationCriteria
+                                                            .HosinsoolPresentationCriteria).realism,
+                                                        onValueChange = { value ->
+                                                            (rating.presentationCriteria as PresentationCriteria
+                                                            .HosinsoolPresentationCriteria).realism = value
+                                                        },
                                                         mode = Modes.WITH_TEXT,
                                                         text = Localization
                                                             .getString("hosinsool-presentation-criteria-1")
                                                     )
                                                     RangeInputComponent(
-                                                        currentValue = 1f,
-                                                        onValueChange = {},
+                                                        currentValue = (rating.presentationCriteria as PresentationCriteria
+                                                        .HosinsoolPresentationCriteria).power,
+                                                        onValueChange = { value ->
+                                                            (rating.presentationCriteria as PresentationCriteria
+                                                            .HosinsoolPresentationCriteria).power = value
+                                                        },
                                                         mode = Modes.WITH_TEXT,
                                                         text = Localization
                                                             .getString("hosinsool-presentation-criteria-2")
                                                     )
                                                     RangeInputComponent(
-                                                        currentValue = 1f,
-                                                        onValueChange = {},
+                                                        currentValue = (rating.presentationCriteria as PresentationCriteria
+                                                        .HosinsoolPresentationCriteria).balance,
+                                                        onValueChange = { value ->
+                                                            (rating.presentationCriteria as PresentationCriteria
+                                                            .HosinsoolPresentationCriteria).balance = value
+                                                        },
                                                         mode = Modes.WITH_TEXT,
                                                         text = Localization
                                                             .getString("hosinsool-presentation-criteria-3")
                                                     )
                                                     RangeInputComponent(
-                                                        currentValue = 1f,
-                                                        onValueChange = {},
+                                                        currentValue = (rating.presentationCriteria as PresentationCriteria
+                                                        .HosinsoolPresentationCriteria).harmony,
+                                                        onValueChange = { value ->
+                                                            (rating.presentationCriteria as PresentationCriteria
+                                                            .HosinsoolPresentationCriteria).harmony = value
+                                                        },
                                                         mode = Modes.WITH_TEXT,
                                                         text = Localization
                                                             .getString("hosinsool-presentation-criteria-4")
