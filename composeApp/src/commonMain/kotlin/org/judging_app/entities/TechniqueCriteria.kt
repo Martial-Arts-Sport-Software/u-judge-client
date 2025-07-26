@@ -3,6 +3,8 @@ package org.judging_app.entities
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import kotlin.math.round
+import kotlin.math.roundToInt
 
 sealed class TechniqueCriteria {
     abstract fun getTotalScore(): Float
@@ -33,7 +35,7 @@ sealed class TechniqueCriteria {
         }
 
         override fun getTotalScore(): Float {
-            return wristHold + clothesHold + fistPunch + legKick
+            return round((wristHold + clothesHold + fistPunch + legKick) * 10) / 10f
         }
     }
 
@@ -65,7 +67,8 @@ sealed class TechniqueCriteria {
         }
 
         override fun getTotalScore(): Float {
-            return super.getTotalScore() + knifeLock + weaponLock
+            return super.getTotalScore() +
+                    round((knifeLock + weaponLock) * 10) / 10f
         }
     }
 }

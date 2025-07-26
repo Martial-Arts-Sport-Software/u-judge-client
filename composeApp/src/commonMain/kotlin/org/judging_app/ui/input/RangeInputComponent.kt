@@ -10,6 +10,8 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.gestures.snapTo
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -50,6 +52,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import judging_app_client.composeapp.generated.resources.Res
 import judging_app_client.composeapp.generated.resources.range_input_point
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -115,6 +118,8 @@ fun RangeInputComponent(
             anchors = anchors,
         )
     }
+    val interactionSource = remember { MutableInteractionSource() }
+    val isDragged by interactionSource.collectIsDraggedAsState()
 
     LaunchedEffect(anchors) { state.updateAnchors(anchors) }
     LaunchedEffect(currentValue) {
@@ -123,10 +128,16 @@ fun RangeInputComponent(
         }
     }
     LaunchedEffect(state) {
-        snapshotFlow { state.currentValue }.collect { value ->
-            onValueChange(value / 10)
-        }
+        snapshotFlow { state.isAnimationRunning }
+            .collect { running ->
+                if (!running) onValueChange(state.currentValue / 10f)
+            }
     }
+
+    LaunchedEffect(isDragged) {
+        if (!isDragged) onValueChange(state.currentValue / 10f)
+    }
+
     Row(
         modifier = modifier
             .fillMaxWidth(ratio),
@@ -287,6 +298,7 @@ fun RangeInputComponent(
                                 state,
                                 Orientation.Horizontal,
                                 enabled = mode != Modes.NUMBERS_ONLY,
+                                interactionSource = interactionSource
                             ),
                         painter = painterResource(Res.drawable.range_input_point),
                         contentDescription = null

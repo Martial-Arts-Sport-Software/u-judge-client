@@ -3,6 +3,7 @@ package org.judging_app.entities
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import kotlin.math.round
 
 sealed class PresentationCriteria {
     abstract fun getTotalScore(): Float
@@ -32,7 +33,7 @@ sealed class PresentationCriteria {
         }
 
         override fun getTotalScore(): Float {
-            return realism + power + balance + harmony
+            return round((realism + power + balance + harmony) * 10f) / 10f
         }
     }
 }

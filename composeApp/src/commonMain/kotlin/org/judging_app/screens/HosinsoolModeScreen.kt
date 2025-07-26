@@ -22,7 +22,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -57,6 +59,9 @@ import org.judging_app.ui.navbar.NavbarComponent
 import org.judging_app.ui.navbar.NavbarStyles
 import org.judging_app.ui.popup.SettingsPopupComponent
 import org.judging_app.screens.TechniqueScreen.DISPLAY
+import org.judging_app.ui.button.ButtonComponent
+import org.judging_app.ui.button.ButtonStyles
+import kotlin.math.roundToInt
 
 object HosinsoolModeScreen : TechniqueScreen {
     var currentDisplay by mutableStateOf(DISPLAY.TECHNIQUE)
@@ -79,6 +84,7 @@ object HosinsoolModeScreen : TechniqueScreen {
         }
         LaunchedEffect(State.currentCategory) {
             State.currentRating = Rating("empty")
+            nextDisplay = DISPLAY.TECHNIQUE
         }
         Column(Modifier
             .fillMaxWidth(0.9f)
@@ -95,9 +101,17 @@ object HosinsoolModeScreen : TechniqueScreen {
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    text = Localization.getString(
-                        "hosinsool_technique"
-                    ),
+                    text = when(currentDisplay) {
+                        DISPLAY.TECHNIQUE -> Localization.getString(
+                            "hosinsool_technique"
+                        )
+                        DISPLAY.PRESENTATION -> Localization.getString(
+                            "hosinsool_presentation"
+                        )
+                        DISPLAY.RESULT -> Localization.getString(
+                            "hosinsool_result"
+                        )
+                    },
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -346,7 +360,90 @@ object HosinsoolModeScreen : TechniqueScreen {
                                             Modifier
                                                 .fillMaxSize()
                                                 .background(State.Colors.BUTTON_GRAY.color)
-                                        ) { Text(text = "result")}
+                                        ) {
+                                            Column(
+                                                Modifier
+                                                    .fillMaxSize()
+                                                    .padding(15.dp)
+                                            ) {
+                                                Row(
+                                                    Modifier
+                                                        .fillMaxWidth()
+                                                        .weight(10f)
+                                                ) {
+                                                    Box(
+                                                        Modifier
+                                                            .fillMaxSize()
+                                                            .weight(1.2f)
+                                                            .clip(RoundedCornerShape(10))
+                                                            .background(State.Colors.SLIDER_TRACK_ACTIVE.color),
+                                                        contentAlignment = Alignment.Center
+                                                    ) {
+                                                        Text(
+                                                            text = "${Localization.getString("hosinsool-result-sum")}: " +
+                                                                    "${((rating.techniqueCriteria.getTotalScore() +
+                                                                            rating.presentationCriteria.getTotalScore()) * 10)
+                                                                        .roundToInt() / 10f}",
+                                                            style = MaterialTheme.typography.titleLarge
+                                                        )
+                                                    }
+                                                    Spacer(Modifier.width(15.dp))
+                                                    Column(
+                                                        Modifier.fillMaxSize().weight(1f)
+                                                    ) {
+                                                        Box(
+                                                            Modifier
+                                                                .fillMaxSize()
+                                                                .weight(1f)
+                                                                .clip(RoundedCornerShape(15))
+                                                                .background(State.Colors.PRIMARY.color.copy(0.85f)),
+                                                            contentAlignment = Alignment.Center
+                                                        ) {
+                                                            Text(
+                                                                text = "${Localization.getString("hosinsool-result-technique")}: " +
+                                                                        "${rating.techniqueCriteria.getTotalScore()}",
+                                                                style = MaterialTheme.typography.titleMedium
+                                                            )
+                                                        }
+                                                        Spacer(Modifier.height(15.dp))
+                                                        Box(
+                                                            Modifier
+                                                                .fillMaxSize()
+                                                                .weight(1f)
+                                                                .clip(RoundedCornerShape(15))
+                                                                .background(State.Colors.PRIMARY.color.copy(0.85f)),
+                                                            contentAlignment = Alignment.Center
+                                                        ) {
+                                                            Text(
+                                                                text = "${Localization.getString("hosinsool-result-presentation")}: " +
+                                                                        "${rating.presentationCriteria.getTotalScore()}",
+                                                                style = MaterialTheme.typography.titleMedium
+                                                            )
+                                                        }
+                                                    }
+                                                }
+                                                Spacer(Modifier.height(15.dp))
+                                                Row(
+                                                    Modifier
+                                                        .fillMaxWidth()
+                                                        .weight(2f)
+                                                ) {
+                                                    ButtonComponent(
+                                                        modifier = Modifier.weight(1f),
+                                                        text = Localization.getString("hosinsool-result-save-btn"),
+                                                        onclick = {}
+                                                    )
+                                                    Spacer(Modifier.width(15.dp))
+                                                    ButtonComponent(
+                                                        modifier = Modifier.weight(1f),
+                                                        style = ButtonStyles.Secondary,
+                                                        text = Localization.getString("hosinsool-result-send-btn"),
+                                                        onclick = {},
+                                                        enabled = !State.isOffline.value
+                                                    )
+                                                }
+                                            }
+                                        }
                                         currentDisplay = DISPLAY.RESULT
                                     }
                                 }

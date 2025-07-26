@@ -93,9 +93,9 @@ object EntryScreen: Screen {
 
                     TextInputComponent(
                         Localization.getString("entry_server_address"),
-                        inputValue = State.judgeSurname,
+                        inputValue = State.serverAddress,
                         onChange = { inputValue ->  
-                            State.judgeSurname = inputValue
+                            State.serverAddress = inputValue
                         }
                     )
                     TextInputComponent(
@@ -123,9 +123,11 @@ object EntryScreen: Screen {
                             .fillMaxHeight(0.2f)
                     ) {
                         ButtonComponent(
-                            Localization.getString("entry_login"),
+                            text = Localization.getString("entry_login"),
                             onclick = loginOnClick,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            enabled = State.serverAddress.isNotBlank()
+                                    && State.judgeSurname.isNotBlank()
                         )
 
                         Spacer(Modifier.width(10.dp))
@@ -134,7 +136,8 @@ object EntryScreen: Screen {
                             Localization.getString("entry_offline"),
                             onclick = offlineOnClick,
                             style = ButtonStyles.Secondary,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            enabled = State.judgeSurname.isNotBlank()
                         )
                     }
                     Spacer(Modifier.weight(0.6f))

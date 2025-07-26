@@ -44,11 +44,19 @@ object Localization {
 
             "hosinsool_technique" to "Technique",
             "hosinsool_presentation" to "Presentation",
+            "hosinsool_result" to "Result",
 
             "hosinsool-presentation-criteria-1" to "Realism",
             "hosinsool-presentation-criteria-2" to "Power, speed, energy blast (kehup)",
             "hosinsool-presentation-criteria-3" to "Balance, technique of nakpok",
             "hosinsool-presentation-criteria-4" to "Harmony, timing",
+
+            "hosinsool-result-sum" to "Total",
+            "hosinsool-result-technique" to "Technique",
+            "hosinsool-result-presentation" to "Presentation",
+
+            "hosinsool-result-send-btn" to "Send",
+            "hosinsool-result-save-btn" to "Save",
         ),
         "ru" to mapOf(
             "entry_club_name" to "СПОРТИВНЫЙ\nКЛУБ Ю'ПИТЕР",
@@ -90,11 +98,19 @@ object Localization {
 
             "hosinsool_technique" to "Техника",
             "hosinsool_presentation" to "Презентация",
+            "hosinsool_result" to "Результат",
 
             "hosinsool-presentation-criteria-1" to "Реалистичность",
             "hosinsool-presentation-criteria-2" to "Сила, скорость, выражение энергии (кихап)",
             "hosinsool-presentation-criteria-3" to "Баланс, техники страховки",
             "hosinsool-presentation-criteria-4" to "Гармония, тайминг",
+
+            "hosinsool-result-sum" to "Итог",
+            "hosinsool-result-technique" to "Техника",
+            "hosinsool-result-presentation" to "Презентация",
+
+            "hosinsool-result-send-btn" to "Отправить",
+            "hosinsool-result-save-btn" to "Сохранить",
         )
     )
     fun getString(key: String): String {

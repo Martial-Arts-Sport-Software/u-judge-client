@@ -14,7 +14,8 @@ object State {
     var navController: NavHostController? = null
     var currentDiscipline: Disciplines? = null
     var currentCategory: Categories? = null
-    var judgeSurname: String = ""
+    var judgeSurname by mutableStateOf("")
+    var serverAddress by mutableStateOf("")
 
     val currentLocale = mutableStateOf(getLocale())
     val currentPopupMode = mutableStateOf(PopupMode.NONE)

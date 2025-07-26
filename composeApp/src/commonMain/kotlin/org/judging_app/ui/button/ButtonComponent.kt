@@ -59,7 +59,8 @@ fun ButtonComponent(
     onclick: () -> Unit,
     iconSrc: DrawableResource? = null,
     colorFilter: ColorFilter? = null,
-    iconPadding: Dp = 10.dp
+    iconPadding: Dp = 10.dp,
+    enabled: Boolean = true
 ) {
     when(style) {
         ButtonStyles.Icon -> require(iconSrc != null)
@@ -88,6 +89,7 @@ fun ButtonComponent(
                             textAlign = TextAlign.Center
                         )
                     },
+                    enabled = enabled
                 )
             }
             ButtonStyles.Secondary -> {
@@ -99,16 +101,19 @@ fun ButtonComponent(
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White.copy(0.48f)
+                        containerColor = Color.White.copy(0.48f),
+                        disabledContainerColor = Color.White.copy(0.25f)
                     ),
                     shape = RoundedCornerShape(5.dp),
                     content = {
                         Text(
                             text!!,
                             style = MaterialTheme.typography.bodyLarge,
-                            color = State.Colors.PRIMARY.color
+                            color = if (enabled) State.Colors.PRIMARY.color
+                            else State.Colors.PRIMARY.color.copy(0.5f)
                         )
-                    }
+                    },
+                    enabled = enabled
                 )
             }
             ButtonStyles.Plain -> {
@@ -138,7 +143,8 @@ fun ButtonComponent(
                     onClick = {
                         if (!State.isAnimating.value) { onclick() }
                     },
-                    contentPadding = PaddingValues(iconPadding)
+                    contentPadding = PaddingValues(iconPadding),
+                    enabled = enabled
                 ) {
                     Image(
                         modifier = Modifier
@@ -155,7 +161,7 @@ fun ButtonComponent(
                     modifier = modifier
                         .fillMaxSize()
                         .clickable {
-                            if (!State.isAnimating.value) { onclick() }
+                            if (!State.isAnimating.value && enabled) { onclick() }
                         },
                 )
             }
