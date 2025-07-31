@@ -23,7 +23,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -38,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import judging_app_client.composeapp.generated.resources.Res
 import judging_app_client.composeapp.generated.resources.belt
@@ -53,6 +60,7 @@ import org.judging_app.entities.Rating
 import org.judging_app.entities.TechniqueCriteria
 import org.judging_app.entities.TechniqueRating
 import org.judging_app.locale.Localization
+import org.judging_app.readFile
 import org.judging_app.ui.input.Modes
 import org.judging_app.ui.input.RangeInputComponent
 import org.judging_app.ui.navbar.NavbarComponent
@@ -69,6 +77,8 @@ object HosinsoolModeScreen : TechniqueScreen {
 
     @Composable
     override fun load() {
+        val filename = "${State.currentLocale.value}.txt"
+        val infoReferencelines = readFile(filename)
         val rating by remember { mutableStateOf(
             if (State.currentRating is TechniqueRating) State.currentRating as TechniqueRating
             else TechniqueRating(
@@ -153,6 +163,72 @@ object HosinsoolModeScreen : TechniqueScreen {
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             SettingsPopupComponent()
+                        }
+                    }
+                    State.PopupMode.INFORMATION -> {
+                        Row(
+                            Modifier.fillMaxWidth().fillMaxHeight(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            NavbarComponent(
+                                style = NavbarStyles.VERTICAL_LEFT,
+                                score = rating.techniqueCriteria.getTotalScore() +
+                                        rating.presentationCriteria.getTotalScore(),
+                                modifier = Modifier.weight(3f),
+                            )
+                            Spacer(Modifier.weight(1f))
+                            Box(
+                                Modifier
+                                    .fillMaxSize()
+                                    .clip(RoundedCornerShape(15.dp))
+                                    .background(Color.White)
+                                    .weight(35f)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxHeight(0.2f)
+                                        .align(Alignment.TopStart),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        modifier = Modifier.padding(horizontal = 15.dp),
+                                        text = Localization.getString("hosinsool-info-title"),
+                                        style = MaterialTheme.typography.displayLarge
+                                    )
+                                }
+                                ButtonComponent(
+                                    modifier = Modifier
+                                        .fillMaxHeight(0.2f)
+                                        .align(Alignment.TopEnd),
+                                    style = ButtonStyles.Icon,
+                                    iconSrc = Res.drawable.cross_icon,
+                                    iconPadding = 8.dp,
+                                    onclick = {
+                                        State.currentPopupMode.value = State.PopupMode.NONE
+                                    }
+                                )
+                                LazyColumn(
+                                    Modifier
+                                        .align(Alignment.BottomCenter)
+                                        .fillMaxWidth()
+                                        .fillMaxHeight(0.8f)
+                                        .padding(
+                                            top = 0.dp,
+                                            start = 15.dp,
+                                            end = 15.dp,
+                                            bottom = 10.dp
+                                        )
+                                        .align(Alignment.BottomCenter)
+                                ) {
+                                    items(infoReferencelines) { line ->
+                                        Text(
+                                            text = line,
+                                            modifier = Modifier.fillMaxWidth(),
+                                            color = Color.Black
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                     else -> {

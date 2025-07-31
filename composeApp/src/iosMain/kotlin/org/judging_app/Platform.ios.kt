@@ -10,10 +10,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import judging_app_client.composeapp.generated.resources.Montserrat
 import judging_app_client.composeapp.generated.resources.Res
+import kotlinx.cinterop.ExperimentalForeignApi
 import org.jetbrains.compose.resources.Font
 import platform.Foundation.NSLocale
+import platform.Foundation.NSString
+import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.currentLocale
 import platform.Foundation.languageCode
+import platform.Foundation.stringWithContentsOfFile
 import platform.UIKit.UIDevice
 import platform.posix.exit
 

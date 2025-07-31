@@ -57,7 +57,10 @@ object Localization {
 
             "hosinsool-result-send-btn" to "Send",
             "hosinsool-result-save-btn" to "Save",
+
+            "hosinsool-info-title" to "Information",
         ),
+
         "ru" to mapOf(
             "entry_club_name" to "СПОРТИВНЫЙ\nКЛУБ Ю'ПИТЕР",
             "entry_club_description" to "Олимпийское Тхэквондо\n" +
@@ -111,6 +114,8 @@ object Localization {
 
             "hosinsool-result-send-btn" to "Отправить",
             "hosinsool-result-save-btn" to "Сохранить",
+
+            "hosinsool-info-title" to "Справка",
         )
     )
     fun getString(key: String): String {
