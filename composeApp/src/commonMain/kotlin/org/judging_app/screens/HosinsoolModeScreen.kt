@@ -1,17 +1,13 @@
 package org.judging_app.screens
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,14 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,10 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import judging_app_client.composeapp.generated.resources.Res
 import judging_app_client.composeapp.generated.resources.belt
@@ -69,6 +55,7 @@ import org.judging_app.ui.popup.SettingsPopupComponent
 import org.judging_app.screens.TechniqueScreen.DISPLAY
 import org.judging_app.ui.button.ButtonComponent
 import org.judging_app.ui.button.ButtonStyles
+import org.judging_app.ui.popup.InformationPopupComponent
 import kotlin.math.roundToInt
 
 object HosinsoolModeScreen : TechniqueScreen {
@@ -78,7 +65,7 @@ object HosinsoolModeScreen : TechniqueScreen {
     @Composable
     override fun load() {
         val filename = "${State.currentLocale.value}.txt"
-        val infoReferencelines = readFile(filename)
+        val infoTextLines = readFile(filename)
         val rating by remember { mutableStateOf(
             if (State.currentRating is TechniqueRating) State.currentRating as TechniqueRating
             else TechniqueRating(
@@ -167,7 +154,7 @@ object HosinsoolModeScreen : TechniqueScreen {
                     }
                     State.PopupMode.INFORMATION -> {
                         Row(
-                            Modifier.fillMaxWidth().fillMaxHeight(),
+                            Modifier.fillMaxSize(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             NavbarComponent(
@@ -177,58 +164,10 @@ object HosinsoolModeScreen : TechniqueScreen {
                                 modifier = Modifier.weight(3f),
                             )
                             Spacer(Modifier.weight(1f))
-                            Box(
-                                Modifier
-                                    .fillMaxSize()
-                                    .clip(RoundedCornerShape(15.dp))
-                                    .background(Color.White)
-                                    .weight(35f)
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxHeight(0.2f)
-                                        .align(Alignment.TopStart),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        modifier = Modifier.padding(horizontal = 15.dp),
-                                        text = Localization.getString("hosinsool-info-title"),
-                                        style = MaterialTheme.typography.displayLarge
-                                    )
-                                }
-                                ButtonComponent(
-                                    modifier = Modifier
-                                        .fillMaxHeight(0.2f)
-                                        .align(Alignment.TopEnd),
-                                    style = ButtonStyles.Icon,
-                                    iconSrc = Res.drawable.cross_icon,
-                                    iconPadding = 8.dp,
-                                    onclick = {
-                                        State.currentPopupMode.value = State.PopupMode.NONE
-                                    }
-                                )
-                                LazyColumn(
-                                    Modifier
-                                        .align(Alignment.BottomCenter)
-                                        .fillMaxWidth()
-                                        .fillMaxHeight(0.8f)
-                                        .padding(
-                                            top = 0.dp,
-                                            start = 15.dp,
-                                            end = 15.dp,
-                                            bottom = 10.dp
-                                        )
-                                        .align(Alignment.BottomCenter)
-                                ) {
-                                    items(infoReferencelines) { line ->
-                                        Text(
-                                            text = line,
-                                            modifier = Modifier.fillMaxWidth(),
-                                            color = Color.Black
-                                        )
-                                    }
-                                }
-                            }
+                            InformationPopupComponent(
+                                lines = infoTextLines,
+                                modifier = Modifier.weight(35f)
+                            )
                         }
                     }
                     else -> {

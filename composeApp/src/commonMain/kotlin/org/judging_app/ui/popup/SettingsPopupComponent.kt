@@ -45,7 +45,7 @@ fun SettingsPopupComponent() {
         ) {
             Box(
                 Modifier
-                    .fillMaxHeight(0.2f)
+                    .weight(1f)
                     .fillMaxWidth()
             ) {
                 Text(
@@ -65,12 +65,14 @@ fun SettingsPopupComponent() {
             }
             Column(
                 Modifier
+                    .weight(4f)
                     .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Spacer(Modifier.fillMaxHeight(0.05f))
+                Spacer(Modifier.weight(1f))
                 ButtonComponent(
+                    modifier = Modifier.weight(2.5f),
                     text = if (
                         State.currentDiscipline in arrayOf(
                             State.Disciplines.KERUGI,
@@ -85,8 +87,9 @@ fun SettingsPopupComponent() {
                         State.currentPopupMode.value = State.PopupMode.NONE
                     },
                 )
-                Spacer(Modifier.fillMaxHeight(0.05f))
+                Spacer(Modifier.weight(1f))
                 ButtonComponent(
+                    modifier = Modifier.weight(2.5f),
                     text = Localization.getString(
                         "settings_choose_category"
                     ),
@@ -95,8 +98,9 @@ fun SettingsPopupComponent() {
                         clickWithTransition(State.Routes.BACK)
                     },
                 )
-                Spacer(Modifier.fillMaxHeight(0.05f))
+                Spacer(Modifier.weight(1f))
                 ButtonComponent(
+                    modifier = Modifier.weight(2.5f),
                     text = Localization.getString(
                         "settings_choose_discipline"
                     ),
@@ -106,10 +110,11 @@ fun SettingsPopupComponent() {
                         clickWithTransition(State.Routes.BACK)
                     },
                 )
-                Spacer(Modifier.fillMaxHeight(0.05f))
+                Spacer(Modifier.weight(1f))
                 Row(
                     Modifier
                         .fillMaxWidth(0.6f)
+                        .weight(2.5f)
                         .padding(bottom = 5.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center,

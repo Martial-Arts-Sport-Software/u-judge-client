@@ -1,7 +1,6 @@
 package org.judging_app.ui.popup
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,7 +24,6 @@ import org.judging_app.State
 import org.judging_app.locale.Localization
 import org.judging_app.ui.button.ButtonComponent
 import org.judging_app.ui.button.ButtonStyles
-import org.judging_app.ui.button.clickWithTransition
 
 @Composable
 fun WarningPopupComponent() {
@@ -58,8 +56,9 @@ fun WarningPopupComponent() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                Spacer(Modifier.fillMaxHeight(0.05f))
+                Spacer(Modifier.weight(0.5f))
                 ButtonComponent(
+                    modifier = Modifier.weight(2f),
                     text = Localization.getString(
                         "warning_continue"
                     ),
@@ -67,8 +66,9 @@ fun WarningPopupComponent() {
                         State.currentPopupMode.value = State.PopupMode.NONE
                     },
                 )
-                Spacer(Modifier.fillMaxHeight(0.05f))
+                Spacer(Modifier.weight(0.5f))
                 ButtonComponent(
+                    modifier = Modifier.weight(2f),
                     text = Localization.getString(
                         "settings_start_fight"
                     ),
@@ -76,9 +76,10 @@ fun WarningPopupComponent() {
                         State.currentPopupMode.value = State.PopupMode.NONE
                     },
                 )
-                Spacer(Modifier.fillMaxHeight(0.25f))
+                Spacer(Modifier.weight(0.5f))
                 Row(
                     Modifier
+                        .weight(2f)
                         .fillMaxWidth(0.6f)
                         .padding(bottom = 5.dp),
                     verticalAlignment = Alignment.CenterVertically,
