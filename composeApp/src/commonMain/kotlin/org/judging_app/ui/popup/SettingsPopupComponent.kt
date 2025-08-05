@@ -1,7 +1,6 @@
 package org.judging_app.ui.popup
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,11 +24,17 @@ import androidx.compose.ui.unit.dp
 import judging_app_client.composeapp.generated.resources.Res
 import judging_app_client.composeapp.generated.resources.cross_icon
 import org.judging_app.State
+import org.judging_app.enums.Colors
+import org.judging_app.enums.Disciplines
+import org.judging_app.enums.Routes
 import org.judging_app.locale.Localization
 import org.judging_app.ui.button.ButtonComponent
 import org.judging_app.ui.button.ButtonStyles
 import org.judging_app.ui.button.clickWithTransition
 
+/**
+ * Renders settings popup
+ */
 @Composable
 fun SettingsPopupComponent() {
     Box(
@@ -37,7 +42,7 @@ fun SettingsPopupComponent() {
             .fillMaxHeight()
             .fillMaxWidth(0.45f)
             .clip(RoundedCornerShape(25.dp))
-            .background(State.Colors.SECONDARY.color)
+            .background(Colors.SECONDARY.color)
             .padding(horizontal = 5.dp)
     ) {
         Column(
@@ -58,7 +63,7 @@ fun SettingsPopupComponent() {
                     style = ButtonStyles.Icon,
                     iconSrc = Res.drawable.cross_icon,
                     onclick = {
-                        State.currentPopupMode.value = State.PopupMode.NONE
+                        State.currentPopupMode = Popup.Modes.NONE
                     },
                     modifier = Modifier.align(Alignment.TopEnd)
                 )
@@ -75,8 +80,8 @@ fun SettingsPopupComponent() {
                     modifier = Modifier.weight(2.5f),
                     text = if (
                         State.currentDiscipline in arrayOf(
-                            State.Disciplines.KERUGI,
-                            State.Disciplines.TANBON
+                            Disciplines.KERUGI,
+                            Disciplines.TANBON
                         )
                     ) Localization.getString(
                         "settings_start_fight"
@@ -84,7 +89,7 @@ fun SettingsPopupComponent() {
                         "settings_start_performance"
                     ),
                     onclick = {
-                        State.currentPopupMode.value = State.PopupMode.NONE
+                        State.currentPopupMode = Popup.Modes.NONE
                     },
                 )
                 Spacer(Modifier.weight(1f))
@@ -94,8 +99,8 @@ fun SettingsPopupComponent() {
                         "settings_choose_category"
                     ),
                     onclick = {
-                        State.currentPopupMode.value = State.PopupMode.NONE
-                        clickWithTransition(State.Routes.BACK)
+                        State.currentPopupMode = Popup.Modes.NONE
+                        clickWithTransition(Routes.BACK)
                     },
                 )
                 Spacer(Modifier.weight(1f))
@@ -105,9 +110,9 @@ fun SettingsPopupComponent() {
                         "settings_choose_discipline"
                     ),
                     onclick = {
-                        State.currentPopupMode.value = State.PopupMode.NONE
-                        clickWithTransition(State.Routes.BACK)
-                        clickWithTransition(State.Routes.BACK)
+                        State.currentPopupMode = Popup.Modes.NONE
+                        clickWithTransition(Routes.BACK)
+                        clickWithTransition(Routes.BACK)
                     },
                 )
                 Spacer(Modifier.weight(1f))
@@ -122,7 +127,7 @@ fun SettingsPopupComponent() {
                     ButtonComponent(
                         "Русский",
                         ButtonStyles.Plain,
-                        onclick = { State.currentLocale.value = "ru" },
+                        onclick = { State.currentLocale = "ru" },
                         modifier = Modifier.weight(1f)
                     )
                     VerticalDivider(
@@ -135,7 +140,7 @@ fun SettingsPopupComponent() {
                     ButtonComponent(
                         "English",
                         ButtonStyles.Plain,
-                        onclick = { State.currentLocale.value = "en" },
+                        onclick = { State.currentLocale = "en" },
                         modifier = Modifier.weight(1f)
                     )
                 }

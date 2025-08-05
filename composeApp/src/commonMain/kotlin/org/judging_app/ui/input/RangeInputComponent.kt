@@ -9,7 +9,6 @@ import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.gestures.animateTo
-import androidx.compose.foundation.gestures.snapTo
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -37,14 +36,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
@@ -52,20 +49,37 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import judging_app_client.composeapp.generated.resources.Res
 import judging_app_client.composeapp.generated.resources.range_input_point
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.judging_app.State
+import org.judging_app.enums.Colors
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
+/**
+ * Modes of range input
+ * @property NUMBERS_ONLY - display only numbers without input itself
+ * @property DEFAULT - range input display by default
+ * @property WITH_TEXT - 
+ */
 enum class Modes {
     NUMBERS_ONLY,
     WITH_TEXT,
     DEFAULT
 }
 
+/**
+ * Renders range input for criterion rating
+ * @param currentValue - initial value on render
+ * @param onValueChange - callback, that is called on range value's change
+ * @param modifier - [Modifier], that is applied to the component
+ * @param steps - count of range values
+ * @param mode - [Modes] variant of range input
+ * @param ratio - part that component is contained in its parent
+ * @param icon - [DrawableResource] instance of required icon
+ * @param text - optional text displayed above range input ([Modes.WITH_TEXT] required)
+ */
 @Composable
 fun RangeInputComponent(
     currentValue: Float,
@@ -77,7 +91,7 @@ fun RangeInputComponent(
     icon: DrawableResource? = null,
     text: String = ""
 ) {
-    var trackSize by remember { mutableStateOf(IntSize.Zero)}
+    var trackSize by remember { mutableStateOf(IntSize.Zero) }
     val markSizeDp by remember(trackSize) {
             derivedStateOf {
                 with(State.density!!) {
@@ -92,7 +106,6 @@ fun RangeInputComponent(
         derivedStateOf { (stepBoxSize + trackSize.height) / 2 }
     }
     val coroutineScope = rememberCoroutineScope()
-
     val stepPositions by remember(edgeBoxSize, stepBoxSize, steps, trackSize) {
         derivedStateOf {
             List(steps + 1) { i ->
@@ -104,7 +117,6 @@ fun RangeInputComponent(
             }
         }
     }
-
     val anchors = remember(stepPositions) {
         DraggableAnchors {
             stepPositions.forEachIndexed { index, value ->
@@ -127,6 +139,7 @@ fun RangeInputComponent(
             state.animateTo(currentValue * 10)
         }
     }
+
     LaunchedEffect(state) {
         snapshotFlow { state.isAnimationRunning }
             .collect { running ->
@@ -246,7 +259,7 @@ fun RangeInputComponent(
                                             steps -> RoundedCornerShape(topEndPercent = 50, bottomEndPercent = 50)
                                             else -> RoundedCornerShape(0)
                                         })
-                                        .background(State.Colors.PRIMARY.color),
+                                        .background(Colors.PRIMARY.color),
                                 ) {
                                     Box(
                                         Modifier
@@ -263,7 +276,7 @@ fun RangeInputComponent(
                                             .fillMaxHeight(0.5f)
                                             .clip(CircleShape)
                                             .align(Alignment.CenterStart)
-                                            .background(State.Colors.SLIDER_TRACK_ACTIVE.color)
+                                            .background(Colors.SLIDER_TRACK_ACTIVE.color)
                                     )
                                 }
                             }
@@ -279,7 +292,7 @@ fun RangeInputComponent(
                             .fillMaxHeight()
                             .clip(CircleShape)
                             .align(Alignment.BottomStart)
-                            .background(State.Colors.SLIDER_TRACK_ACTIVE.color)
+                            .background(Colors.SLIDER_TRACK_ACTIVE.color)
                     ) {
 
                     }

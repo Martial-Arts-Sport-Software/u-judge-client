@@ -18,6 +18,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
+/**
+ * Renders text input component
+ * @param labelText - label text above input
+ * @param inputValue - initial value of text input
+ * @param onChange - callback, that is called on component's value change
+ */
 @Composable
 fun TextInputComponent(
     labelText: String? = null,

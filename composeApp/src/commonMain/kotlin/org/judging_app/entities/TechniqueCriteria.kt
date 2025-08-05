@@ -4,11 +4,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlin.math.round
-import kotlin.math.roundToInt
 
+/**
+ * rating's score for presentation, has:
+ * - [TechniqueCriteria.Junior]
+ * - [TechniqueCriteria.Adult]
+ */
 sealed class TechniqueCriteria {
+    /**
+     * fun to get total score for all technique criteria
+     * @return total sum
+     */
     abstract fun getTotalScore(): Float
 
+    /**
+     * [TechniqueCriteria] implementation for junior category
+     * @property wristHold - criterion, responsible for score of wrist holding defense
+     * @property clothesHold - criterion, responsible for score of clothes holding defense
+     * @property fistPunch - criterion, responsible for score of fist punch defense
+     * @property legKick - criterion, responsible for score of leg kick defense
+     */
     open class Junior(
         wristHold: Float = 0.1f,
         clothesHold: Float = 0.1f,
@@ -39,6 +54,15 @@ sealed class TechniqueCriteria {
         }
     }
 
+    /**
+     * [TechniqueCriteria] implementation for junior category
+     * @property wristHold - criterion, responsible for score of wrist holding defense
+     * @property clothesHold - criterion, responsible for score of clothes holding defense
+     * @property fistPunch - criterion, responsible for score of fist punch defense
+     * @property legKick - criterion, responsible for score of leg kick defense
+     * @property knifeLock - criterion, responsible for score of knife defense
+     * @property weaponLock - criterion, responsible for score of defense with hapkido weapon
+     */
     class Adult(
         wristHold: Float = 0.1f,
         clothesHold: Float = 0.1f,

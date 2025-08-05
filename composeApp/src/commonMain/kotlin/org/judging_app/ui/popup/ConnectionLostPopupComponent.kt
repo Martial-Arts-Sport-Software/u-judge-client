@@ -1,35 +1,31 @@
 package org.judging_app.ui.popup
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import judging_app_client.composeapp.generated.resources.Res
-import judging_app_client.composeapp.generated.resources.cross_icon
 import org.judging_app.State
+import org.judging_app.enums.Colors
+import org.judging_app.enums.Routes
 import org.judging_app.locale.Localization
 import org.judging_app.ui.button.ButtonComponent
-import org.judging_app.ui.button.ButtonStyles
 import org.judging_app.ui.button.clickWithTransition
 
+/**
+ * Renders popup on connection lost
+ */
 @Composable
 fun ConnectionLostPopupComponent() {
     Box(
@@ -37,7 +33,7 @@ fun ConnectionLostPopupComponent() {
             .fillMaxHeight(0.5f)
             .fillMaxWidth(0.45f)
             .clip(RoundedCornerShape(25.dp))
-            .background(State.Colors.SECONDARY.color)
+            .background(Colors.SECONDARY.color)
             .padding(horizontal = 5.dp)
     ) {
         Column(
@@ -74,9 +70,9 @@ fun ConnectionLostPopupComponent() {
                         "connection_lost_change_server"
                     ),
                     onclick = {
-                        State.isOffline.value = true
-                        State.currentPopupMode.value = State.PopupMode.NONE
-                        clickWithTransition(State.Routes.ENTRY)
+                        State.isOffline = true
+                        State.currentPopupMode = Popup.Modes.NONE
+                        clickWithTransition(Routes.ENTRY)
                     },
                 )
                 Spacer(Modifier.fillMaxHeight(0.05f))

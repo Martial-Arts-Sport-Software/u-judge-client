@@ -5,9 +5,24 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlin.math.round
 
+/**
+ * rating's score for presentation, has:
+ * - [PresentationCriteria.HosinsoolPresentationCriteria]
+ */
 sealed class PresentationCriteria {
+    /**
+     * fun to get total score for all presentation criteria
+     * @return total sum
+     */
     abstract fun getTotalScore(): Float
 
+    /**
+     * [PresentationCriteria] implementation for hosinsool
+     * @property realism - first criterion
+     * @property realism - second criterion
+     * @property realism - third criterion
+     * @property realism - fourth criterion
+     */
     class HosinsoolPresentationCriteria(
         realism: Float,
         power: Float,

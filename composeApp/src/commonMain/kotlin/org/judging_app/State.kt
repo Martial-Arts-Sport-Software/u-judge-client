@@ -3,72 +3,41 @@ package org.judging_app
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Density
 import androidx.navigation.NavHostController
 import org.judging_app.entities.Rating
+import org.judging_app.enums.Categories
+import org.judging_app.enums.Disciplines
+import org.judging_app.ui.popup.Popup
 
+/**
+ * Singleton that controls current state of application
+ * @property density - device's density of the screen
+ * @property navController - class, responsible for switching between screens
+ * @property judgeSurname - surname of user (judge)
+ * @property serverAddress - Server IPv4 address
+ * @property currentDiscipline - selected discipline
+ * @property currentCategory - selected age category
+ * @property currentRating - rating of current bout/performance
+ * @property currentLocale - selected interface language
+ * @property currentPopupMode - active [Popup.Modes] mode
+ * @property isConnectedToServer - is application connected to server or not
+ * @property isAnimating - flag for ui animations. True if some animation/transition is active, false otherwise
+ * @property isOffline - flag of application Mode. If true application's functions, that require server connection,  are locked
+ */
 object State {
     var density: Density? = null
-
     var navController: NavHostController? = null
-    var currentDiscipline: Disciplines? = null
-    var currentCategory: Categories? = null
     var judgeSurname by mutableStateOf("")
     var serverAddress by mutableStateOf("")
 
-    val currentLocale = mutableStateOf(getLocale())
-    val currentPopupMode = mutableStateOf(PopupMode.NONE)
-    val isConnectedToServer = mutableStateOf(false)
-    val isAnimating = mutableStateOf(false)
-    val isOffline = mutableStateOf(true)
-
+    var currentDiscipline: Disciplines? = null
+    var currentCategory: Categories? = null
     var currentRating by mutableStateOf(Rating("offline"))
+    var currentLocale by mutableStateOf(getLocale())
+    var currentPopupMode by mutableStateOf(Popup.Modes.NONE)
 
-    enum class Routes(val path: String) {
-        ENTRY("entry"),
-
-        DISCIPLINE_SELECT("discipline_select"),
-        CATEGORY_SELECT("category_select"),
-
-        KERUGI_MODE("kerugi_mode"),
-        TANBON_MODE("tanbon_mode"),
-        HOSINSOOL_MODE("hosinsool_mode"),
-        FREESTYLE_MODE("freestyle_mode"),
-
-        BACK("");
-
-        override fun toString(): String = path
-    }
-
-    enum class Disciplines(val value: String) {
-        KERUGI("discipline_kerugi"),
-        HOSINSOOL("discipline_hosinsool"),
-        TANBON("discipline_tanbon"),
-        FREESTYLE_WEAPON("discipline_freestyle_weapon"),
-        FREESTYLE_PAIR("discipline_freestyle_pair"),
-        FREESTYLE_GROUP("discipline_freestyle_group"),
-    }
-
-    enum class Colors(val color: Color) {
-        PRIMARY(Color(0xFF7C45E2)),
-        SECONDARY(Color(0xFFEFD4FF)),
-        SLIDER_TRACK_ACTIVE(Color(0xFFBC9DF6)),
-        BUTTON_BLUE(Color(0xBF5500FF)),
-        BUTTON_RED(Color(0xBFBB0042)),
-        BUTTON_GRAY(Color(0xBF525151)),
-        BUTTON_BROWN(Color(0xFF2C2C2C))
-    }
-
-    enum class Categories(val value: String) {
-        JUNIORS("category_juniors"),
-        ADULTS("category_adults")
-    }
-
-    enum class PopupMode {
-        NONE,
-        SETTINGS,
-        WARNING,
-        INFORMATION
-    }
+    var isConnectedToServer by mutableStateOf(false)
+    var isAnimating by mutableStateOf(false)
+    var isOffline by mutableStateOf(true)
 }

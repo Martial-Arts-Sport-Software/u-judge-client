@@ -1,7 +1,9 @@
 package org.judging_app.entities
 
-import androidx.lifecycle.ViewModel
-
+/**
+ * The main parent of all ratings
+ * @property id - rating id
+ */
 open class Rating(
     val id: String
-): ViewModel()
+)

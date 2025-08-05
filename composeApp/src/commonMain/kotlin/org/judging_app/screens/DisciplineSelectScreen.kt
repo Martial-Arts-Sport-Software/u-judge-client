@@ -23,16 +23,22 @@ import androidx.compose.ui.unit.dp
 import judging_app_client.composeapp.generated.resources.Res
 import judging_app_client.composeapp.generated.resources.back_icon
 import org.judging_app.State
+import org.judging_app.enums.Colors
+import org.judging_app.enums.Disciplines
+import org.judging_app.enums.Routes
 import org.judging_app.locale.Localization
 import org.judging_app.ui.button.ButtonComponent
 import org.judging_app.ui.button.ButtonStyles
 import org.judging_app.ui.button.clickWithTransition
 
+/**
+ * Screen of discipline select
+ */
 object DisciplineSelectScreen: Screen {
     @Composable
     override fun load() {
         val goBackOnclick = remember { {
-            clickWithTransition(State.Routes.BACK)
+            clickWithTransition(Routes.BACK)
         } }
         Column(
             modifier = Modifier
@@ -68,7 +74,7 @@ object DisciplineSelectScreen: Screen {
                     .fillMaxWidth(0.8f)
                     .fillMaxHeight(0.9f)
                     .clip(RoundedCornerShape(15.dp))
-                    .background(State.Colors.SECONDARY.color),
+                    .background(Colors.SECONDARY.color),
                 contentAlignment = Alignment.Center
             ) {
                 Column(
@@ -78,7 +84,7 @@ object DisciplineSelectScreen: Screen {
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    val disciplines = State.Disciplines.entries
+                    val disciplines = Disciplines.entries
                     for (i in disciplines.indices step 2) {
                         val first = disciplines[i]
                         val second = if (i + 1 < disciplines.size)
@@ -86,7 +92,7 @@ object DisciplineSelectScreen: Screen {
                         val firstOnclick = {
                             State.currentDiscipline = first
                             clickWithTransition(
-                                State.Routes.CATEGORY_SELECT
+                                Routes.CATEGORY_SELECT
                             )
                         }
                         Row(
@@ -105,7 +111,7 @@ object DisciplineSelectScreen: Screen {
                                 val secondOnclick = {
                                     State.currentDiscipline = second
                                     clickWithTransition(
-                                        State.Routes.CATEGORY_SELECT
+                                        Routes.CATEGORY_SELECT
                                     )
                                 }
                                 Spacer(Modifier.weight(0.1f))

@@ -45,6 +45,8 @@ import org.judging_app.entities.PresentationCriteria
 import org.judging_app.entities.Rating
 import org.judging_app.entities.TechniqueCriteria
 import org.judging_app.entities.TechniqueRating
+import org.judging_app.enums.Categories
+import org.judging_app.enums.Colors
 import org.judging_app.locale.Localization
 import org.judging_app.readFile
 import org.judging_app.ui.input.Modes
@@ -56,21 +58,28 @@ import org.judging_app.screens.TechniqueScreen.DISPLAY
 import org.judging_app.ui.button.ButtonComponent
 import org.judging_app.ui.button.ButtonStyles
 import org.judging_app.ui.popup.InformationPopupComponent
+import org.judging_app.ui.popup.Popup
 import kotlin.math.roundToInt
 
+/**
+ * Screen of hosinsool discipline
+ * @property currentDisplay - display that is currently shown
+ * @property nextDisplay - display, that will be switched to
+ */
 object HosinsoolModeScreen : TechniqueScreen {
-    var currentDisplay by mutableStateOf(DISPLAY.TECHNIQUE)
-    var nextDisplay by mutableStateOf(DISPLAY.TECHNIQUE)
+    override var currentDisplay by mutableStateOf(DISPLAY.TECHNIQUE)
+    override var nextDisplay by mutableStateOf(DISPLAY.TECHNIQUE)
+    override var showInformation by mutableStateOf(false)
 
     @Composable
     override fun load() {
-        val filename = "${State.currentLocale.value}.txt"
+        val filename = "${State.currentLocale}.txt"
         val infoTextLines = readFile(filename)
         val rating by remember { mutableStateOf(
             if (State.currentRating is TechniqueRating) State.currentRating as TechniqueRating
             else TechniqueRating(
                 State.currentRating.id,
-                techniqueCriteria = if (State.currentCategory == State.Categories.JUNIORS)
+                techniqueCriteria = if (State.currentCategory == Categories.JUNIORS)
                     TechniqueCriteria.Junior(0.1f, 0.1f, 0.1f, 0.1f)
                 else TechniqueCriteria.Adult(0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f),
                 presentationCriteria = PresentationCriteria.HosinsoolPresentationCriteria(0.1f, 0.1f, 0.1f, 0.1f)
@@ -119,7 +128,7 @@ object HosinsoolModeScreen : TechniqueScreen {
             ) {
                 Text(
                     text = if (State.currentCategory?.value
-                        == State.Categories.ADULTS.value)
+                        == Categories.ADULTS.value)
                         Localization.getString("category_adults")
                     else Localization.getString("category_juniors"),
                     style = MaterialTheme.typography.titleSmall
@@ -134,14 +143,14 @@ object HosinsoolModeScreen : TechniqueScreen {
             }
             Spacer(Modifier.height(20.dp))
             AnimatedContent(
-                targetState = State.currentPopupMode.value,
+                targetState = State.currentPopupMode,
                 transitionSpec = {
                     fadeIn(animationSpec = tween(300)) togetherWith
                             fadeOut(animationSpec = tween(300))
                 }
             ) { target ->
                 when (target) {
-                    State.PopupMode.SETTINGS -> {
+                    Popup.Modes.SETTINGS -> {
                         Column(
                             Modifier
                                 .fillMaxHeight()
@@ -152,7 +161,7 @@ object HosinsoolModeScreen : TechniqueScreen {
                             SettingsPopupComponent()
                         }
                     }
-                    State.PopupMode.INFORMATION -> {
+                    Popup.Modes.INFORMATION -> {
                         Row(
                             Modifier.fillMaxSize(),
                             horizontalArrangement = Arrangement.SpaceBetween
@@ -211,7 +220,7 @@ object HosinsoolModeScreen : TechniqueScreen {
                                         Box(
                                             Modifier
                                                 .fillMaxSize()
-                                                .background(State.Colors.BUTTON_GRAY.color)
+                                                .background(Colors.BUTTON_GRAY.color)
                                         ) {
                                             Box(
                                                 Modifier
@@ -234,7 +243,7 @@ object HosinsoolModeScreen : TechniqueScreen {
                                                         .align(Alignment.BottomCenter)
                                                         .fillMaxHeight(),
                                                     horizontalAlignment = Alignment.CenterHorizontally,
-                                                    verticalArrangement = if (State.currentCategory == State.Categories.ADULTS)
+                                                    verticalArrangement = if (State.currentCategory == Categories.ADULTS)
                                                         Arrangement.SpaceBetween else Arrangement.SpaceAround
                                                 ) {
                                                     RangeInputComponent(
@@ -269,7 +278,7 @@ object HosinsoolModeScreen : TechniqueScreen {
                                                         },
                                                         icon = Res.drawable.foot
                                                     )
-                                                    if (State.currentCategory == State.Categories.ADULTS) {
+                                                    if (State.currentCategory == Categories.ADULTS) {
                                                         RangeInputComponent(
                                                             currentValue = (rating.techniqueCriteria as TechniqueCriteria.Adult)
                                                                 .knifeLock,
@@ -297,7 +306,7 @@ object HosinsoolModeScreen : TechniqueScreen {
                                         Box(
                                             Modifier
                                                 .fillMaxSize()
-                                                .background(State.Colors.BUTTON_GRAY.color)
+                                                .background(Colors.BUTTON_GRAY.color)
                                         ) {
                                             Box(
                                                 Modifier
@@ -374,7 +383,7 @@ object HosinsoolModeScreen : TechniqueScreen {
                                         Box(
                                             Modifier
                                                 .fillMaxSize()
-                                                .background(State.Colors.BUTTON_GRAY.color)
+                                                .background(Colors.BUTTON_GRAY.color)
                                         ) {
                                             Column(
                                                 Modifier
@@ -391,7 +400,7 @@ object HosinsoolModeScreen : TechniqueScreen {
                                                             .fillMaxSize()
                                                             .weight(1.2f)
                                                             .clip(RoundedCornerShape(10))
-                                                            .background(State.Colors.SLIDER_TRACK_ACTIVE.color),
+                                                            .background(Colors.SLIDER_TRACK_ACTIVE.color),
                                                         contentAlignment = Alignment.Center
                                                     ) {
                                                         Text(
@@ -411,7 +420,7 @@ object HosinsoolModeScreen : TechniqueScreen {
                                                                 .fillMaxSize()
                                                                 .weight(1f)
                                                                 .clip(RoundedCornerShape(15))
-                                                                .background(State.Colors.PRIMARY.color.copy(0.85f)),
+                                                                .background(Colors.PRIMARY.color.copy(0.85f)),
                                                             contentAlignment = Alignment.Center
                                                         ) {
                                                             Text(
@@ -426,7 +435,7 @@ object HosinsoolModeScreen : TechniqueScreen {
                                                                 .fillMaxSize()
                                                                 .weight(1f)
                                                                 .clip(RoundedCornerShape(15))
-                                                                .background(State.Colors.PRIMARY.color.copy(0.85f)),
+                                                                .background(Colors.PRIMARY.color.copy(0.85f)),
                                                             contentAlignment = Alignment.Center
                                                         ) {
                                                             Text(
@@ -454,7 +463,7 @@ object HosinsoolModeScreen : TechniqueScreen {
                                                         style = ButtonStyles.Secondary,
                                                         text = Localization.getString("hosinsool-result-send-btn"),
                                                         onclick = {},
-                                                        enabled = !State.isOffline.value
+                                                        enabled = !State.isOffline
                                                     )
                                                 }
                                             }

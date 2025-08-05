@@ -2,6 +2,10 @@ package org.judging_app.locale
 
 import org.judging_app.State
 
+/**
+ * Singleton for all text in different languages
+ * @property strings - map of all text, every map key is sub-map for specific lang
+ */
 object Localization {
     private val strings = mapOf(
         "en" to mapOf(
@@ -119,7 +123,7 @@ object Localization {
         )
     )
     fun getString(key: String): String {
-        return strings[State.currentLocale.value]
+        return strings[State.currentLocale]
             ?.get(key) ?: strings["ru"]?.get(key) ?: key
     }
 }

@@ -21,19 +21,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import judging_app_client.composeapp.generated.resources.Res
-import judging_app_client.composeapp.generated.resources.kerugi_chestplate
 import judging_app_client.composeapp.generated.resources.kerugi_helmet
 import judging_app_client.composeapp.generated.resources.tanbon_body
 import judging_app_client.composeapp.generated.resources.tanbon_cross
 import org.judging_app.State
+import org.judging_app.enums.Colors
 import org.judging_app.locale.Localization
-import org.judging_app.ui.button.KerugiButtonComponent
-import org.judging_app.ui.button.KerugiButtonPositions
+import org.judging_app.ui.button.CombatButtonComponent
+import org.judging_app.ui.button.CombatButtonPositions
 import org.judging_app.ui.navbar.NavbarComponent
 import org.judging_app.ui.navbar.NavbarStyles
+import org.judging_app.ui.popup.Popup
 import org.judging_app.ui.popup.SettingsPopupComponent
 import org.judging_app.ui.popup.WarningPopupComponent
 
+/**
+ * Screen of tanbon discipline
+ */
 object TanbonModeScreen : Screen {
     @Composable
     override fun load() {
@@ -69,14 +73,14 @@ object TanbonModeScreen : Screen {
             }
             Spacer(Modifier.height(15.dp))
             AnimatedContent(
-                targetState = State.currentPopupMode.value,
+                targetState = State.currentPopupMode,
                 transitionSpec = {
                     fadeIn(animationSpec = tween(300)) togetherWith
                             fadeOut(animationSpec = tween(300))
                 }
             ) { target ->
                 when (target) {
-                    State.PopupMode.SETTINGS -> {
+                    Popup.Modes.SETTINGS -> {
                         Column(
                             Modifier
                                 .fillMaxHeight(0.95f)
@@ -87,7 +91,7 @@ object TanbonModeScreen : Screen {
                             SettingsPopupComponent()
                         }
                     }
-                    State.PopupMode.WARNING -> {
+                    Popup.Modes.WARNING -> {
                         Column(
                             Modifier
                                 .fillMaxHeight(0.95f)
@@ -108,18 +112,18 @@ object TanbonModeScreen : Screen {
                                 Modifier
                                     .weight(0.38f)
                             ) {
-                                KerugiButtonComponent(
-                                    position = KerugiButtonPositions.LEFT,
-                                    color = State.Colors.BUTTON_BLUE,
+                                CombatButtonComponent(
+                                    position = CombatButtonPositions.LEFT,
+                                    color = Colors.BUTTON_BLUE,
                                     icon = Res.drawable.kerugi_helmet,
                                     onclick = {},
                                     modifier = Modifier
                                         .weight(1f)
                                 )
                                 Spacer(Modifier.weight(0.02f))
-                                KerugiButtonComponent(
-                                    position = KerugiButtonPositions.RIGHT,
-                                    color = State.Colors.BUTTON_RED,
+                                CombatButtonComponent(
+                                    position = CombatButtonPositions.RIGHT,
+                                    color = Colors.BUTTON_RED,
                                     icon = Res.drawable.kerugi_helmet,
                                     onclick = {},
                                     modifier = Modifier
@@ -131,27 +135,27 @@ object TanbonModeScreen : Screen {
                                 Modifier
                                     .weight(0.38f)
                             ) {
-                                KerugiButtonComponent(
-                                    position = KerugiButtonPositions.LEFT,
-                                    color = State.Colors.BUTTON_BLUE,
+                                CombatButtonComponent(
+                                    position = CombatButtonPositions.LEFT,
+                                    color = Colors.BUTTON_BLUE,
                                     icon = Res.drawable.tanbon_body,
                                     onclick = {},
                                     modifier = Modifier
                                         .weight(1f)
                                 )
                                 Spacer(Modifier.weight(0.04f))
-                                KerugiButtonComponent(
-                                    position = KerugiButtonPositions.CENTER,
-                                    color = State.Colors.BUTTON_GRAY,
+                                CombatButtonComponent(
+                                    position = CombatButtonPositions.CENTER,
+                                    color = Colors.BUTTON_GRAY,
                                     icon = Res.drawable.tanbon_cross,
                                     onclick = {},
                                     modifier = Modifier
                                         .weight(1f)
                                 )
                                 Spacer(Modifier.weight(0.04f))
-                                KerugiButtonComponent(
-                                    position = KerugiButtonPositions.RIGHT,
-                                    color = State.Colors.BUTTON_RED,
+                                CombatButtonComponent(
+                                    position = CombatButtonPositions.RIGHT,
+                                    color = Colors.BUTTON_RED,
                                     icon = Res.drawable.tanbon_body,
                                     onclick = {},
                                     modifier = Modifier

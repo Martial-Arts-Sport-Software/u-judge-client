@@ -29,12 +29,16 @@ import judging_app_client.composeapp.generated.resources.Res
 import judging_app_client.composeapp.generated.resources.club_logo
 import org.jetbrains.compose.resources.painterResource
 import org.judging_app.State
+import org.judging_app.enums.Routes
 import org.judging_app.locale.Localization
 import org.judging_app.ui.button.ButtonComponent
 import org.judging_app.ui.button.ButtonStyles
 import org.judging_app.ui.button.clickWithTransition
 import org.judging_app.ui.input.TextInputComponent
 
+/**
+ * Welcome screen
+ */
 object EntryScreen: Screen {
     @Composable
     override fun load() {
@@ -107,12 +111,12 @@ object EntryScreen: Screen {
                     )
 
                     val loginOnClick = remember { {
-                        State.isOffline.value = false
-                        clickWithTransition(State.Routes.DISCIPLINE_SELECT)
+                        State.isOffline = false
+                        clickWithTransition(Routes.DISCIPLINE_SELECT)
                     } }
                     val offlineOnClick = remember { {
-                        State.isOffline.value = true
-                        clickWithTransition(State.Routes.DISCIPLINE_SELECT)
+                        State.isOffline = true
+                        clickWithTransition(Routes.DISCIPLINE_SELECT)
                     } }
 
                     Spacer(Modifier.weight(0.3f))
@@ -152,7 +156,7 @@ object EntryScreen: Screen {
                         ButtonComponent(
                             "Русский",
                             ButtonStyles.Plain,
-                            onclick = { State.currentLocale.value = "ru" },
+                            onclick = { State.currentLocale = "ru" },
                             modifier = Modifier.weight(1f)
                         )
                         VerticalDivider(
@@ -165,7 +169,7 @@ object EntryScreen: Screen {
                         ButtonComponent(
                             "English",
                             ButtonStyles.Plain,
-                            onclick = { State.currentLocale.value = "en" },
+                            onclick = { State.currentLocale = "en" },
                             modifier = Modifier.weight(1f)
                         )
                     }

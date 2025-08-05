@@ -9,11 +9,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import judging_app_client.composeapp.generated.resources.Res
 
-interface Platform {
-    val name: String
-}
-
-expect fun getPlatform(): Platform
 expect fun getLocale(): String
 
 @Composable

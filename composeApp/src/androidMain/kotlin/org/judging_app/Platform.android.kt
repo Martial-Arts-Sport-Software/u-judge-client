@@ -1,13 +1,7 @@
 package org.judging_app
 
-import android.os.Build
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -17,15 +11,9 @@ import androidx.compose.ui.unit.em
 import judging_app_client.composeapp.generated.resources.Montserrat
 import judging_app_client.composeapp.generated.resources.Res
 import org.jetbrains.compose.resources.Font
-import java.io.File
-import java.lang.reflect.InvocationTargetException
+import org.judging_app.enums.Colors
 import java.util.Locale
 
-class AndroidPlatform : Platform {
-    override val name: String = "Android ${Build.VERSION.SDK_INT}"
-}
-
-actual fun getPlatform(): Platform = AndroidPlatform()
 actual fun getLocale(): String = Locale.getDefault().language
 
 @Composable
@@ -75,7 +63,7 @@ actual fun getTypography(): Typography {
         displayLarge = TextStyle(
             fontFamily = montserratVariable,
             fontSize = 5.em,
-            color = State.Colors.PRIMARY.color
+            color = Colors.PRIMARY.color
         )
     )
 }

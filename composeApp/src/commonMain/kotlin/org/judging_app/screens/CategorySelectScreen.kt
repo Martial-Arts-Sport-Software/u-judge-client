@@ -24,16 +24,22 @@ import androidx.compose.ui.unit.dp
 import judging_app_client.composeapp.generated.resources.Res
 import judging_app_client.composeapp.generated.resources.back_icon
 import org.judging_app.State
+import org.judging_app.enums.Categories
+import org.judging_app.enums.Colors
+import org.judging_app.enums.Routes
 import org.judging_app.locale.Localization
 import org.judging_app.ui.button.ButtonComponent
 import org.judging_app.ui.button.ButtonStyles
 import org.judging_app.ui.button.clickWithTransition
 
+/**
+ * Screen of category select
+ */
 object CategorySelectScreen : Screen {
     @Composable
     override fun load() {
         val goBackOnclick = remember { {
-            clickWithTransition(State.Routes.BACK)
+            clickWithTransition(Routes.BACK)
         } }
         Column(
             modifier = Modifier
@@ -73,7 +79,7 @@ object CategorySelectScreen : Screen {
                     .fillMaxWidth(0.5f)
                     .fillMaxHeight(0.8f)
                     .clip(RoundedCornerShape(15.dp))
-                    .background(State.Colors.SECONDARY.color),
+                    .background(Colors.SECONDARY.color),
                 contentAlignment = Alignment.Center
             ) {
                 Row(
@@ -83,7 +89,7 @@ object CategorySelectScreen : Screen {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    val categories = State.Categories.entries
+                    val categories = Categories.entries
                     for (i in categories.indices step 2) {
                         val first = categories[i]
                         val second = if (i + 1 < categories.size)
@@ -91,7 +97,7 @@ object CategorySelectScreen : Screen {
                         val firstOnclick = {
                             State.currentCategory = first
                             clickWithTransition(
-                                State.Routes.valueOf(
+                                Routes.valueOf(
                                     "${State.currentDiscipline!!
                                         .value.split("_")[1].uppercase()}_MODE"
                                 )
@@ -114,7 +120,7 @@ object CategorySelectScreen : Screen {
                                 val secondOnclick = {
                                     State.currentCategory = second
                                     clickWithTransition(
-                                        State.Routes.valueOf(
+                                        Routes.valueOf(
                                             "${State.currentDiscipline!!
                                                 .value.split("_")[1].uppercase()}_MODE"
                                         )

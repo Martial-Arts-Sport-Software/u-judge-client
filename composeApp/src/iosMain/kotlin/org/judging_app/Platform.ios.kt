@@ -10,22 +10,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import judging_app_client.composeapp.generated.resources.Montserrat
 import judging_app_client.composeapp.generated.resources.Res
-import kotlinx.cinterop.ExperimentalForeignApi
 import org.jetbrains.compose.resources.Font
+import org.judging_app.enums.Colors
 import platform.Foundation.NSLocale
-import platform.Foundation.NSString
-import platform.Foundation.NSUTF8StringEncoding
 import platform.Foundation.currentLocale
 import platform.Foundation.languageCode
-import platform.Foundation.stringWithContentsOfFile
-import platform.UIKit.UIDevice
-import platform.posix.exit
 
-class IOSPlatform: Platform {
-    override val name: String = UIDevice.currentDevice.systemName() + " " + UIDevice.currentDevice.systemVersion
-}
-
-actual fun getPlatform(): Platform = IOSPlatform()
 actual fun getLocale(): String = NSLocale.currentLocale.languageCode
 @Composable
 actual fun getTypography(): Typography {
@@ -74,7 +64,7 @@ actual fun getTypography(): Typography {
         displayLarge = TextStyle(
             fontFamily = montserratVariable,
             fontSize = 20.sp,
-            color = State.Colors.PRIMARY.color
+            color = Colors.PRIMARY.color
         )
     )
 }

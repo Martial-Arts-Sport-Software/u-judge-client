@@ -37,10 +37,14 @@ import judging_app_client.composeapp.generated.resources.Res
 import judging_app_client.composeapp.generated.resources.cross_icon
 import kotlinx.coroutines.launch
 import org.judging_app.State
+import org.judging_app.enums.Colors
 import org.judging_app.locale.Localization
 import org.judging_app.ui.button.ButtonComponent
 import org.judging_app.ui.button.ButtonStyles
 
+/**
+ * Renders information popup
+ */
 @Composable
 fun InformationPopupComponent(
     lines: List<String>,
@@ -82,7 +86,7 @@ fun InformationPopupComponent(
             style = ButtonStyles.Icon,
             iconSrc = Res.drawable.cross_icon,
             onclick = {
-                State.currentPopupMode.value = State.PopupMode.NONE
+                State.currentPopupMode = Popup.Modes.NONE
             }
         )
         Row(
@@ -120,7 +124,7 @@ fun InformationPopupComponent(
                         .fillMaxWidth()
                         .aspectRatio(1 / 3f)
                         .offset(y = with(State.density!!) { (scrollFraction * (scrollbarSize.height - thumbSize.height)).toDp() })
-                        .background(State.Colors.PRIMARY.color, RoundedCornerShape(50))
+                        .background(Colors.PRIMARY.color, RoundedCornerShape(50))
                         .draggable(
                             orientation = Orientation.Vertical,
                             state = rememberDraggableState { delta ->

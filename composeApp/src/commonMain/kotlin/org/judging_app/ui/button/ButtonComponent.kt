@@ -2,44 +2,40 @@ package org.judging_app.ui.button
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.judging_app.State
+import org.judging_app.enums.Colors
+import org.judging_app.enums.Routes
 
+/**
+ * buttons variants
+ * @property Primary - primary button with text, first accent
+ * @property Secondary - secondary button with text, second accent
+ * @property Plain - button with transparent background with text, third accent
+ * @property Icon - button with icon without text
+ * @property Solid - button without anything but solid background
+ */
 enum class ButtonStyles {
     Primary,
     Secondary,
@@ -48,9 +44,17 @@ enum class ButtonStyles {
     Solid
 }
 
-
-
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Renders button component
+ * @param text - button's content. Does not required for [ButtonStyles.Icon] & [ButtonStyles.Solid]
+ * @param style - [ButtonStyles] style of button
+ * @param modifier - custom [Modifier] applied to component
+ * @param onclick - callback that is called on button click
+ * @param iconSrc - [DrawableResource] source to image that is provided as icon to [ButtonStyles.Icon]
+ * @param colorFilter - [ColorFilter] instance, applied to button's icon ([ButtonStyles.Icon] only)
+ * @param iconPadding - inner padding for icon inside button ([ButtonStyles.Icon] only)
+ * @param enabled - button's accessibility
+ */
 @Composable
 fun ButtonComponent(
     text: String? = null,
@@ -69,113 +73,111 @@ fun ButtonComponent(
                  ButtonStyles.Plain -> require(text != null)
         else -> {}
     }
-    CompositionLocalProvider(LocalRippleConfiguration provides null) {
-        when(style) {
-            ButtonStyles.Primary -> {
-                Button(
-                    modifier = modifier
-                        .fillMaxWidth(0.8f),
-                    onClick = {
-                        if (!State.isAnimating.value) onclick()
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = State.Colors.PRIMARY.color
-                    ),
-                    shape = RoundedCornerShape(5.dp),
-                    content = {
-                        Text(
-                            style = MaterialTheme.typography.bodyLarge,
-                            text = text!!,
-                            textAlign = TextAlign.Center
-                        )
-                    },
-                    enabled = enabled
-                )
-            }
-            ButtonStyles.Secondary -> {
-                Button(
-                    modifier = modifier.fillMaxWidth(0.8f),
-                    onClick = {
-                        if (!State.isAnimating.value) {
-                            onclick()
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White.copy(0.48f),
-                        disabledContainerColor = Color.White.copy(0.25f)
-                    ),
-                    shape = RoundedCornerShape(5.dp),
-                    content = {
-                        Text(
-                            text!!,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = if (enabled) State.Colors.PRIMARY.color
-                            else State.Colors.PRIMARY.color.copy(0.5f)
-                        )
-                    },
-                    enabled = enabled
-                )
-            }
-            ButtonStyles.Plain -> {
-                Button(
-                    modifier = modifier
-                        .fillMaxWidth(0.8f),
-                    onClick = {
-                        if (!State.isAnimating.value) { onclick() }
-                    },
-                    border = BorderStroke(0.dp, Color.Transparent),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent
-                    ),
-                    content = {
-                        Text(
-                            style = MaterialTheme.typography.bodyMedium,
-                            text = text!!,
-                            color = State.Colors.PRIMARY.color
-                        )
-                    },
-                )
-            }
-            ButtonStyles.Icon -> {
-                TextButton(
-                    modifier = modifier
-                        .aspectRatio(1f),
-                    onClick = {
-                        if (!State.isAnimating.value) { onclick() }
-                    },
-                    contentPadding = PaddingValues(iconPadding),
-                    enabled = enabled
-                ) {
-                    Image(
-                        modifier = Modifier
-                            .aspectRatio(1f),
-                        painter = painterResource(iconSrc!!),
-                        contentDescription = null,
-                        contentScale = ContentScale.Fit,
-                        colorFilter = colorFilter
+    when(style) {
+        ButtonStyles.Primary -> {
+            Button(
+                modifier = modifier
+                    .fillMaxWidth(0.8f),
+                onClick = {
+                    if (!State.isAnimating) onclick()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Colors.PRIMARY.color
+                ),
+                shape = RoundedCornerShape(5.dp),
+                content = {
+                    Text(
+                        style = MaterialTheme.typography.bodyLarge,
+                        text = text!!,
+                        textAlign = TextAlign.Center
                     )
-                }
-            }
-            ButtonStyles.Solid -> {
-                Box(
-                    modifier = modifier
-                        .fillMaxSize()
-                        .clickable {
-                            if (!State.isAnimating.value && enabled) { onclick() }
-                        },
+                },
+                enabled = enabled
+            )
+        }
+        ButtonStyles.Secondary -> {
+            Button(
+                modifier = modifier.fillMaxWidth(0.8f),
+                onClick = {
+                    if (!State.isAnimating) {
+                        onclick()
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White.copy(0.48f),
+                    disabledContainerColor = Color.White.copy(0.35f)
+                ),
+                shape = RoundedCornerShape(5.dp),
+                content = {
+                    Text(
+                        text!!,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = if (enabled) Colors.PRIMARY.color
+                        else Color.Black.copy(0.3f)
+                    )
+                },
+                enabled = enabled
+            )
+        }
+        ButtonStyles.Plain -> {
+            Button(
+                modifier = modifier
+                    .fillMaxWidth(0.8f),
+                onClick = {
+                    if (!State.isAnimating) { onclick() }
+                },
+                border = BorderStroke(0.dp, Color.Transparent),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent
+                ),
+                content = {
+                    Text(
+                        style = MaterialTheme.typography.bodyMedium,
+                        text = text!!,
+                        color = Colors.PRIMARY.color
+                    )
+                },
+            )
+        }
+        ButtonStyles.Icon -> {
+            TextButton(
+                modifier = modifier
+                    .aspectRatio(1f),
+                onClick = {
+                    if (!State.isAnimating) { onclick() }
+                },
+                contentPadding = PaddingValues(iconPadding),
+                enabled = enabled
+            ) {
+                Image(
+                    modifier = Modifier
+                        .aspectRatio(1f),
+                    painter = painterResource(iconSrc!!),
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                    colorFilter = colorFilter
                 )
             }
+        }
+        ButtonStyles.Solid -> {
+            Box(
+                modifier = modifier
+                    .fillMaxSize()
+                    .clickable {
+                        if (!State.isAnimating && enabled) { onclick() }
+                    },
+            )
         }
     }
 }
 
 fun clickWithTransition(
-    route: State.Routes
+    route: Routes
 ) {
-    if (State.isOffline.value || State.isConnectedToServer.value) {
-        State.isAnimating.value = true
-        if (route == State.Routes.BACK) {
+    if (State.isOffline || State.isConnectedToServer) {
+        State.isAnimating = true
+        if (route == Routes.BACK) {
             State.navController!!.popBackStack()
         } else State.navController!!.navigate(route.path)
-    } else State.isConnectedToServer.value = false
+    } else State.isConnectedToServer = false
 }

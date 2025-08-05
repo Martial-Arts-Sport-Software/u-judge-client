@@ -21,10 +21,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.judging_app.State
+import org.judging_app.enums.Colors
 import org.judging_app.locale.Localization
 import org.judging_app.ui.button.ButtonComponent
 import org.judging_app.ui.button.ButtonStyles
 
+/**
+ * Renders warning popup (for kerugi & tanbon)
+ */
 @Composable
 fun WarningPopupComponent() {
     Box(
@@ -32,7 +36,7 @@ fun WarningPopupComponent() {
             .fillMaxHeight(0.8f)
             .fillMaxWidth(0.45f)
             .clip(RoundedCornerShape(25.dp))
-            .background(State.Colors.SECONDARY.color)
+            .background(Colors.SECONDARY.color)
             .padding(horizontal = 5.dp)
     ) {
         Column(
@@ -63,7 +67,7 @@ fun WarningPopupComponent() {
                         "warning_continue"
                     ),
                     onclick = {
-                        State.currentPopupMode.value = State.PopupMode.NONE
+                        State.currentPopupMode = Popup.Modes.NONE
                     },
                 )
                 Spacer(Modifier.weight(0.5f))
@@ -73,7 +77,7 @@ fun WarningPopupComponent() {
                         "settings_start_fight"
                     ),
                     onclick = {
-                        State.currentPopupMode.value = State.PopupMode.NONE
+                        State.currentPopupMode = Popup.Modes.NONE
                     },
                 )
                 Spacer(Modifier.weight(0.5f))
@@ -88,7 +92,7 @@ fun WarningPopupComponent() {
                     ButtonComponent(
                         "Русский",
                         ButtonStyles.Plain,
-                        onclick = { State.currentLocale.value = "ru" },
+                        onclick = { State.currentLocale = "ru" },
                         modifier = Modifier.weight(1f)
                     )
                     VerticalDivider(
@@ -101,7 +105,7 @@ fun WarningPopupComponent() {
                     ButtonComponent(
                         "English",
                         ButtonStyles.Plain,
-                        onclick = { State.currentLocale.value = "en" },
+                        onclick = { State.currentLocale = "en" },
                         modifier = Modifier.weight(1f)
                     )
                 }

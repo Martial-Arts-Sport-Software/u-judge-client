@@ -24,15 +24,19 @@ import judging_app_client.composeapp.generated.resources.Res
 import judging_app_client.composeapp.generated.resources.kerugi_chestplate
 import judging_app_client.composeapp.generated.resources.kerugi_helmet
 import org.judging_app.State
+import org.judging_app.enums.Colors
 import org.judging_app.locale.Localization
-import org.judging_app.ui.button.KerugiButtonComponent
-import org.judging_app.ui.button.KerugiButtonPositions
+import org.judging_app.ui.button.CombatButtonComponent
+import org.judging_app.ui.button.CombatButtonPositions
 import org.judging_app.ui.navbar.NavbarComponent
 import org.judging_app.ui.navbar.NavbarStyles
+import org.judging_app.ui.popup.Popup
 import org.judging_app.ui.popup.SettingsPopupComponent
 import org.judging_app.ui.popup.WarningPopupComponent
 
-
+/**
+ * Screen of kerugi discipline
+ */
 object KerugiModeScreen : Screen {
     @Composable
     override fun load() {
@@ -67,14 +71,14 @@ object KerugiModeScreen : Screen {
             }
             Spacer(Modifier.height(15.dp))
             AnimatedContent(
-                targetState = State.currentPopupMode.value,
+                targetState = State.currentPopupMode,
                 transitionSpec = {
                     fadeIn(animationSpec = tween(300)) togetherWith
                             fadeOut(animationSpec = tween(300))
                 }
             ) { target ->
                 when (target) {
-                    State.PopupMode.SETTINGS -> {
+                    Popup.Modes.SETTINGS -> {
                         Column(
                             Modifier
                                 .fillMaxHeight(0.95f)
@@ -85,7 +89,7 @@ object KerugiModeScreen : Screen {
                             SettingsPopupComponent()
                         }
                     }
-                    State.PopupMode.WARNING -> {
+                    Popup.Modes.WARNING -> {
                         Column(
                             Modifier
                                 .fillMaxHeight(0.95f)
@@ -106,18 +110,18 @@ object KerugiModeScreen : Screen {
                                 Modifier
                                     .weight(0.38f)
                             ) {
-                                KerugiButtonComponent(
-                                    position = KerugiButtonPositions.LEFT,
-                                    color = State.Colors.BUTTON_BLUE,
+                                CombatButtonComponent(
+                                    position = CombatButtonPositions.LEFT,
+                                    color = Colors.BUTTON_BLUE,
                                     icon = Res.drawable.kerugi_helmet,
                                     onclick = {},
                                     modifier = Modifier
                                         .weight(1f)
                                 )
                                 Spacer(Modifier.weight(0.02f))
-                                KerugiButtonComponent(
-                                    position = KerugiButtonPositions.RIGHT,
-                                    color = State.Colors.BUTTON_RED,
+                                CombatButtonComponent(
+                                    position = CombatButtonPositions.RIGHT,
+                                    color = Colors.BUTTON_RED,
                                     icon = Res.drawable.kerugi_helmet,
                                     onclick = {},
                                     modifier = Modifier
@@ -129,18 +133,18 @@ object KerugiModeScreen : Screen {
                                 Modifier
                                     .weight(0.38f)
                             ) {
-                                KerugiButtonComponent(
-                                    position = KerugiButtonPositions.LEFT,
-                                    color = State.Colors.BUTTON_BLUE,
+                                CombatButtonComponent(
+                                    position = CombatButtonPositions.LEFT,
+                                    color = Colors.BUTTON_BLUE,
                                     icon = Res.drawable.kerugi_chestplate,
                                     onclick = {},
                                     modifier = Modifier
                                         .weight(1f)
                                 )
                                 Spacer(Modifier.weight(0.02f))
-                                KerugiButtonComponent(
-                                    position = KerugiButtonPositions.RIGHT,
-                                    color = State.Colors.BUTTON_RED,
+                                CombatButtonComponent(
+                                    position = CombatButtonPositions.RIGHT,
+                                    color = Colors.BUTTON_RED,
                                     icon = Res.drawable.kerugi_chestplate,
                                     onclick = {},
                                     modifier = Modifier
