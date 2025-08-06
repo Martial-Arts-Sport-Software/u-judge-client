@@ -1,14 +1,23 @@
-This is a Kotlin Multiplatform project targeting Android, iOS.
+## Short Info
+<b>U'Judge - Client</b> is mobile application for Android & IOS, designed for judging sport competitions
+- Based on Kotlin Multiplatform technology
+- Part of U'Judge Platform, client & server system for judging Taekwondo & Hapkido sport competition
+- The appearance of the application is designed in accordance with our <a href="https://www.figma.com/design/x5vY9DbXh3a0kv0lBPcNru/Judging-app?node-id=51-128&t=r4o8EgEnSLslF1dG-0">specific design</a>
 
-* `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - `commonMain` is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    `iosMain` would be the right folder for such calls.
+## Features
+Application has two main modes - online and offline
+Note: both modes requires username filled to work
 
-* `/iosApp` contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform, 
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+### Offline Mode (No server required)
+- Does not need server, but some of disciplines are locked to judge (kerugi & tanbon, they require server to display information about current bout)
+- From all dicipline screens there is settings button, that toggles settings menu. Menu differs depending on current discipline.
+- Support two languages, russian & english, korean language also is planning to be added. Language select is available on entry screen and in settings for every discipline
+- Technical disciplines (hosinsool & freestyle) are available, but "Send" button is disabled, user can only save his judging ratings
+- In technical disciplines there is info button, that shows information in seleteced language to remind competition rules
 
-
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+### Online Mode (Server required)
+- This mode has all disciplines available, but requires server connection.
+- To use online mode, user must enter server's IP address, that can be got from server application.
+- In combat disciplines (kerugi & tanbon), user can click on buttons that represent different hits by competitors.
+- In case if something is wrong, there is "Attention button", that send signal to server, and bout is stopped.
+- All offline mode features are also available
