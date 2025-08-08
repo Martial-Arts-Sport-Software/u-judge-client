@@ -18,11 +18,11 @@ sealed class TechniqueCriteria {
     abstract fun getTotalScore(): Float
 
     /**
-     * [TechniqueCriteria] implementation for junior category
-     * @property wristHold - criterion, responsible for score of wrist holding defense
-     * @property clothesHold - criterion, responsible for score of clothes holding defense
-     * @property fistPunch - criterion, responsible for score of fist punch defense
-     * @property legKick - criterion, responsible for score of leg kick defense
+     * [TechniqueCriteria] implementation for hosinsool & freestyle pair junior category
+     * @property wristHold score of wrist holding defense
+     * @property clothesHold score of clothes holding defense
+     * @property fistPunch score of fist punch defense
+     * @property legKick score of leg kick defense
      */
     open class Junior(
         wristHold: Float = 0.1f,
@@ -30,17 +30,17 @@ sealed class TechniqueCriteria {
         fistPunch: Float = 0.1f,
         legKick: Float = 0.1f,
     ): TechniqueCriteria() {
-        var wristHold by mutableStateOf(wristHold)
-        var clothesHold by mutableStateOf(clothesHold)
-        var fistPunch by mutableStateOf(fistPunch)
-        var legKick by mutableStateOf(legKick)
-
         init {
             require(wristHold in 0.1f..1f)
             require(clothesHold in 0.1f..1f)
             require(fistPunch in 0.1f..1f)
             require(legKick in 0.1f..1f)
         }
+        
+        var wristHold by mutableStateOf(wristHold)
+        var clothesHold by mutableStateOf(clothesHold)
+        var fistPunch by mutableStateOf(fistPunch)
+        var legKick by mutableStateOf(legKick)
 
         override fun toString(): String {
             return "wristHold: $wristHold,\n" +
@@ -55,13 +55,13 @@ sealed class TechniqueCriteria {
     }
 
     /**
-     * [TechniqueCriteria] implementation for junior category
-     * @property wristHold - criterion, responsible for score of wrist holding defense
-     * @property clothesHold - criterion, responsible for score of clothes holding defense
-     * @property fistPunch - criterion, responsible for score of fist punch defense
-     * @property legKick - criterion, responsible for score of leg kick defense
-     * @property knifeLock - criterion, responsible for score of knife defense
-     * @property weaponLock - criterion, responsible for score of defense with hapkido weapon
+     * [TechniqueCriteria] implementation for hosinsool & freestyle pair adult category
+     * @property wristHold score of wrist holding defense
+     * @property clothesHold score of clothes holding defense
+     * @property fistPunch score of fist punch defense
+     * @property legKick score of leg kick defense
+     * @property knifeLock score of knife defense
+     * @property weaponLock score of defense with hapkido weapon
      */
     class Adult(
         wristHold: Float = 0.1f,
@@ -76,13 +76,13 @@ sealed class TechniqueCriteria {
         fistPunch,
         legKick
     ){
-        var knifeLock by mutableStateOf(knifeLock)
-        var weaponLock by mutableStateOf(weaponLock)
-
         init {
             require(knifeLock in 0.1f..1f)
             require(weaponLock in 0.1f..1f)
         }
+        
+        var knifeLock by mutableStateOf(knifeLock)
+        var weaponLock by mutableStateOf(weaponLock)
 
         override fun toString(): String {
             return super.toString() +
@@ -93,6 +93,107 @@ sealed class TechniqueCriteria {
         override fun getTotalScore(): Float {
             return super.getTotalScore() +
                     round((knifeLock + weaponLock) * 10) / 10f
+        }
+    }
+
+    /**
+     * [TechniqueCriteria] implementation for freestyle group discipline
+     * @property offenseDefense offense & defense techniques
+     * @property itemsBreaking breaking planks & other stuff
+     * @property legKicks leg-kick techniques
+     * @property weaponUse weapon usage
+     * @property dynamicMovement dynamics & movement of the performance
+     * @property acrobatics acrobatic elements
+     */
+    class Group(
+        offenseDefense: Float = 0.1f,
+        itemsBreaking: Float = 0.1f,
+        legKicks: Float = 0.1f,
+        weaponUse: Float = 0.1f,
+        dynamicMovement: Float = 0.1f,
+        acrobatics: Float = 0.1f
+    ): TechniqueCriteria() {
+        init {
+            require(offenseDefense in 0.1f..1f)
+            require(itemsBreaking in 0.1f..1f)
+            require(legKicks in 0.1f..1f)
+            require(weaponUse in 0.1f..1f)
+            require(dynamicMovement in 0.1f..1f)
+            require(acrobatics in 0.1f..1f)
+        }
+        
+        var offenseDefense by mutableStateOf(offenseDefense)
+        var itemsBreaking by mutableStateOf(itemsBreaking)
+        var legKicks by mutableStateOf(legKicks)
+        var weaponUse by mutableStateOf(weaponUse)
+        var dynamicMovement by mutableStateOf(dynamicMovement)
+        var acrobatics by mutableStateOf(acrobatics)
+
+        override fun toString(): String {
+            return "offenseDefense: $offenseDefense,\n" +
+                    "itemsBreaking: $itemsBreaking,\n" +
+                    "legKicks: $legKicks,\n" +
+                    "weaponUse: $weaponUse,\n" +
+                    "dynamicMovement: $dynamicMovement,\n" +
+                    "acrobatics: $acrobatics"
+        }
+        
+        override fun getTotalScore(): Float {
+            return round(
+                (offenseDefense + itemsBreaking + legKicks + 
+                        weaponUse + dynamicMovement + acrobatics) * 10
+            ) / 10f
+        }
+
+    }
+
+    /**
+     * [TechniqueCriteria] implementation for freestyle with weapon
+     * @property weaponTechniques techniques with weapon
+     * @property jumpKicks leg kicks in air
+     * @property rotateKicks leg kicks with rotation
+     * @property weaponManipulation effective weapon usage
+     * @property movement competitors movement during performance
+     * @property acrobatics acrobatic elements
+     */
+    class Weapon(
+        weaponTechniques: Float = 0.1f,
+        jumpKicks: Float = 0.1f,
+        rotateKicks: Float = 0.1f,
+        weaponManipulation: Float = 0.1f,
+        movement: Float = 0.1f,
+        acrobatics: Float = 0.1f
+    ): TechniqueCriteria() {
+        init {
+            require(weaponTechniques in 0.1f..1f)
+            require(jumpKicks in 0.1f..1f)
+            require(rotateKicks in 0.1f..1f)
+            require(weaponManipulation in 0.1f..1f)
+            require(movement in 0.1f..1f)
+            require(acrobatics in 0.1f..1f)
+        }
+        
+        var weaponTechniques by mutableStateOf(weaponTechniques)
+        var jumpKicks by mutableStateOf(jumpKicks)
+        var rotateKicks by mutableStateOf(rotateKicks)
+        var weaponManipulation by mutableStateOf(weaponManipulation)
+        var movement by mutableStateOf(movement)
+        var acrobatics by mutableStateOf(acrobatics)
+
+        override fun toString(): String {
+            return "weaponTechniques: $weaponTechniques,\n" +
+                    "jumpKicks: $jumpKicks,\n" +
+                    "rotateKicks: $rotateKicks,\n" +
+                    "weaponManipulation: $weaponManipulation,\n" +
+                    "movement: $movement,\n" +
+                    "acrobatics: $acrobatics"
+        }
+        
+        override fun getTotalScore(): Float {
+            return round(
+                (weaponTechniques + jumpKicks + rotateKicks + 
+                        weaponManipulation + movement + acrobatics) * 10
+            ) / 10f
         }
     }
 }

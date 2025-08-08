@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -46,14 +47,14 @@ enum class ButtonStyles {
 
 /**
  * Renders button component
- * @param text - button's content. Does not required for [ButtonStyles.Icon] & [ButtonStyles.Solid]
- * @param style - [ButtonStyles] style of button
- * @param modifier - custom [Modifier] applied to component
- * @param onclick - callback that is called on button click
- * @param iconSrc - [DrawableResource] source to image that is provided as icon to [ButtonStyles.Icon]
- * @param colorFilter - [ColorFilter] instance, applied to button's icon ([ButtonStyles.Icon] only)
- * @param iconPadding - inner padding for icon inside button ([ButtonStyles.Icon] only)
- * @param enabled - button's accessibility
+ * @param text button's content. Isn't required for [ButtonStyles.Icon] & [ButtonStyles.Solid]
+ * @param style [ButtonStyles] style of button
+ * @param modifier custom [Modifier] applied to component
+ * @param onclick callback that is called on button click
+ * @param iconSrc [DrawableResource] source to image that is provided as icon to [ButtonStyles.Icon]
+ * @param colorFilter [ColorFilter] instance, applied to button's icon ([ButtonStyles.Icon] only)
+ * @param iconPadding inner padding for icon inside button ([ButtonStyles.Icon] only)
+ * @param enabled button's accessibility
  */
 @Composable
 fun ButtonComponent(
@@ -166,7 +167,13 @@ fun ButtonComponent(
                     .clickable {
                         if (!State.isAnimating && enabled) { onclick() }
                     },
-            )
+                contentAlignment = Alignment.Center
+            ) {
+                if (text != null) Text(
+                    style = MaterialTheme.typography.titleSmall,
+                    text = text
+                )
+            }
         }
     }
 }

@@ -71,14 +71,14 @@ enum class Modes {
 
 /**
  * Renders range input for criterion rating
- * @param currentValue - initial value on render
- * @param onValueChange - callback, that is called on range value's change
- * @param modifier - [Modifier], that is applied to the component
- * @param steps - count of range values
- * @param mode - [Modes] variant of range input
- * @param ratio - part that component is contained in its parent
- * @param icon - [DrawableResource] instance of required icon
- * @param text - optional text displayed above range input ([Modes.WITH_TEXT] required)
+ * @param currentValue initial value on render
+ * @param onValueChange callback, that is called on range value's change
+ * @param modifier [Modifier], that is applied to the component
+ * @param steps count of range values
+ * @param mode [Modes] variant of range input
+ * @param ratio part that component is contained in its parent
+ * @param icon [DrawableResource] instance of required icon
+ * @param text optional text displayed above range input ([Modes.WITH_TEXT] is required)
  */
 @Composable
 fun RangeInputComponent(

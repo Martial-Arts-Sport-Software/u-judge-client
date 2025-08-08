@@ -4,7 +4,7 @@ import org.judging_app.State
 
 /**
  * Singleton for all text in different languages
- * @property strings - map of all text, every map key is sub-map for specific lang
+ * @property strings map of all text, every map key is sub-map for specific lang
  */
 object Localization {
     private val strings = mapOf(
@@ -63,6 +63,12 @@ object Localization {
             "hosinsool-result-save-btn" to "Save",
 
             "hosinsool-info-title" to "Information",
+
+            "freestyle-pair-presentation-criteria-1" to "Realism, creativity",
+            "freestyle-pair-presentation-criteria-2" to "Power, speed, energy blast (kehup)",
+            "freestyle-pair-presentation-criteria-3" to "Balance, technique of nakpok, acrobatic elements",
+            "freestyle-pair-presentation-criteria-4" to "Music, choreography",
+            "freestyle-extra-points" to "Penalty points",
         ),
 
         "ru" to mapOf(
@@ -120,6 +126,12 @@ object Localization {
             "hosinsool-result-save-btn" to "Сохранить",
 
             "hosinsool-info-title" to "Справка",
+
+            "freestyle-pair-presentation-criteria-1" to "Реалистичность, креативность",
+            "freestyle-pair-presentation-criteria-2" to "Сила, скорость, выражение энергии (кихап)",
+            "freestyle-pair-presentation-criteria-3" to "Баланс, техники страховки, элементы акробатики",
+            "freestyle-pair-presentation-criteria-4" to "Музыка, хореография",
+            "freestyle-extra-points" to "Штрафные баллы",
         )
     )
     fun getString(key: String): String {

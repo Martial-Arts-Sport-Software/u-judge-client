@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,6 +27,7 @@ import judging_app_client.composeapp.generated.resources.information_icon
 import judging_app_client.composeapp.generated.resources.settings_icon
 import judging_app_client.composeapp.generated.resources.warning_icon
 import org.judging_app.State
+import org.judging_app.entities.TechniqueRating
 import org.judging_app.enums.Colors
 import org.judging_app.locale.Localization
 import org.judging_app.screens.HosinsoolModeScreen
@@ -35,17 +37,26 @@ import org.judging_app.ui.button.ButtonStyles
 import org.judging_app.ui.popup.Popup
 import kotlin.math.roundToInt
 
+/**
+ * Styles for navigation bar component
+ */
 enum class NavbarStyles {
     VERTICAL_LEFT,
     VERTICAL_RIGHT,
     HORIZONTAL
 }
 
+/**
+ * Navigation bar component
+ * @param style style of the component
+ * @param modifier [Modifier], applied to the component
+ * @param rating [TechniqueRating] instance
+ */
 @Composable
 fun NavbarComponent(
     style: NavbarStyles,
     modifier: Modifier = Modifier,
-    score: Float = 0f,
+    rating: TechniqueRating? = null
 ) {
     when (style) {
         NavbarStyles.VERTICAL_LEFT -> {
@@ -60,7 +71,7 @@ fun NavbarComponent(
                     modifier = Modifier
                         .padding(
                             top = 10.dp,
-                            bottom = 15.dp,
+                            bottom = 10.dp,
                             start = 5.dp,
                             end = 5.dp
                         )
@@ -97,11 +108,40 @@ fun NavbarComponent(
                             ColorFilter.tint(Colors.PRIMARY.color)
                         else null
                     )
-                    Spacer(Modifier.fillMaxHeight(0.2f))
+                    Spacer(Modifier.weight(1f))
                     Text(
-                        text = ((score * 10).roundToInt() / 10f).toString(),
+                        text = ((rating!!.totalScore * 10).roundToInt() / 10f).toString(),
                         style = MaterialTheme.typography.titleMedium,
                     )
+                    if (State.currentDiscipline.toString().contains("FREESTYLE")) {
+                        Spacer(Modifier.weight(1f))
+                        ButtonComponent(
+                            modifier = Modifier
+                                .padding(horizontal = 5.dp)
+                                .aspectRatio(1f)
+                                .clip(RoundedCornerShape(15))
+                                .background(Colors.BUTTON_GREEN.color),
+                            style = ButtonStyles.Solid,
+                            text = "+0.3",
+                            enabled = rating.extraPoints < 0f,
+                            onclick = {
+                                if (rating.extraPoints > -0.3f) rating.extraPoints = 0f
+                                else rating.extraPoints += 0.3f
+                            }
+                        )
+                        Spacer(Modifier.fillMaxHeight(0.1f))
+                        ButtonComponent(
+                            modifier = Modifier
+                                .padding(horizontal = 5.dp)
+                                .aspectRatio(1f)
+                                .clip(RoundedCornerShape(15))
+                                .background(Colors.BUTTON_RED.color),
+                            style = ButtonStyles.Solid,
+                            text = "-0.3",
+                            enabled = rating.totalScore >= 0.3f,
+                            onclick = { rating.extraPoints -= 0.3f }
+                        )
+                    } else Spacer(Modifier.weight(3f))
                 }
             }
         }
