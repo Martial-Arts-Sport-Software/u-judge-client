@@ -105,7 +105,7 @@ interface TechniqueScreen : Screen {
      * @param rating - current rating, that criteria must be rendered
      */
     @Composable
-    fun TechniqueDisplay(
+    fun DefaultTechniqueDisplay(
         rating: TechniqueRating
     ) {
         require(State.currentDiscipline == Disciplines.HOSINSOOL ||

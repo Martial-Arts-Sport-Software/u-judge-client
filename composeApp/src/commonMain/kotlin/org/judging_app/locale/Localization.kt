@@ -69,6 +69,18 @@ object Localization {
             "freestyle-pair-presentation-criteria-3" to "Balance, technique of nakpok, acrobatic elements",
             "freestyle-pair-presentation-criteria-4" to "Music, choreography",
             "freestyle-extra-points" to "Penalty points",
+
+            "freestyle-weapon-technique-criterion-1" to "Defense / offense techniques with weapon",
+            "freestyle-weapon-technique-criterion-2" to "Jump kicks",
+            "freestyle-weapon-technique-criterion-3" to "Rotation kicks",
+            "freestyle-weapon-technique-criterion-4" to "Manipulations with weapon",
+            "freestyle-weapon-technique-criterion-5" to "Stands, movements",
+            "freestyle-weapon-technique-criterion-6" to "Acrobatics",
+
+            "freestyle-weapon-presentation-criteria-1" to "Realism, creativity",
+            "freestyle-weapon-presentation-criteria-2" to "Power, speed, energy blast (kehup)",
+            "freestyle-weapon-presentation-criteria-3" to "Balance",
+            "freestyle-weapon-presentation-criteria-4" to "Music, choreography",
         ),
 
         "ru" to mapOf(
@@ -132,6 +144,18 @@ object Localization {
             "freestyle-pair-presentation-criteria-3" to "Баланс, техники страховки, элементы акробатики",
             "freestyle-pair-presentation-criteria-4" to "Музыка, хореография",
             "freestyle-extra-points" to "Штрафные баллы",
+
+            "freestyle-weapon-technique-criterion-1" to "Ударные и защитные техники с оружием",
+            "freestyle-weapon-technique-criterion-2" to "Удары ногами в прыжке",
+            "freestyle-weapon-technique-criterion-3" to "Удары ногами во вращении",
+            "freestyle-weapon-technique-criterion-4" to "Манипуляции с оружием",
+            "freestyle-weapon-technique-criterion-5" to "Стойки, передвижения",
+            "freestyle-weapon-technique-criterion-6" to "Акробатика",
+
+            "freestyle-weapon-presentation-criteria-1" to "Реалистичность, креативность",
+            "freestyle-weapon-presentation-criteria-2" to "Сила, скорость, выражение энергии (кихап)",
+            "freestyle-weapon-presentation-criteria-3" to "Баланс",
+            "freestyle-weapon-presentation-criteria-4" to "Музыка, хореография",
         )
     )
     fun getString(key: String): String {

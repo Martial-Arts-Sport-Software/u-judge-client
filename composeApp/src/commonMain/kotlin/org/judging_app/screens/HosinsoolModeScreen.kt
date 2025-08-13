@@ -181,7 +181,7 @@ object HosinsoolModeScreen : TechniqueScreen {
                                                     modifier = Modifier.align(Alignment.TopCenter),
                                                     currentValue = 0f,
                                                     onValueChange = {},
-                                                    mode = Modes.NUMBERS_ONLY,
+                                                    showSlider = false,
                                                     icon = Res.drawable.cross_icon
                                                 )
                                                 Column(
@@ -193,7 +193,7 @@ object HosinsoolModeScreen : TechniqueScreen {
                                                     horizontalAlignment = Alignment.CenterHorizontally,
                                                     verticalArrangement = Arrangement.SpaceBetween
                                                 ) {
-                                                    TechniqueDisplay(rating)
+                                                    DefaultTechniqueDisplay(rating)
                                                 }
                                             }
                                         }
@@ -218,7 +218,7 @@ object HosinsoolModeScreen : TechniqueScreen {
                                                     modifier = Modifier.align(Alignment.TopCenter),
                                                     currentValue = 0f,
                                                     onValueChange = {},
-                                                    mode = Modes.NUMBERS_ONLY,
+                                                    showSlider = false,
                                                 )
                                                 Column(
                                                     Modifier
@@ -235,7 +235,7 @@ object HosinsoolModeScreen : TechniqueScreen {
                                                             (rating.presentationCriteria as PresentationCriteria
                                                             .Hosinsool).realism = value
                                                         },
-                                                        mode = Modes.WITH_TEXT,
+                                                        mode = Modes.TEXT_ABOVE,
                                                         text = Localization
                                                             .getString("hosinsool-presentation-criteria-1")
                                                     )
@@ -246,7 +246,7 @@ object HosinsoolModeScreen : TechniqueScreen {
                                                             (rating.presentationCriteria as PresentationCriteria
                                                             .Hosinsool).power = value
                                                         },
-                                                        mode = Modes.WITH_TEXT,
+                                                        mode = Modes.TEXT_ABOVE,
                                                         text = Localization
                                                             .getString("hosinsool-presentation-criteria-2")
                                                     )
@@ -257,7 +257,7 @@ object HosinsoolModeScreen : TechniqueScreen {
                                                             (rating.presentationCriteria as PresentationCriteria
                                                             .Hosinsool).balance = value
                                                         },
-                                                        mode = Modes.WITH_TEXT,
+                                                        mode = Modes.TEXT_ABOVE,
                                                         text = Localization
                                                             .getString("hosinsool-presentation-criteria-3")
                                                     )
@@ -268,7 +268,7 @@ object HosinsoolModeScreen : TechniqueScreen {
                                                             (rating.presentationCriteria as PresentationCriteria
                                                             .Hosinsool).harmony = value
                                                         },
-                                                        mode = Modes.WITH_TEXT,
+                                                        mode = Modes.TEXT_ABOVE,
                                                         text = Localization
                                                             .getString("hosinsool-presentation-criteria-4")
                                                     )
@@ -286,7 +286,7 @@ object HosinsoolModeScreen : TechniqueScreen {
                                             Column(
                                                 Modifier
                                                     .fillMaxSize()
-                                                    .padding(15.dp)
+                                                    .padding(10.dp)
                                             ) {
                                                 Row(
                                                     Modifier

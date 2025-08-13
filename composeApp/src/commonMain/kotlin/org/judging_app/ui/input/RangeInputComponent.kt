@@ -59,13 +59,13 @@ import kotlin.math.roundToInt
 
 /**
  * Modes of range input
- * @property NUMBERS_ONLY - display only numbers without input itself
- * @property DEFAULT - range input display by default
- * @property WITH_TEXT - 
+ * @property DEFAULT range input display by default
+ * @property TEXT_ABOVE display default range component with text above
+ * @property TEXT_ABOVE display default range component with text on left
  */
 enum class Modes {
-    NUMBERS_ONLY,
-    WITH_TEXT,
+    TEXT_ABOVE,
+    TEXT_LEFT,
     DEFAULT
 }
 
@@ -76,9 +76,10 @@ enum class Modes {
  * @param modifier [Modifier], that is applied to the component
  * @param steps count of range values
  * @param mode [Modes] variant of range input
+ * @param showSlider show or hide range slider itself; on false only upper part is visible
  * @param ratio part that component is contained in its parent
  * @param icon [DrawableResource] instance of required icon
- * @param text optional text displayed above range input ([Modes.WITH_TEXT] is required)
+ * @param text optional text displayed above range input ([Modes.TEXT_ABOVE] & [Modes.TEXT_LEFT] is required)
  */
 @Composable
 fun RangeInputComponent(
@@ -87,6 +88,7 @@ fun RangeInputComponent(
     modifier: Modifier = Modifier,
     steps: Int = 10,
     mode: Modes = Modes.DEFAULT,
+    showSlider: Boolean = true,
     ratio: Float = 1f,
     icon: DrawableResource? = null,
     text: String = ""
@@ -152,32 +154,32 @@ fun RangeInputComponent(
     }
 
     Row(
-        modifier = modifier
-            .fillMaxWidth(ratio),
-        verticalAlignment = Alignment.Bottom
+        modifier = modifier.fillMaxWidth(ratio),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         if (icon != null) {
-            Column(
+            Image(
                 modifier = Modifier
                     .fillMaxWidth(1 / 24f)
-                    .alpha(if (mode != Modes.NUMBERS_ONLY) 1f else 0f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Bottom
-            ) {
-                Image(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f),
-                    painter = painterResource(icon),
-                    contentDescription = null
-                )
-            }
-            Spacer(Modifier.width(15.dp))
+                    .alpha(if (showSlider) 1f else 0f)
+                    .aspectRatio(1f),
+                painter = painterResource(icon),
+                contentDescription = null
+            )
+            Spacer(Modifier.width(10.dp))
+        }
+        if (mode == Modes.TEXT_LEFT) {
+            Text(
+                modifier = Modifier.fillMaxWidth(2 / 13f),
+                text = text,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Spacer(Modifier.width(10.dp))
         }
         Column(
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
-            if (mode == Modes.WITH_TEXT) {
+            if (mode == Modes.TEXT_ABOVE) {
                 Row(
                     Modifier
                         .wrapContentHeight()
@@ -197,7 +199,7 @@ fun RangeInputComponent(
             Box(
                 Modifier
                     .fillMaxWidth()
-                    .aspectRatio(22 / 1f),
+                    .aspectRatio(if (mode == Modes.TEXT_LEFT) 18 / 1f else 20 / 1f),
             ) {
                 Row(
                     Modifier
@@ -213,7 +215,7 @@ fun RangeInputComponent(
                             .clickable(
                                 interactionSource = null,
                                 indication = null,
-                                enabled = mode != Modes.NUMBERS_ONLY,
+                                enabled = showSlider,
                                 onClick = {
                                     coroutineScope.launch {
                                         state.animateTo(
@@ -227,7 +229,7 @@ fun RangeInputComponent(
                         Column(
                             modifier = stepModifier
                         ) {
-                            if (mode == Modes.NUMBERS_ONLY) {
+                            if (!showSlider) {
                                 BoxWithConstraints(
                                     Modifier.fillMaxSize()
                                 ) {
@@ -252,7 +254,7 @@ fun RangeInputComponent(
                             } else {
                                 BoxWithConstraints(
                                     Modifier
-                                        .alpha(if (mode != Modes.NUMBERS_ONLY) 0.85f else 0f)
+                                        .alpha(if (showSlider) 0.85f else 0f)
                                         .fillMaxSize()
                                         .clip(when(i) {
                                             0 -> RoundedCornerShape(topStartPercent = 50, bottomStartPercent = 50)
@@ -283,7 +285,7 @@ fun RangeInputComponent(
                         }
                     }
                 }
-                if (mode != Modes.NUMBERS_ONLY) {
+                if (showSlider) {
                     Box(
                         Modifier
                             .width(with(State.density!!) {
@@ -310,7 +312,7 @@ fun RangeInputComponent(
                             .anchoredDraggable(
                                 state,
                                 Orientation.Horizontal,
-                                enabled = mode != Modes.NUMBERS_ONLY,
+                                enabled = showSlider,
                                 interactionSource = interactionSource
                             ),
                         painter = painterResource(Res.drawable.range_input_point),

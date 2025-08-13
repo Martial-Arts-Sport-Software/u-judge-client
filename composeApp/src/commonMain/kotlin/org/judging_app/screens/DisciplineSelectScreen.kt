@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import judging_app_client.composeapp.generated.resources.Res
 import judging_app_client.composeapp.generated.resources.back_icon
 import org.judging_app.State
+import org.judging_app.enums.Categories
 import org.judging_app.enums.Colors
 import org.judging_app.enums.Disciplines
 import org.judging_app.enums.Routes
@@ -91,7 +92,17 @@ object DisciplineSelectScreen: Screen {
                             disciplines[i + 1] else null
                         val firstOnclick = {
                             State.currentDiscipline = first
-                            clickWithTransition(
+                            if (first in arrayOf(
+                                    Disciplines.FREESTYLE_WEAPON, Disciplines.FREESTYLE_GROUP)
+                            ) {
+                                State.currentCategory = Categories.ADULTS
+                                clickWithTransition(
+                                    Routes.valueOf(
+                                        "${State.currentDiscipline!!
+                                            .value.split("_")[1].uppercase()}_MODE"
+                                    )
+                                )
+                            } else clickWithTransition(
                                 Routes.CATEGORY_SELECT
                             )
                         }
@@ -110,7 +121,17 @@ object DisciplineSelectScreen: Screen {
                             if (second != null) {
                                 val secondOnclick = {
                                     State.currentDiscipline = second
-                                    clickWithTransition(
+                                    if (second in arrayOf(
+                                            Disciplines.FREESTYLE_WEAPON, Disciplines.FREESTYLE_GROUP)
+                                    ) {
+                                        State.currentCategory = Categories.ADULTS
+                                        clickWithTransition(
+                                            Routes.valueOf(
+                                                "${State.currentDiscipline!!
+                                                    .value.split("_")[1].uppercase()}_MODE"
+                                            )
+                                        )
+                                    } else clickWithTransition(
                                         Routes.CATEGORY_SELECT
                                     )
                                 }

@@ -55,7 +55,8 @@ actual fun getTypography(): Typography {
         ),
         bodyMedium = TextStyle(
             fontFamily = montserratVariable,
-            fontSize = 9.sp
+            fontSize = 9.sp,
+            color = Color.White,
         ),
         labelLarge = TextStyle(
             fontFamily = montserratVariable,

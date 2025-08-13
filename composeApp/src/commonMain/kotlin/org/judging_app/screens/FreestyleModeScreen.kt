@@ -43,7 +43,7 @@ import org.judging_app.enums.Colors
 import org.judging_app.enums.Disciplines
 import org.judging_app.locale.Localization
 import org.judging_app.readFile
-import org.judging_app.screens.HosinsoolModeScreen.TechniqueDisplay
+import org.judging_app.screens.HosinsoolModeScreen.DefaultTechniqueDisplay
 import org.judging_app.screens.HosinsoolModeScreen.TechniqueScreenHeader
 import org.judging_app.screens.HosinsoolModeScreen.currentDisplay
 import org.judging_app.screens.HosinsoolModeScreen.nextDisplay
@@ -193,8 +193,11 @@ object FreestyleModeScreen : Screen {
                                                     modifier = Modifier.align(Alignment.TopCenter),
                                                     currentValue = 0f,
                                                     onValueChange = {},
-                                                    mode = Modes.NUMBERS_ONLY,
-                                                    icon = Res.drawable.cross_icon
+                                                    showSlider = false,
+                                                    mode = if (State.currentDiscipline == Disciplines.FREESTYLE_WEAPON)
+                                                        Modes.TEXT_LEFT else Modes.DEFAULT,
+                                                    icon = if (State.currentDiscipline == Disciplines.FREESTYLE_WEAPON)
+                                                        null else Res.drawable.cross_icon
                                                 )
                                                 Column(
                                                     Modifier
@@ -206,7 +209,69 @@ object FreestyleModeScreen : Screen {
                                                     verticalArrangement = Arrangement.SpaceBetween
                                                 ) {
                                                     when(State.currentDiscipline) {
-                                                        else -> TechniqueDisplay(rating)
+                                                        Disciplines.FREESTYLE_WEAPON -> {
+                                                            RangeInputComponent(
+                                                                currentValue = (rating.techniqueCriteria
+                                                                        as TechniqueCriteria.Weapon).weaponTechniques,
+                                                                onValueChange = { value ->
+                                                                    (rating.techniqueCriteria
+                                                                            as TechniqueCriteria.Weapon).weaponTechniques = value
+                                                                },
+                                                                mode = Modes.TEXT_LEFT,
+                                                                text = Localization.getString("freestyle-weapon-technique-criterion-1")
+                                                            )
+                                                            RangeInputComponent(
+                                                                currentValue = (rating.techniqueCriteria
+                                                                        as TechniqueCriteria.Weapon).jumpKicks,
+                                                                onValueChange = { value ->
+                                                                    (rating.techniqueCriteria
+                                                                            as TechniqueCriteria.Weapon).jumpKicks = value
+                                                                },
+                                                                mode = Modes.TEXT_LEFT,
+                                                                text = Localization.getString("freestyle-weapon-technique-criterion-2")
+                                                            )
+                                                            RangeInputComponent(
+                                                                currentValue = (rating.techniqueCriteria
+                                                                        as TechniqueCriteria.Weapon).rotateKicks,
+                                                                onValueChange = { value ->
+                                                                    (rating.techniqueCriteria
+                                                                            as TechniqueCriteria.Weapon).rotateKicks = value
+                                                                },
+                                                                mode = Modes.TEXT_LEFT,
+                                                                text = Localization.getString("freestyle-weapon-technique-criterion-3")
+                                                            )
+                                                            RangeInputComponent(
+                                                                currentValue = (rating.techniqueCriteria
+                                                                        as TechniqueCriteria.Weapon).weaponManipulation,
+                                                                onValueChange = { value ->
+                                                                    (rating.techniqueCriteria
+                                                                            as TechniqueCriteria.Weapon).weaponManipulation = value
+                                                                },
+                                                                mode = Modes.TEXT_LEFT,
+                                                                text = Localization.getString("freestyle-weapon-technique-criterion-4")
+                                                            )
+                                                            RangeInputComponent(
+                                                                currentValue = (rating.techniqueCriteria
+                                                                        as TechniqueCriteria.Weapon).movement,
+                                                                onValueChange = { value ->
+                                                                    (rating.techniqueCriteria
+                                                                            as TechniqueCriteria.Weapon).movement = value
+                                                                },
+                                                                mode = Modes.TEXT_LEFT,
+                                                                text = Localization.getString("freestyle-weapon-technique-criterion-5")
+                                                            )
+                                                            RangeInputComponent(
+                                                                currentValue = (rating.techniqueCriteria
+                                                                        as TechniqueCriteria.Weapon).acrobatics,
+                                                                onValueChange = { value ->
+                                                                    (rating.techniqueCriteria
+                                                                            as TechniqueCriteria.Weapon).acrobatics = value
+                                                                },
+                                                                mode = Modes.TEXT_LEFT,
+                                                                text = Localization.getString("freestyle-weapon-technique-criterion-6")
+                                                            )
+                                                        }
+                                                        else -> DefaultTechniqueDisplay(rating)
                                                     }
                                                 }
                                             }
@@ -232,7 +297,7 @@ object FreestyleModeScreen : Screen {
                                                     modifier = Modifier.align(Alignment.TopCenter),
                                                     currentValue = 0f,
                                                     onValueChange = {},
-                                                    mode = Modes.NUMBERS_ONLY,
+                                                    showSlider = false,
                                                 )
                                                 Column(
                                                     Modifier
@@ -251,7 +316,7 @@ object FreestyleModeScreen : Screen {
                                                                     (rating.presentationCriteria as
                                                                             PresentationCriteria.FreestylePair).creativity = value
                                                                 },
-                                                                mode = Modes.WITH_TEXT,
+                                                                mode = Modes.TEXT_ABOVE,
                                                                 text = Localization
                                                                     .getString("freestyle-pair-presentation-criteria-1")
                                                             )
@@ -262,7 +327,7 @@ object FreestyleModeScreen : Screen {
                                                                     (rating.presentationCriteria as
                                                                             PresentationCriteria.FreestylePair).power = value
                                                                 },
-                                                                mode = Modes.WITH_TEXT,
+                                                                mode = Modes.TEXT_ABOVE,
                                                                 text = Localization
                                                                     .getString("freestyle-pair-presentation-criteria-2")
                                                             )
@@ -273,7 +338,7 @@ object FreestyleModeScreen : Screen {
                                                                     (rating.presentationCriteria as
                                                                             PresentationCriteria.FreestylePair).balance = value
                                                                 },
-                                                                mode = Modes.WITH_TEXT,
+                                                                mode = Modes.TEXT_ABOVE,
                                                                 text = Localization
                                                                     .getString("freestyle-pair-presentation-criteria-3")
                                                             )
@@ -284,7 +349,7 @@ object FreestyleModeScreen : Screen {
                                                                     (rating.presentationCriteria as
                                                                             PresentationCriteria.FreestylePair).choreography = value
                                                                 },
-                                                                mode = Modes.WITH_TEXT,
+                                                                mode = Modes.TEXT_ABOVE,
                                                                 text = Localization
                                                                     .getString("freestyle-pair-presentation-criteria-4")
                                                             )
@@ -304,7 +369,7 @@ object FreestyleModeScreen : Screen {
                                             Column(
                                                 Modifier
                                                     .fillMaxSize()
-                                                    .padding(15.dp)
+                                                    .padding(10.dp)
                                             ) {
                                                 Row(
                                                     Modifier

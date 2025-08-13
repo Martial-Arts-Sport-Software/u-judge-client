@@ -1,6 +1,7 @@
 package org.judging_app.ui.popup
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -50,7 +52,7 @@ fun SettingsPopupComponent() {
         ) {
             Box(
                 Modifier
-                    .weight(1f)
+                    .weight(1.1f)
                     .fillMaxWidth()
             ) {
                 Text(
@@ -65,12 +67,14 @@ fun SettingsPopupComponent() {
                     onclick = {
                         State.currentPopupMode = Popup.Modes.NONE
                     },
-                    modifier = Modifier.align(Alignment.TopEnd)
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .fillMaxHeight(0.8f),
                 )
             }
             Column(
                 Modifier
-                    .weight(4f)
+                    .weight(3.5f)
                     .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween
@@ -111,7 +115,9 @@ fun SettingsPopupComponent() {
                     ),
                     onclick = {
                         State.currentPopupMode = Popup.Modes.NONE
-                        clickWithTransition(Routes.BACK)
+                        if (State.currentDiscipline !in arrayOf(
+                                Disciplines.FREESTYLE_WEAPON, Disciplines.FREESTYLE_WEAPON
+                        )) clickWithTransition(Routes.BACK)
                         clickWithTransition(Routes.BACK)
                     },
                 )
