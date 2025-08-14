@@ -36,6 +36,8 @@ import org.judging_app.screens.HosinsoolModeScreen
 import org.judging_app.screens.KerugiModeScreen
 import org.judging_app.screens.TanbonModeScreen
 import org.judging_app.ui.popup.ConnectionLostPopupComponent
+import org.judging_app.ui.popup.Popup
+import org.judging_app.ui.popup.SettingsPopupComponent
 
 /**
  * Main fun, that render the whole application
@@ -166,6 +168,8 @@ fun NavGraphBuilder.animatedComposable(
                         Routes.ENTRY.path
                     )
                 ) State.navController!!.popBackStack()
+                else State.currentPopupMode = if (State.currentPopupMode == Popup.Modes.NONE)
+                    Popup.Modes.SETTINGS else Popup.Modes.NONE
             }
             content()
         }

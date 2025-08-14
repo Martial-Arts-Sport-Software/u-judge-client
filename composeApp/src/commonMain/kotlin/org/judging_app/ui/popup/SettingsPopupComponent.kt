@@ -116,7 +116,7 @@ fun SettingsPopupComponent() {
                     onclick = {
                         State.currentPopupMode = Popup.Modes.NONE
                         if (State.currentDiscipline !in arrayOf(
-                                Disciplines.FREESTYLE_WEAPON, Disciplines.FREESTYLE_WEAPON
+                                Disciplines.FREESTYLE_WEAPON, Disciplines.FREESTYLE_GROUP
                         )) clickWithTransition(Routes.BACK)
                         clickWithTransition(Routes.BACK)
                     },

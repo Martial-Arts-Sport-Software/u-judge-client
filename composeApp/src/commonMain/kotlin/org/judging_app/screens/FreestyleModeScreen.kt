@@ -209,6 +209,68 @@ object FreestyleModeScreen : Screen {
                                                     verticalArrangement = Arrangement.SpaceBetween
                                                 ) {
                                                     when(State.currentDiscipline) {
+                                                        Disciplines.FREESTYLE_GROUP -> {
+                                                            RangeInputComponent(
+                                                                currentValue = (rating.techniqueCriteria
+                                                                        as TechniqueCriteria.Group).offenseDefense,
+                                                                onValueChange = { value ->
+                                                                    (rating.techniqueCriteria
+                                                                            as TechniqueCriteria.Group).offenseDefense = value
+                                                                },
+                                                                mode = Modes.TEXT_LEFT,
+                                                                text = Localization.getString("freestyle-group-technique-criterion-1")
+                                                            )
+                                                            RangeInputComponent(
+                                                                currentValue = (rating.techniqueCriteria
+                                                                        as TechniqueCriteria.Group).itemsBreaking,
+                                                                onValueChange = { value ->
+                                                                    (rating.techniqueCriteria
+                                                                            as TechniqueCriteria.Group).itemsBreaking = value
+                                                                },
+                                                                mode = Modes.TEXT_LEFT,
+                                                                text = Localization.getString("freestyle-group-technique-criterion-2")
+                                                            )
+                                                            RangeInputComponent(
+                                                                currentValue = (rating.techniqueCriteria
+                                                                        as TechniqueCriteria.Group).legKicks,
+                                                                onValueChange = { value ->
+                                                                    (rating.techniqueCriteria
+                                                                            as TechniqueCriteria.Group).legKicks = value
+                                                                },
+                                                                mode = Modes.TEXT_LEFT,
+                                                                text = Localization.getString("freestyle-group-technique-criterion-3")
+                                                            )
+                                                            RangeInputComponent(
+                                                                currentValue = (rating.techniqueCriteria
+                                                                        as TechniqueCriteria.Group).weaponSkills,
+                                                                onValueChange = { value ->
+                                                                    (rating.techniqueCriteria
+                                                                            as TechniqueCriteria.Group).weaponSkills = value
+                                                                },
+                                                                mode = Modes.TEXT_LEFT,
+                                                                text = Localization.getString("freestyle-group-technique-criterion-4")
+                                                            )
+                                                            RangeInputComponent(
+                                                                currentValue = (rating.techniqueCriteria
+                                                                        as TechniqueCriteria.Group).dynamicMovement,
+                                                                onValueChange = { value ->
+                                                                    (rating.techniqueCriteria
+                                                                            as TechniqueCriteria.Group).dynamicMovement = value
+                                                                },
+                                                                mode = Modes.TEXT_LEFT,
+                                                                text = Localization.getString("freestyle-group-technique-criterion-5")
+                                                            )
+                                                            RangeInputComponent(
+                                                                currentValue = (rating.techniqueCriteria
+                                                                        as TechniqueCriteria.Group).acrobatics,
+                                                                onValueChange = { value ->
+                                                                    (rating.techniqueCriteria
+                                                                            as TechniqueCriteria.Group).acrobatics = value
+                                                                },
+                                                                mode = Modes.TEXT_LEFT,
+                                                                text = Localization.getString("freestyle-group-technique-criterion-6")
+                                                            )
+                                                        }
                                                         Disciplines.FREESTYLE_WEAPON -> {
                                                             RangeInputComponent(
                                                                 currentValue = (rating.techniqueCriteria
@@ -308,6 +370,98 @@ object FreestyleModeScreen : Screen {
                                                     verticalArrangement = Arrangement.SpaceAround
                                                 ) {
                                                     when(State.currentDiscipline) {
+                                                        Disciplines.FREESTYLE_GROUP -> {
+                                                            RangeInputComponent(
+                                                                currentValue = (rating.presentationCriteria as
+                                                                        PresentationCriteria.FreestyleGroup).creativity,
+                                                                onValueChange = { value ->
+                                                                    (rating.presentationCriteria as
+                                                                            PresentationCriteria.FreestyleGroup).creativity = value
+                                                                },
+                                                                mode = Modes.TEXT_ABOVE,
+                                                                text = Localization
+                                                                    .getString("freestyle-group-presentation-criteria-1")
+                                                            )
+                                                            RangeInputComponent(
+                                                                currentValue = (rating.presentationCriteria as
+                                                                        PresentationCriteria.FreestyleGroup).power,
+                                                                onValueChange = { value ->
+                                                                    (rating.presentationCriteria as
+                                                                            PresentationCriteria.FreestyleGroup).power = value
+                                                                },
+                                                                mode = Modes.TEXT_ABOVE,
+                                                                text = Localization
+                                                                    .getString("freestyle-group-presentation-criteria-2")
+                                                            )
+                                                            RangeInputComponent(
+                                                                currentValue = (rating.presentationCriteria as
+                                                                        PresentationCriteria.FreestyleGroup).balance,
+                                                                onValueChange = { value ->
+                                                                    (rating.presentationCriteria as
+                                                                            PresentationCriteria.FreestyleGroup).balance = value
+                                                                },
+                                                                mode = Modes.TEXT_ABOVE,
+                                                                text = Localization
+                                                                    .getString("freestyle-group-presentation-criteria-3")
+                                                            )
+                                                            RangeInputComponent(
+                                                                currentValue = (rating.presentationCriteria as
+                                                                        PresentationCriteria.FreestyleGroup).choreography,
+                                                                onValueChange = { value ->
+                                                                    (rating.presentationCriteria as
+                                                                            PresentationCriteria.FreestyleGroup).choreography = value
+                                                                },
+                                                                mode = Modes.TEXT_ABOVE,
+                                                                text = Localization
+                                                                    .getString("freestyle-group-presentation-criteria-4")
+                                                            )
+                                                        }
+                                                        Disciplines.FREESTYLE_WEAPON -> {
+                                                            RangeInputComponent(
+                                                                currentValue = (rating.presentationCriteria as
+                                                                        PresentationCriteria.FreestyleWeapon).creativity,
+                                                                onValueChange = { value ->
+                                                                    (rating.presentationCriteria as
+                                                                            PresentationCriteria.FreestyleWeapon).creativity = value
+                                                                },
+                                                                mode = Modes.TEXT_ABOVE,
+                                                                text = Localization
+                                                                    .getString("freestyle-weapon-presentation-criteria-1")
+                                                            )
+                                                            RangeInputComponent(
+                                                                currentValue = (rating.presentationCriteria as
+                                                                        PresentationCriteria.FreestyleWeapon).power,
+                                                                onValueChange = { value ->
+                                                                    (rating.presentationCriteria as
+                                                                            PresentationCriteria.FreestyleWeapon).power = value
+                                                                },
+                                                                mode = Modes.TEXT_ABOVE,
+                                                                text = Localization
+                                                                    .getString("freestyle-weapon-presentation-criteria-2")
+                                                            )
+                                                            RangeInputComponent(
+                                                                currentValue = (rating.presentationCriteria as
+                                                                        PresentationCriteria.FreestyleWeapon).balance,
+                                                                onValueChange = { value ->
+                                                                    (rating.presentationCriteria as
+                                                                            PresentationCriteria.FreestyleWeapon).balance = value
+                                                                },
+                                                                mode = Modes.TEXT_ABOVE,
+                                                                text = Localization
+                                                                    .getString("freestyle-weapon-presentation-criteria-3")
+                                                            )
+                                                            RangeInputComponent(
+                                                                currentValue = (rating.presentationCriteria as
+                                                                        PresentationCriteria.FreestyleWeapon).choreography,
+                                                                onValueChange = { value ->
+                                                                    (rating.presentationCriteria as
+                                                                            PresentationCriteria.FreestyleWeapon).choreography = value
+                                                                },
+                                                                mode = Modes.TEXT_ABOVE,
+                                                                text = Localization
+                                                                    .getString("freestyle-weapon-presentation-criteria-4")
+                                                            )
+                                                        }
                                                         else -> {
                                                             RangeInputComponent(
                                                                 currentValue = (rating.presentationCriteria as

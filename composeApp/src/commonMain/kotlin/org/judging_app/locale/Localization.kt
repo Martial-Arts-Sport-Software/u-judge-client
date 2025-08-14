@@ -81,6 +81,18 @@ object Localization {
             "freestyle-weapon-presentation-criteria-2" to "Power, speed, energy blast (kehup)",
             "freestyle-weapon-presentation-criteria-3" to "Balance",
             "freestyle-weapon-presentation-criteria-4" to "Music, choreography",
+
+            "freestyle-group-technique-criterion-1" to "Offense & defense techniques",
+            "freestyle-group-technique-criterion-2" to "Items breaking",
+            "freestyle-group-technique-criterion-3" to "Kicking techniques",
+            "freestyle-group-technique-criterion-4" to "Weapon skills",
+            "freestyle-group-technique-criterion-5" to "Dynamics, movement",
+            "freestyle-group-technique-criterion-6" to "Acrobatics",
+
+            "freestyle-group-presentation-criteria-1" to "Realism, creativity",
+            "freestyle-group-presentation-criteria-2" to "Power, speed, energy blast (kehup)",
+            "freestyle-group-presentation-criteria-3" to "Balance, falling techniques (nakpok)",
+            "freestyle-group-presentation-criteria-4" to "Music, choreography",
         ),
 
         "ru" to mapOf(
@@ -156,6 +168,18 @@ object Localization {
             "freestyle-weapon-presentation-criteria-2" to "Сила, скорость, выражение энергии (кихап)",
             "freestyle-weapon-presentation-criteria-3" to "Баланс",
             "freestyle-weapon-presentation-criteria-4" to "Музыка, хореография",
+
+            "freestyle-group-technique-criterion-1" to "Техники защиты и нападения",
+            "freestyle-group-technique-criterion-2" to "Разбивание предметов",
+            "freestyle-group-technique-criterion-3" to "Ударные техники ногами",
+            "freestyle-group-technique-criterion-4" to "Навыки владения оружием",
+            "freestyle-group-technique-criterion-5" to "Динамика, передвижение",
+            "freestyle-group-technique-criterion-6" to "Акробатика",
+
+            "freestyle-group-presentation-criteria-1" to "Реалистичность, креативность",
+            "freestyle-group-presentation-criteria-2" to "Сила, скорость, выражение энергии (кихап)",
+            "freestyle-group-presentation-criteria-3" to "Баланс, техники страховки",
+            "freestyle-group-presentation-criteria-4" to "Музыка, хореография",
         )
     )
     fun getString(key: String): String {

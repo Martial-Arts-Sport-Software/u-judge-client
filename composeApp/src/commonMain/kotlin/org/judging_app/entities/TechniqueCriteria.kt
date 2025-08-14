@@ -101,7 +101,7 @@ sealed class TechniqueCriteria {
      * @property offenseDefense offense & defense techniques
      * @property itemsBreaking breaking planks & other stuff
      * @property legKicks leg-kick techniques
-     * @property weaponUse weapon usage
+     * @property weaponSkills weapon usage
      * @property dynamicMovement dynamics & movement of the performance
      * @property acrobatics acrobatic elements
      */
@@ -109,7 +109,7 @@ sealed class TechniqueCriteria {
         offenseDefense: Float = 0.1f,
         itemsBreaking: Float = 0.1f,
         legKicks: Float = 0.1f,
-        weaponUse: Float = 0.1f,
+        weaponSkills: Float = 0.1f,
         dynamicMovement: Float = 0.1f,
         acrobatics: Float = 0.1f
     ): TechniqueCriteria() {
@@ -117,7 +117,7 @@ sealed class TechniqueCriteria {
             require(offenseDefense in 0.1f..1f)
             require(itemsBreaking in 0.1f..1f)
             require(legKicks in 0.1f..1f)
-            require(weaponUse in 0.1f..1f)
+            require(weaponSkills in 0.1f..1f)
             require(dynamicMovement in 0.1f..1f)
             require(acrobatics in 0.1f..1f)
         }
@@ -125,7 +125,7 @@ sealed class TechniqueCriteria {
         var offenseDefense by mutableStateOf(offenseDefense)
         var itemsBreaking by mutableStateOf(itemsBreaking)
         var legKicks by mutableStateOf(legKicks)
-        var weaponUse by mutableStateOf(weaponUse)
+        var weaponSkills by mutableStateOf(weaponSkills)
         var dynamicMovement by mutableStateOf(dynamicMovement)
         var acrobatics by mutableStateOf(acrobatics)
 
@@ -133,7 +133,7 @@ sealed class TechniqueCriteria {
             return "offenseDefense: $offenseDefense,\n" +
                     "itemsBreaking: $itemsBreaking,\n" +
                     "legKicks: $legKicks,\n" +
-                    "weaponUse: $weaponUse,\n" +
+                    "weaponUse: $weaponSkills,\n" +
                     "dynamicMovement: $dynamicMovement,\n" +
                     "acrobatics: $acrobatics"
         }
@@ -141,7 +141,7 @@ sealed class TechniqueCriteria {
         override fun getTotalScore(): Float {
             return round(
                 (offenseDefense + itemsBreaking + legKicks + 
-                        weaponUse + dynamicMovement + acrobatics) * 10
+                        weaponSkills + dynamicMovement + acrobatics) * 10
             ) / 10f
         }
 
