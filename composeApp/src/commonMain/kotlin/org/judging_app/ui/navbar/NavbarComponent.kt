@@ -30,7 +30,6 @@ import org.judging_app.State
 import org.judging_app.entities.TechniqueRating
 import org.judging_app.enums.Colors
 import org.judging_app.locale.Localization
-import org.judging_app.screens.HosinsoolModeScreen
 import org.judging_app.screens.TechniqueScreen
 import org.judging_app.ui.button.ButtonComponent
 import org.judging_app.ui.button.ButtonStyles
@@ -56,7 +55,8 @@ enum class NavbarStyles {
 fun NavbarComponent(
     style: NavbarStyles,
     modifier: Modifier = Modifier,
-    rating: TechniqueRating? = null
+    rating: TechniqueRating? = null,
+    currentScreen: TechniqueScreen? = null,
 ) {
     when (style) {
         NavbarStyles.VERTICAL_LEFT -> {
@@ -146,6 +146,7 @@ fun NavbarComponent(
             }
         }
         NavbarStyles.VERTICAL_RIGHT -> {
+            require(currentScreen != null)
             Box(
                 modifier
                     .clip(RoundedCornerShape(15.dp))
@@ -165,13 +166,13 @@ fun NavbarComponent(
                             .weight(1f)
                             .clip(RoundedCornerShape(50))
                             .background(
-                                if (HosinsoolModeScreen.currentDisplay == TechniqueScreen.DISPLAY.TECHNIQUE)
+                                if (currentScreen.currentDisplay == TechniqueScreen.DISPLAY.TECHNIQUE)
                                     Colors.SLIDER_TRACK_ACTIVE.color
                                 else Color.White.copy(0.75f)
                             ),
                         style = ButtonStyles.Solid,
                         onclick = {
-                            HosinsoolModeScreen.nextDisplay = TechniqueScreen.DISPLAY.TECHNIQUE
+                            currentScreen.nextDisplay = TechniqueScreen.DISPLAY.TECHNIQUE
                         },
                     )
                     Spacer(Modifier.weight(0.3f))
@@ -180,13 +181,13 @@ fun NavbarComponent(
                             .weight(1f)
                             .clip(RoundedCornerShape(50))
                             .background(
-                                if (HosinsoolModeScreen.currentDisplay == TechniqueScreen.DISPLAY.PRESENTATION)
+                                if (currentScreen.currentDisplay == TechniqueScreen.DISPLAY.PRESENTATION)
                                     Colors.SLIDER_TRACK_ACTIVE.color
                                 else Color.White.copy(0.75f)
                             ),
                         style = ButtonStyles.Solid,
                         onclick = {
-                            HosinsoolModeScreen.nextDisplay = TechniqueScreen.DISPLAY.PRESENTATION
+                            currentScreen.nextDisplay = TechniqueScreen.DISPLAY.PRESENTATION
                         },
                     )
                     Spacer(Modifier.weight(0.3f))
@@ -195,13 +196,13 @@ fun NavbarComponent(
                             .weight(1f)
                             .clip(RoundedCornerShape(50))
                             .background(
-                                if (HosinsoolModeScreen.currentDisplay == TechniqueScreen.DISPLAY.RESULT)
+                                if (currentScreen.currentDisplay == TechniqueScreen.DISPLAY.RESULT)
                                     Colors.SLIDER_TRACK_ACTIVE.color
                                 else Color.White.copy(0.75f)
                             ),
                         style = ButtonStyles.Solid,
                         onclick = {
-                            HosinsoolModeScreen.nextDisplay = TechniqueScreen.DISPLAY.RESULT
+                            currentScreen.nextDisplay = TechniqueScreen.DISPLAY.RESULT
                         },
                     )
                 }

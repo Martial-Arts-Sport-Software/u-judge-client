@@ -1,7 +1,6 @@
 package org.judging_app.ui.popup
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -94,19 +92,25 @@ fun SettingsPopupComponent() {
                     ),
                     onclick = {
                         State.currentPopupMode = Popup.Modes.NONE
+                        State.currentRating = null
                     },
                 )
-                Spacer(Modifier.weight(1f))
-                ButtonComponent(
-                    modifier = Modifier.weight(2.5f),
-                    text = Localization.getString(
-                        "settings_choose_category"
-                    ),
-                    onclick = {
-                        State.currentPopupMode = Popup.Modes.NONE
-                        clickWithTransition(Routes.BACK)
-                    },
-                )
+                if (State.currentDiscipline !in arrayOf(
+                        Disciplines.FREESTYLE_WEAPON, Disciplines.FREESTYLE_GROUP
+                    )
+                ) {
+                    Spacer(Modifier.weight(1f))
+                    ButtonComponent(
+                        modifier = Modifier.weight(2.5f),
+                        text = Localization.getString(
+                            "settings_choose_category"
+                        ),
+                        onclick = {
+                            State.currentPopupMode = Popup.Modes.NONE
+                            clickWithTransition(Routes.BACK)
+                        },
+                    )
+                }
                 Spacer(Modifier.weight(1f))
                 ButtonComponent(
                     modifier = Modifier.weight(2.5f),
@@ -115,10 +119,10 @@ fun SettingsPopupComponent() {
                     ),
                     onclick = {
                         State.currentPopupMode = Popup.Modes.NONE
-                        if (State.currentDiscipline !in arrayOf(
-                                Disciplines.FREESTYLE_WEAPON, Disciplines.FREESTYLE_GROUP
-                        )) clickWithTransition(Routes.BACK)
-                        clickWithTransition(Routes.BACK)
+                        clickWithTransition(
+                            route = Routes.DISCIPLINE_SELECT,
+                            inclusiveMode = true
+                        )
                     },
                 )
                 Spacer(Modifier.weight(1f))

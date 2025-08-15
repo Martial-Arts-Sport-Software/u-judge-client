@@ -33,7 +33,7 @@ object State {
 
     var currentDiscipline: Disciplines? = null
     var currentCategory: Categories? = null
-    var currentRating by mutableStateOf(Rating("offline"))
+    var currentRating: Rating? by mutableStateOf(null)
     var currentLocale by mutableStateOf(getLocale())
     var currentPopupMode by mutableStateOf(Popup.Modes.NONE)
 

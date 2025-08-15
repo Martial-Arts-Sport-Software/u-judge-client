@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -101,65 +104,64 @@ interface TechniqueScreen : Screen {
     }
 
     /**
-     * Renders display for technique criteria in all [TechniqueScreen] implementations
-     * @param rating - current rating, that criteria must be rendered
+     * Renders display for technique criteria in all [TechniqueScreen] implementations.
+     *
+     * Only for [Disciplines.HOSINSOOL] and [Disciplines.FREESTYLE_PAIR]
      */
     @Composable
-    fun DefaultTechniqueDisplay(
-        rating: TechniqueRating
-    ) {
-        require(State.currentDiscipline == Disciplines.HOSINSOOL ||
-        State.currentDiscipline == Disciplines.FREESTYLE_PAIR)
-
-        RangeInputComponent(
-            currentValue = (rating.techniqueCriteria as TechniqueCriteria.Junior)
-                .wristHold,
-            onValueChange = { value ->
-                (rating.techniqueCriteria as TechniqueCriteria.Junior).wristHold = value
-            },
-            icon = Res.drawable.wrist
-        )
-        RangeInputComponent(
-            currentValue = (rating.techniqueCriteria as TechniqueCriteria.Junior)
-                .clothesHold,
-            onValueChange = { value ->
-                (rating.techniqueCriteria as TechniqueCriteria.Junior).clothesHold = value
-            },
-            icon = Res.drawable.clothes
-        )
-        RangeInputComponent(
-            currentValue = (rating.techniqueCriteria as TechniqueCriteria.Junior)
-                .fistPunch,
-            onValueChange = { value ->
-                (rating.techniqueCriteria as TechniqueCriteria.Junior).fistPunch = value
-            },
-            icon = Res.drawable.fist
-        )
-        RangeInputComponent(
-            currentValue = (rating.techniqueCriteria as TechniqueCriteria.Junior)
-                .legKick,
-            onValueChange = { value ->
-                (rating.techniqueCriteria as TechniqueCriteria.Junior).legKick = value
-            },
-            icon = Res.drawable.foot
-        )
-        if (State.currentCategory == Categories.ADULTS) {
+    fun DefaultTechniqueDisplay() {
+        if (State.currentRating != null) {
+            val rating by remember { mutableStateOf(State.currentRating as TechniqueRating) }
             RangeInputComponent(
-                currentValue = (rating.techniqueCriteria as TechniqueCriteria.Adult)
-                    .knifeLock,
+                currentValue = (rating.techniqueCriteria as TechniqueCriteria.Junior)
+                    .wristHold,
                 onValueChange = { value ->
-                    (rating.techniqueCriteria as TechniqueCriteria.Adult).knifeLock = value
+                    (rating.techniqueCriteria as TechniqueCriteria.Junior).wristHold = value
                 },
-                icon = Res.drawable.knife
+                icon = Res.drawable.wrist
             )
             RangeInputComponent(
-                currentValue = (rating.techniqueCriteria as TechniqueCriteria.Adult)
-                    .weaponLock,
+                currentValue = (rating.techniqueCriteria as TechniqueCriteria.Junior)
+                    .clothesHold,
                 onValueChange = { value ->
-                    (rating.techniqueCriteria as TechniqueCriteria.Adult).weaponLock = value
+                    (rating.techniqueCriteria as TechniqueCriteria.Junior).clothesHold = value
                 },
-                icon = Res.drawable.belt
+                icon = Res.drawable.clothes
             )
+            RangeInputComponent(
+                currentValue = (rating.techniqueCriteria as TechniqueCriteria.Junior)
+                    .fistPunch,
+                onValueChange = { value ->
+                    (rating.techniqueCriteria as TechniqueCriteria.Junior).fistPunch = value
+                },
+                icon = Res.drawable.fist
+            )
+            RangeInputComponent(
+                currentValue = (rating.techniqueCriteria as TechniqueCriteria.Junior)
+                    .legKick,
+                onValueChange = { value ->
+                    (rating.techniqueCriteria as TechniqueCriteria.Junior).legKick = value
+                },
+                icon = Res.drawable.foot
+            )
+            if (State.currentCategory == Categories.ADULTS) {
+                RangeInputComponent(
+                    currentValue = (rating.techniqueCriteria as TechniqueCriteria.Adult)
+                        .knifeLock,
+                    onValueChange = { value ->
+                        (rating.techniqueCriteria as TechniqueCriteria.Adult).knifeLock = value
+                    },
+                    icon = Res.drawable.knife
+                )
+                RangeInputComponent(
+                    currentValue = (rating.techniqueCriteria as TechniqueCriteria.Adult)
+                        .weaponLock,
+                    onValueChange = { value ->
+                        (rating.techniqueCriteria as TechniqueCriteria.Adult).weaponLock = value
+                    },
+                    icon = Res.drawable.belt
+                )
+            }
         }
     }
 }

@@ -179,12 +179,18 @@ fun ButtonComponent(
 }
 
 fun clickWithTransition(
-    route: Routes
+    route: Routes,
+    inclusiveMode: Boolean = false
 ) {
     if (State.isOffline || State.isConnectedToServer) {
         State.isAnimating = true
         if (route == Routes.BACK) {
             State.navController!!.popBackStack()
-        } else State.navController!!.navigate(route.path)
+        } else State.navController!!.navigate(route.path) {
+            popUpTo(route.path) {
+                inclusive = inclusiveMode
+            }
+            launchSingleTop = inclusiveMode
+        }
     } else State.isConnectedToServer = false
 }
