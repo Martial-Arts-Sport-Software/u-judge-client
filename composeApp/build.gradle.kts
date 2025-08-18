@@ -43,6 +43,7 @@ kotlin {
             implementation(libs.navigation.compose)
             implementation(libs.ui.backhandler)
             implementation(libs.androidx.annotation)
+            implementation(libs.androidx.core.splashscreen)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

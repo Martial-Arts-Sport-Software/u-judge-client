@@ -4,6 +4,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import kotlin.math.round
 
 /**
  * Parent for technique ratings - hosinsool, freestyle (all categories)
@@ -20,9 +21,9 @@ class TechniqueRating(
     val presentationCriteria by mutableStateOf(presentationCriteria)
     var extraPoints by mutableStateOf(exPoints)
     val totalScore by derivedStateOf {
-        val sum = extraPoints +
+        val sum = round((extraPoints +
                 techniqueCriteria.getTotalScore() +
-                presentationCriteria.getTotalScore()
+                presentationCriteria.getTotalScore()) * 10) / 10f
         if (sum < 0f) return@derivedStateOf 0f
         return@derivedStateOf sum
     }

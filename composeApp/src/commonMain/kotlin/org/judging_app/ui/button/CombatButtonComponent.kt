@@ -50,22 +50,16 @@ fun CombatButtonComponent(
             },
         border = BorderStroke(3.dp, Colors.BUTTON_BROWN.color),
         shape = when (position) {
-            CombatButtonPositions.LEFT -> RoundedCornerShape(
-                topStart = 10.dp,
-                topEnd = 20.dp,
-                bottomStart = 10.dp,
-                bottomEnd = 20.dp
-            )
-            CombatButtonPositions.RIGHT -> RoundedCornerShape(
-                topStart = 20.dp,
-                topEnd = 10.dp,
-                bottomStart = 20.dp,
-                bottomEnd = 10.dp
-            )
             CombatButtonPositions.CENTER -> RoundedCornerShape(
                 topStart = 20.dp,
                 topEnd = 20.dp,
                 bottomStart = 20.dp,
+                bottomEnd = 20.dp
+            )
+            else -> RoundedCornerShape(
+                topStart = 10.dp,
+                topEnd = 20.dp,
+                bottomStart = 10.dp,
                 bottomEnd = 20.dp
             )
         },
