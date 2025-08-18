@@ -79,6 +79,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.appcompat)
     debugImplementation(compose.uiTooling)
 }
 
