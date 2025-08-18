@@ -94,8 +94,8 @@ object DisciplineSelectScreen: Screen {
                             disciplines[i + 1] else null
                         val firstOnclick = {
                             State.currentDiscipline = first
-                            if (first in arrayOf(
-                                    Disciplines.FREESTYLE_WEAPON, Disciplines.FREESTYLE_GROUP)
+                            if (first !in arrayOf(
+                                    Disciplines.HOSINSOOL, Disciplines.FREESTYLE_PAIR)
                             ) {
                                 State.currentCategory = Categories.ADULTS
                                 clickWithTransition(
@@ -123,8 +123,8 @@ object DisciplineSelectScreen: Screen {
                             if (second != null) {
                                 val secondOnclick = {
                                     State.currentDiscipline = second
-                                    if (second in arrayOf(
-                                            Disciplines.FREESTYLE_WEAPON, Disciplines.FREESTYLE_GROUP)
+                                    if (second !in arrayOf(
+                                            Disciplines.HOSINSOOL, Disciplines.FREESTYLE_PAIR)
                                     ) {
                                         State.currentCategory = Categories.ADULTS
                                         clickWithTransition(

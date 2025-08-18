@@ -95,8 +95,8 @@ fun SettingsPopupComponent() {
                         State.currentRating = null
                     },
                 )
-                if (State.currentDiscipline !in arrayOf(
-                        Disciplines.FREESTYLE_WEAPON, Disciplines.FREESTYLE_GROUP
+                if (State.currentDiscipline in arrayOf(
+                        Disciplines.HOSINSOOL, Disciplines.FREESTYLE_PAIR
                     )
                 ) {
                     Spacer(Modifier.weight(1f))
