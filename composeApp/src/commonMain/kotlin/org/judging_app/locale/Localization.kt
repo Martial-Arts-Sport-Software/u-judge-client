@@ -9,8 +9,9 @@ import org.judging_app.State
 object Localization {
     private val strings = mapOf(
         "en" to mapOf(
-            "entry_club_name" to "U'PITER\nSPORT CLUB",
-            "entry_club_description" to "Olympic Taekwondo\n" +
+            "entry_title" to "U'JUDGE - Client",
+            "entry_quote" to "A good judge is always fair...",
+            "entry_description" to "Olympic Taekwondo\n" +
                     "Sport and combat Hapkido",
             "entry_login" to "Online",
             "entry_offline" to "Offline",
@@ -96,8 +97,9 @@ object Localization {
         ),
 
         "ru" to mapOf(
-            "entry_club_name" to "СПОРТИВНЫЙ\nКЛУБ Ю'ПИТЕР",
-            "entry_club_description" to "Олимпийское Тхэквондо\n" +
+            "entry_title" to "U'JUDGE - Клиент",
+            "entry_quote" to "Хороший судья беспристрастен...",
+            "entry_description" to "Олимпийское Тхэквондо\n" +
                     "Спортивное и боевое Хапкидо",
             "entry_login" to "Онлайн",
             "entry_offline" to "Офлайн",
