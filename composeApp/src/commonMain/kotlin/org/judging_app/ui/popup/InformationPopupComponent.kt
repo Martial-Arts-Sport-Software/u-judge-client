@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -59,7 +60,14 @@ fun InformationPopupComponent(
             }
         )
         PDFViewer(
-            Modifier.align(Alignment.BottomCenter)
+            filename =
+                "files/${State.currentDiscipline?.name?.lowercase()}" +
+                    "/${State.currentLocale}.pdf",
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.8f)
+                .padding(start = 15.dp, end = 15.dp, bottom = 10.dp)
+                .align(Alignment.BottomCenter)
         )
     }
 }

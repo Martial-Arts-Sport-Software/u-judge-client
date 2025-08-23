@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -70,11 +69,10 @@ fun loadPdfRenderer(filepath: String): PdfRenderer? {
 
 @Composable
 actual fun PDFViewer(
+    filename: String,
     modifier: Modifier
 ) {
-    val filepath = "files/${State.currentDiscipline?.name?.lowercase()}" +
-            "/${State.currentLocale}.pdf"
-    val pdfRenderer = loadPdfRenderer(filepath)
+    val pdfRenderer = loadPdfRenderer(filename)
     pdfRenderer?.let {
         val coroutineScope = rememberCoroutineScope()
         var textColumnSize by remember { mutableStateOf(IntSize.Zero) }
@@ -90,10 +88,7 @@ actual fun PDFViewer(
             Array(pageCount) { mutableStateOf<ImageBitmap?>(null) }
         }
         Row(
-            modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.8f)
-                .padding(start = 15.dp, end = 15.dp, bottom = 10.dp),
+            modifier = modifier,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
