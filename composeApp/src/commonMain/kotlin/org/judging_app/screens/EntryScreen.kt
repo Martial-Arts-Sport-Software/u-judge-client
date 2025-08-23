@@ -65,7 +65,7 @@ object EntryScreen: Screen {
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
-                        modifier = Modifier.fillMaxHeight(0.65f),
+                        modifier = Modifier.fillMaxHeight(0.6f),
                     ) {
                         Text(
                             Localization.getString("entry_title"),
@@ -83,7 +83,7 @@ object EntryScreen: Screen {
                         )
                         Spacer(Modifier.weight(1f))
                         Row(
-                            Modifier.fillMaxHeight(0.7f),
+                            Modifier.fillMaxHeight(0.8f),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Image(

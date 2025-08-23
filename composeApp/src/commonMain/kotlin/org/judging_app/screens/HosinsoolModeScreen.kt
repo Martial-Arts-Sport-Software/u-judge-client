@@ -41,7 +41,6 @@ import org.judging_app.entities.TechniqueRating
 import org.judging_app.enums.Categories
 import org.judging_app.enums.Colors
 import org.judging_app.locale.Localization
-import org.judging_app.readFile
 import org.judging_app.ui.input.Modes
 import org.judging_app.ui.input.RangeInputComponent
 import org.judging_app.ui.navbar.NavbarComponent
@@ -65,9 +64,6 @@ object HosinsoolModeScreen : TechniqueScreen {
 
     @Composable
     override fun load() {
-        val filename = "${State.currentLocale}.txt"
-        val infoTextLines = readFile(filename)
-
         if (State.currentRating == null
             && State.currentCategory != null
             && State.currentDiscipline != null
@@ -122,7 +118,6 @@ object HosinsoolModeScreen : TechniqueScreen {
                                 )
                                 Spacer(Modifier.weight(1f))
                                 InformationPopupComponent(
-                                    lines = infoTextLines,
                                     modifier = Modifier.weight(35f)
                                 )
                             }

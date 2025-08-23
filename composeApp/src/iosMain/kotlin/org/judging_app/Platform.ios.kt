@@ -2,6 +2,7 @@ package org.judging_app
 
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -17,6 +18,12 @@ import platform.Foundation.currentLocale
 import platform.Foundation.languageCode
 
 actual fun getLocale(): String = NSLocale.currentLocale.languageCode
+
+@Composable
+actual fun PDFViewer(
+    modifier: Modifier
+) {}
+
 @Composable
 actual fun getTypography(): Typography {
     val montserratVariable = FontFamily(
