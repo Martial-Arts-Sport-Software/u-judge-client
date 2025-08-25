@@ -37,6 +37,16 @@ fun InformationPopupComponent(
             .clip(RoundedCornerShape(15.dp))
             .background(Color.White)
     ) {
+        PDFViewer(
+            filename =
+                "files/${State.currentDiscipline?.name?.lowercase()}" +
+                    "/${State.currentLocale}.pdf",
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.8f)
+                .padding(start = 15.dp, end = 15.dp, bottom = 10.dp)
+                .align(Alignment.BottomCenter)
+        )
         Row(
             modifier = Modifier
                 .fillMaxHeight(0.2f)
@@ -58,16 +68,6 @@ fun InformationPopupComponent(
             onclick = {
                 State.currentPopupMode = Popup.Modes.NONE
             }
-        )
-        PDFViewer(
-            filename =
-                "files/${State.currentDiscipline?.name?.lowercase()}" +
-                    "/${State.currentLocale}.pdf",
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.8f)
-                .padding(start = 15.dp, end = 15.dp, bottom = 10.dp)
-                .align(Alignment.BottomCenter)
         )
     }
 }

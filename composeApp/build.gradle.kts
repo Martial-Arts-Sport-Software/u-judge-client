@@ -30,6 +30,7 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.android.pdfview)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -82,4 +83,3 @@ dependencies {
     implementation(libs.appcompat)
     debugImplementation(compose.uiTooling)
 }
-

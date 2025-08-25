@@ -4,6 +4,10 @@ agp = "8.10.1"
 android-compileSdk = "35"
 android-minSdk = "24"
 android-targetSdk = "35"
+androidPdfview = "3.2.11"
+androidPdfViewer = "2.8.2"
+androidpdfviewerv1 = "1.6.0"
+androidPdfViewerVersion = "3.2.0-beta.1"
 androidx-activity = "1.10.1"
 androidx-appcompat = "1.7.0"
 androidx-constraintlayout = "2.2.1"
@@ -17,13 +21,20 @@ coreSplashscreen = "1.0.1"
 junit = "4.13.2"
 kotlin = "2.1.21"
 navigationCompose = "2.9.0-beta03"
+pdfViewerFragment = "1.0.0-alpha10"
 uiBackhandler = "1.8.2"
 appcompat = "1.7.1"
+fragmentCompose = "1.8.9"
 
 [libraries]
 accompanist-navigation-animation = { module = "com.google.accompanist:accompanist-navigation-animation", version.ref = "accompanistNavigationAnimation" }
+android-pdf-viewer = { module = "com.github.barteksc:android-pdf-viewer", version.ref = "androidPdfViewer" }
+android-pdf-viewer-v320beta1 = { module = "com.github.barteksc:android-pdf-viewer", version.ref = "androidPdfViewerVersion" }
+android-pdfview = { module = "com.github.Infomaniak:android-pdfview", version.ref = "androidPdfview" }
+androidpdfviewerv1 = { module = "com.github.barteksc:AndroidPdfViewerV1", version.ref = "androidpdfviewerv1" }
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
+androidx-pdf-viewer-fragment = { module = "androidx.pdf:pdf-viewer-fragment", version.ref = "pdfViewerFragment" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { module = "junit:junit", version.ref = "junit" }
@@ -38,6 +49,7 @@ androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle
 navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 ui-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.ref = "uiBackhandler" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-fragment-compose = { group = "androidx.fragment", name = "fragment-compose", version.ref = "fragmentCompose" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
