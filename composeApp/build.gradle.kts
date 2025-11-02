@@ -45,6 +45,9 @@ kotlin {
             implementation(libs.ui.backhandler)
             implementation(libs.androidx.annotation)
             implementation(libs.androidx.core.splashscreen)
+            implementation(libs.krop.core)
+            implementation(libs.krop.ui)
+            implementation(libs.kmp.capturable.compose)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -53,13 +56,13 @@ kotlin {
 }
 
 android {
-    namespace = "org.judging_app"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    namespace = "org.u_judge_client"
+    compileSdk = 36
 
     defaultConfig {
-        applicationId = "org.judging_app"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
+        applicationId = "org.u_judge_client"
+        minSdk = 24
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
     }

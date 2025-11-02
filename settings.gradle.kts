@@ -1,4 +1,4 @@
-rootProject.name = "judging-app-client"
+rootProject.name = "u_judge_client"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {

@@ -1,59 +1,69 @@
 [versions]
-accompanistNavigationAnimation = "0.34.0"
-agp = "8.10.1"
-android-compileSdk = "35"
-android-minSdk = "24"
-android-targetSdk = "35"
-androidPdfview = "3.2.11"
-androidPdfViewer = "2.8.2"
-androidpdfviewerv1 = "1.6.0"
-androidPdfViewerVersion = "3.2.0-beta.1"
-androidx-activity = "1.10.1"
-androidx-appcompat = "1.7.0"
-androidx-constraintlayout = "2.2.1"
-androidx-core = "1.16.0"
-androidx-espresso = "3.6.1"
-androidx-lifecycle = "2.9.0"
-androidx-testExt = "1.2.1"
+# Build Tools
+agp = "8.13.0"
+kotlin = "2.2.21"
+
+# Compose & UI Framework
+composeMultiplatform = "1.9.2"
+uiBackhandler = "1.9.2"
+
+# AndroidX - Core
 annotation = "1.9.1"
-composeMultiplatform = "1.8.1"
-coreSplashscreen = "1.0.1"
-junit = "4.13.2"
-kotlin = "2.1.21"
-navigationCompose = "2.9.0-beta03"
-pdfViewerFragment = "1.0.0-alpha10"
-uiBackhandler = "1.8.2"
 appcompat = "1.7.1"
-fragmentCompose = "1.8.9"
+coreSplashscreen = "1.0.1"
+
+# AndroidX - Activity & Lifecycle
+androidx-activity = "1.11.0"
+androidx-lifecycle = "2.9.5"
+
+# Navigation
+navigationCompose = "2.9.1"
+
+# Image & Media
+androidPdfview = "3.2.11"
+kmpCapturableCompose = "0.1.1"
+krop = "0.2.0"
+
 
 [libraries]
-accompanist-navigation-animation = { module = "com.google.accompanist:accompanist-navigation-animation", version.ref = "accompanistNavigationAnimation" }
-android-pdf-viewer = { module = "com.github.barteksc:android-pdf-viewer", version.ref = "androidPdfViewer" }
-android-pdf-viewer-v320beta1 = { module = "com.github.barteksc:android-pdf-viewer", version.ref = "androidPdfViewerVersion" }
-android-pdfview = { module = "com.github.Infomaniak:android-pdfview", version.ref = "androidPdfview" }
-androidpdfviewerv1 = { module = "com.github.barteksc:AndroidPdfViewerV1", version.ref = "androidpdfviewerv1" }
+# Build & Language
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+
+# AndroidX - Core
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
-androidx-pdf-viewer-fragment = { module = "androidx.pdf:pdf-viewer-fragment", version.ref = "pdfViewerFragment" }
-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
-kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
-junit = { module = "junit:junit", version.ref = "junit" }
-androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
-androidx-testExt-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-testExt" }
-androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx-espresso" }
-androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
-androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx-constraintlayout" }
+appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+
+# AndroidX - Activity & Compose
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
+
+# AndroidX - Lifecycle
 androidx-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+
+# Navigation
 navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+
+# Compose UI Framework
 ui-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.ref = "uiBackhandler" }
-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-androidx-fragment-compose = { group = "androidx.fragment", name = "fragment-compose", version.ref = "fragmentCompose" }
+
+# Image Processing & Capture
+android-pdfview = { module = "com.github.Infomaniak:android-pdfview", version.ref = "androidPdfview" }
+kmp-capturable-compose = { module = "io.github.suwasto:kmp-capturable-compose", version.ref = "kmpCapturableCompose" }
+
+# Image Cropping (Krop)
+krop-core = { module = "com.attafitamim.krop:core", version.ref = "krop" }
+krop-ui = { module = "com.attafitamim.krop:ui", version.ref = "krop" }
+
 
 [plugins]
+# Android Gradle Plugin
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
+
+# Kotlin Multiplatform
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+
+# Compose & Compiler
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
