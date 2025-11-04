@@ -37,7 +37,7 @@ import org.u_judge_client.ui.button.clickWithTransition
  */
 object DisciplineSelectScreen: Screen {
     @Composable
-    override fun load() {
+    override fun Load() {
         State.currentDiscipline = null
         State.currentRating = null
         val goBackOnclick = remember { {

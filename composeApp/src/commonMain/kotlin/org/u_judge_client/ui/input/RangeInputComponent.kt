@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -42,6 +43,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
@@ -54,6 +57,8 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.u_judge_client.State
 import org.u_judge_client.enums.Colors
+import org.u_judge_client.getContext
+import org.u_judge_client.vibrate
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
@@ -93,11 +98,12 @@ fun RangeInputComponent(
     icon: DrawableResource? = null,
     text: String = ""
 ) {
+    val context = getContext()
     var trackSize by remember { mutableStateOf(IntSize.Zero) }
     val markSizeDp by remember(trackSize) {
             derivedStateOf {
                 with(State.density!!) {
-                    (trackSize.height * 0.2f).toDp()
+                    (trackSize.height * 0.4f).toDp()
             }
         }
     }
@@ -153,6 +159,18 @@ fun RangeInputComponent(
         if (!isDragged) onValueChange(state.currentValue / 10f)
     }
 
+    var lastVibrationStep by remember { mutableStateOf(-1) }
+
+    LaunchedEffect(state) {
+        snapshotFlow { state.currentValue.toInt() }
+            .collect { currentStep ->
+                if (currentStep != lastVibrationStep && isDragged) {
+                    lastVibrationStep = currentStep
+                    vibrate(context)
+                }
+            }
+    }
+
     Row(
         modifier = modifier.fillMaxWidth(ratio),
         verticalAlignment = Alignment.CenterVertically
@@ -204,6 +222,17 @@ fun RangeInputComponent(
                 Row(
                     Modifier
                         .fillMaxWidth()
+                        .clip(CircleShape)
+                        .background(
+
+                            brush = Brush.linearGradient(
+                                colors = if (showSlider) listOf(
+                                    Color(0xFF1E1355),
+                                    Color(0xFF361A73),
+                                    Color(0xFF552BB0),
+                                ) else listOf(Color.Transparent, Color.Transparent)
+                            )
+                        )
                         .onSizeChanged { trackSize = it },
                     verticalAlignment = Alignment.Bottom,
                 ){
@@ -217,6 +246,7 @@ fun RangeInputComponent(
                                 indication = null,
                                 enabled = showSlider,
                                 onClick = {
+                                    vibrate(context)
                                     coroutineScope.launch {
                                         state.animateTo(
                                             targetValue = i.toFloat(),
@@ -261,7 +291,6 @@ fun RangeInputComponent(
                                             steps -> RoundedCornerShape(topEndPercent = 50, bottomEndPercent = 50)
                                             else -> RoundedCornerShape(0)
                                         })
-                                        .background(Colors.PRIMARY.color),
                                 ) {
                                     Box(
                                         Modifier
@@ -275,10 +304,32 @@ fun RangeInputComponent(
                                                 }
                                             )
                                             .width(markSizeDp)
-                                            .fillMaxHeight(0.5f)
-                                            .clip(CircleShape)
+                                            .height(markSizeDp)
+                                            .clip(RoundedCornerShape(2.dp))
                                             .align(Alignment.CenterStart)
-                                            .background(Colors.SLIDER_TRACK_ACTIVE.color)
+                                            .background(
+                                                when(i) {
+                                                    in 0..3 -> Color(0xFF552BB0)
+                                                    in 4..6 -> Color(0xFF7C45E2)
+                                                    else -> Color(0xFF9569EA)
+                                                }
+                                            )
+                                    )
+                                    Box(
+                                        Modifier
+                                            .align(Alignment.CenterStart)
+                                            .fillMaxWidth(
+                                                if (i != steps) 1f
+                                                else 0.5f
+                                            )
+                                            .fillMaxHeight(0.1f)
+                                            .background(
+                                                when(i) {
+                                                    in 0..3 -> Color(0xFF552BB0)
+                                                    in 4..6 -> Color(0xFF7C45E2)
+                                                    else -> Color(0xFF9569EA)
+                                                }
+                                            )
                                     )
                                 }
                             }
@@ -295,9 +346,7 @@ fun RangeInputComponent(
                             .clip(CircleShape)
                             .align(Alignment.BottomStart)
                             .background(Colors.SLIDER_TRACK_ACTIVE.color)
-                    ) {
-
-                    }
+                    )
                     Image(
                         modifier = Modifier
                             .fillMaxHeight()

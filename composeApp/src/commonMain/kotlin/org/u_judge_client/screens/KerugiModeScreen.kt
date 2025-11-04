@@ -39,7 +39,7 @@ import org.u_judge_client.ui.popup.WarningPopupComponent
  */
 object KerugiModeScreen : Screen {
     @Composable
-    override fun load() {
+    override fun Load() {
         Column(
             Modifier
                 .fillMaxHeight(0.9f)
