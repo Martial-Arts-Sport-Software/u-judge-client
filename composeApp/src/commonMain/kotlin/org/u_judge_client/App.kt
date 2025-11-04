@@ -82,25 +82,25 @@ fun App() {
                             contentAlignment = Alignment.Center,
                         ) {
                             animatedComposable(Routes.ENTRY) {
-                                EntryScreen.load()
+                                EntryScreen.Load()
                             }
                             animatedComposable(Routes.DISCIPLINE_SELECT) {
-                                DisciplineSelectScreen.load()
+                                DisciplineSelectScreen.Load()
                             }
                             animatedComposable(Routes.CATEGORY_SELECT) {
-                                CategorySelectScreen.load()
+                                CategorySelectScreen.Load()
                             }
                             animatedComposable(Routes.KERUGI_MODE) {
-                                KerugiModeScreen.load()
+                                KerugiModeScreen.Load()
                             }
                             animatedComposable(Routes.TANBON_MODE) {
-                                TanbonModeScreen.load()
+                                TanbonModeScreen.Load()
                             }
                             animatedComposable(Routes.HOSINSOOL_MODE) {
-                                HosinsoolModeScreen.load()
+                                HosinsoolModeScreen.Load()
                             }
                             animatedComposable(Routes.FREESTYLE_MODE) {
-                                FreestyleModeScreen.load()
+                                FreestyleModeScreen.Load()
                             }
                         }
                     }

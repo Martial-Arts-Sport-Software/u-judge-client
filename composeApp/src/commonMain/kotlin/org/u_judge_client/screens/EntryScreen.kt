@@ -44,7 +44,7 @@ import org.u_judge_client.ui.input.TextInputComponent
  */
 object EntryScreen: Screen {
     @Composable
-    override fun load() {
+    override fun Load() {
         Box(
             Modifier
                 .fillMaxWidth(0.9f)

@@ -4,6 +4,11 @@ import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
+@Composable
+expect fun getContext(): Any?
+
+expect fun vibrate(context: Any?)
+
 expect fun getLocale(): String
 
 @Composable

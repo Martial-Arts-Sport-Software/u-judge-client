@@ -3,7 +3,6 @@ package org.u_judge_client.ui.input
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
@@ -44,8 +43,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
@@ -60,6 +57,8 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.u_judge_client.State
 import org.u_judge_client.enums.Colors
+import org.u_judge_client.getContext
+import org.u_judge_client.vibrate
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
@@ -99,6 +98,7 @@ fun RangeInputComponent(
     icon: DrawableResource? = null,
     text: String = ""
 ) {
+    val context = getContext()
     var trackSize by remember { mutableStateOf(IntSize.Zero) }
     val markSizeDp by remember(trackSize) {
             derivedStateOf {
@@ -157,6 +157,18 @@ fun RangeInputComponent(
 
     LaunchedEffect(isDragged) {
         if (!isDragged) onValueChange(state.currentValue / 10f)
+    }
+
+    var lastVibrationStep by remember { mutableStateOf(-1) }
+
+    LaunchedEffect(state) {
+        snapshotFlow { state.currentValue.toInt() }
+            .collect { currentStep ->
+                if (currentStep != lastVibrationStep && isDragged) {
+                    lastVibrationStep = currentStep
+                    vibrate(context)
+                }
+            }
     }
 
     Row(
@@ -234,6 +246,7 @@ fun RangeInputComponent(
                                 indication = null,
                                 enabled = showSlider,
                                 onClick = {
+                                    vibrate(context)
                                     coroutineScope.launch {
                                         state.animateTo(
                                             targetValue = i.toFloat(),
@@ -358,22 +371,4 @@ fun RangeInputComponent(
             }
         }
     }
-}
-
-fun Modifier.leftRightBorders(color: Color, width: Float) = this.drawWithContent {
-    drawContent()
-    // Левая граница
-    drawLine(
-        color = color,
-        start = Offset(0f, 0f),
-        end = Offset(0f, size.height),
-        strokeWidth = width
-    )
-    // Правая граница
-    drawLine(
-        color = color,
-        start = Offset(size.width, 0f),
-        end = Offset(size.width, size.height),
-        strokeWidth = width
-    )
 }

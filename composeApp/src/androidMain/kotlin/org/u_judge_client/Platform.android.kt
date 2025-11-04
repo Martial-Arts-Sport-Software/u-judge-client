@@ -1,5 +1,13 @@
 package org.u_judge_client
 
+import android.Manifest
+import android.content.Context
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
+import androidx.annotation.RequiresApi
+import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
@@ -136,4 +144,23 @@ actual fun getTypography(): Typography {
             color = Colors.PRIMARY.color
         )
     )
+}
+
+@Composable
+actual fun getContext(): Any? {
+    return LocalContext.current
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@RequiresPermission(Manifest.permission.VIBRATE)
+actual fun vibrate(context: Any?) {
+    val vibrator: Vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val vibratorManager = (context as Context).getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+        vibratorManager.defaultVibrator
+    } else {
+        @Suppress("DEPRECATION")
+        (context as Context).getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    }
+    val effect = VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE)
+    vibrator.vibrate(effect)
 }
