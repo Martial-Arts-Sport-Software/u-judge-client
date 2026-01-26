@@ -1,27 +1,26 @@
 [versions]
 # Build Tools
-agp = "8.13.0"
-kotlin = "2.2.21"
+agp = "8.13.2"
+kotlin = "2.3.0"
 
 # Compose & UI Framework
-composeMultiplatform = "1.9.2"
-uiBackhandler = "1.9.2"
+composeMultiplatform = "1.10.0"
 
 # AndroidX - Core
 annotation = "1.9.1"
 appcompat = "1.7.1"
-coreSplashscreen = "1.0.1"
+coreSplashscreen = "1.2.0"
 
 # AndroidX - Activity & Lifecycle
-androidx-activity = "1.11.0"
-androidx-lifecycle = "2.9.5"
+androidx-activity = "1.12.2"
+androidx-lifecycle = "2.9.6"
 
 # Navigation
 navigationCompose = "2.9.1"
 
 # Image & Media
 androidPdfview = "3.2.11"
-kmpCapturableCompose = "0.1.1"
+kmpCapturableCompose = "1.0.0"
 krop = "0.2.0"
 
 
@@ -45,7 +44,14 @@ androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle
 navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 
 # Compose UI Framework
-ui-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.ref = "uiBackhandler" }
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "composeMultiplatform" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "composeMultiplatform" }
+compose-material3 = { module = "org.jetbrains.compose.material3:material3", version = "1.9.0" }
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "composeMultiplatform" }
+compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "composeMultiplatform" }
+compose-components-uiToolingPreview = { module = "org.jetbrains.compose.components:components-ui-tooling-preview", version.ref = "composeMultiplatform" }
+compose-ui-tooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "composeMultiplatform" }
+compose-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "composeMultiplatform" }
 
 # Image Processing & Capture
 android-pdfview = { module = "com.github.Infomaniak:android-pdfview", version.ref = "androidPdfview" }
@@ -63,7 +69,5 @@ androidLibrary = { id = "com.android.library", version.ref = "agp" }
 
 # Kotlin Multiplatform
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-
-# Compose & Compiler
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
