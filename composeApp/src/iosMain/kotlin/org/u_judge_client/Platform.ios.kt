@@ -1,11 +1,8 @@
 package org.u_judge_client
 
-import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,34 +19,40 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.UIKitView
-import kotlinx.cinterop.ByteVar
 import u_judge_client.composeapp.generated.resources.Montserrat
 import u_judge_client.composeapp.generated.resources.Res
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.readBytes
-import kotlinx.cinterop.reinterpret
 import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.Font
 import org.u_judge_client.enums.Colors
-import org.u_judge_client.ui.popup.Popup
 import platform.CoreGraphics.CGRectMake
-import platform.Foundation.NSBundle
 import platform.Foundation.NSData
 import platform.Foundation.NSLocale
 import platform.Foundation.create
 import platform.Foundation.currentLocale
-import platform.Foundation.dataWithContentsOfFile
 import platform.Foundation.languageCode
 import platform.PDFKit.PDFDocument
 import platform.PDFKit.PDFView
 import platform.UIKit.UIColor
 import platform.UIKit.UIEdgeInsetsMake
+import platform.UIKit.UIImpactFeedbackGenerator
+import platform.UIKit.UIImpactFeedbackStyle
 import platform.UIKit.UIView
 
 actual fun getLocale(): String = NSLocale.currentLocale.languageCode
+
+@Composable
+actual fun getContext(): Any? {
+    return null
+}
+
+actual fun vibrate(context: Any?) {
+    val generator = UIImpactFeedbackGenerator(UIImpactFeedbackStyle.UIImpactFeedbackStyleMedium)
+    generator.prepare()
+    generator.impactOccurred()
+}
 
 @Composable
 actual fun PDFViewer(
@@ -57,7 +60,6 @@ actual fun PDFViewer(
     modifier: Modifier,
 ) {
     var pdfData by remember(filename) { mutableStateOf<ByteArray?>(null) }
-    val transition = updateTransition(State.currentPopupMode)
     var isLoaded by remember { mutableStateOf(false) }
 
     LaunchedEffect(filename) {

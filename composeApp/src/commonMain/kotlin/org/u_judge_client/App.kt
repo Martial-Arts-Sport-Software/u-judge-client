@@ -22,8 +22,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
-
+import androidx.compose.ui.tooling.preview.Preview
 import u_judge_client.composeapp.generated.resources.Res
 import u_judge_client.composeapp.generated.resources.app_background
 import kotlinx.coroutines.delay
@@ -82,25 +81,25 @@ fun App() {
                             contentAlignment = Alignment.Center,
                         ) {
                             animatedComposable(Routes.ENTRY) {
-                                EntryScreen.load()
+                                EntryScreen.Load()
                             }
                             animatedComposable(Routes.DISCIPLINE_SELECT) {
-                                DisciplineSelectScreen.load()
+                                DisciplineSelectScreen.Load()
                             }
                             animatedComposable(Routes.CATEGORY_SELECT) {
-                                CategorySelectScreen.load()
+                                CategorySelectScreen.Load()
                             }
                             animatedComposable(Routes.KERUGI_MODE) {
-                                KerugiModeScreen.load()
+                                KerugiModeScreen.Load()
                             }
                             animatedComposable(Routes.TANBON_MODE) {
-                                TanbonModeScreen.load()
+                                TanbonModeScreen.Load()
                             }
                             animatedComposable(Routes.HOSINSOOL_MODE) {
-                                HosinsoolModeScreen.load()
+                                HosinsoolModeScreen.Load()
                             }
                             animatedComposable(Routes.FREESTYLE_MODE) {
-                                FreestyleModeScreen.load()
+                                FreestyleModeScreen.Load()
                             }
                         }
                     }

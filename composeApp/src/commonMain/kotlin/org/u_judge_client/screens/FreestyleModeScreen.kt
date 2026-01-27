@@ -64,7 +64,7 @@ object FreestyleModeScreen : TechniqueScreen {
     override var showInformation by mutableStateOf(false)
 
     @Composable
-    override fun load() {
+    override fun Load() {
         if (State.currentRating == null
             && State.currentCategory != null
             && State.currentDiscipline != null
