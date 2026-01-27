@@ -5,6 +5,7 @@ kotlin = "2.3.0"
 
 # Compose & UI Framework
 composeMultiplatform = "1.10.0"
+uiBackhandler = "1.10.0"
 
 # AndroidX - Core
 annotation = "1.9.1"
@@ -19,7 +20,7 @@ androidx-lifecycle = "2.9.6"
 navigationCompose = "2.9.1"
 
 # Image & Media
-androidPdfview = "3.2.11"
+androidPdfview = "3.2.15"
 kmpCapturableCompose = "1.0.0"
 krop = "0.2.0"
 
@@ -52,6 +53,7 @@ compose-components-resources = { module = "org.jetbrains.compose.components:comp
 compose-components-uiToolingPreview = { module = "org.jetbrains.compose.components:components-ui-tooling-preview", version.ref = "composeMultiplatform" }
 compose-ui-tooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "composeMultiplatform" }
 compose-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "composeMultiplatform" }
+ui-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.ref = "uiBackhandler" }
 
 # Image Processing & Capture
 android-pdfview = { module = "com.github.Infomaniak:android-pdfview", version.ref = "androidPdfview" }
@@ -65,6 +67,7 @@ krop-ui = { module = "com.attafitamim.krop:ui", version.ref = "krop" }
 [plugins]
 # Android Gradle Plugin
 androidApplication = { id = "com.android.application", version.ref = "agp" }
+androidKotlinMultiplatform = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 
 # Kotlin Multiplatform

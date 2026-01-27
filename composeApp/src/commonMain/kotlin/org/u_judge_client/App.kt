@@ -22,8 +22,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
-
+import androidx.compose.ui.tooling.preview.Preview
 import u_judge_client.composeapp.generated.resources.Res
 import u_judge_client.composeapp.generated.resources.app_background
 import kotlinx.coroutines.delay
