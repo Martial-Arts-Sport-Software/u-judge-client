@@ -4,6 +4,12 @@
 - Part of U'Judge Platform, client & server system for judging Taekwondo & Hapkido sport competition
 - The appearance of the application is designed in accordance with our <a href="https://www.figma.com/design/x5vY9DbXh3a0kv0lBPcNru/Judging-app?node-id=51-128&t=r4o8EgEnSLslF1dG-0">specific design</a>
 
+## License
+[![License](https://img.shields.io/github/license/TheGeniusOfEternity/u-judge-client?color=purple)](LICENSE)
+- **Public for portfolio/showcase only**
+- **All Rights Reserved** — cannot copy/use commercially
+- **Forking/Cloning prohibited**
+
 ## Features
 Application has two main modes - online and offline
 Note: both modes requires username filled to work
