@@ -13,7 +13,7 @@ appcompat = "1.7.1"
 coreSplashscreen = "1.2.0"
 
 # AndroidX - Activity & Lifecycle
-androidx-activity = "1.12.2"
+androidx-activity = "1.12.3"
 androidx-lifecycle = "2.9.6"
 
 # Navigation

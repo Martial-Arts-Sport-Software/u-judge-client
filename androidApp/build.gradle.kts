@@ -37,6 +37,14 @@ android {
     }
 }
 
+configurations.all {
+    resolutionStrategy {
+        force("com.google.protobuf:protobuf-kotlin:4.33.4")
+        force("com.google.protobuf:protobuf-java:4.33.4")
+        force("com.google.protobuf:protobuf-java-util:4.33.4")
+    }
+}
+
 dependencies {
     implementation(project(":composeApp"))
 }
