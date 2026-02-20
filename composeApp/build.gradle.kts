@@ -20,7 +20,7 @@ kotlin {
     }
 
     androidLibrary {
-        namespace = "org.u_judge_client"
+        namespace = "org.mass"
         compileSdk = 36
         minSdk = 24
 

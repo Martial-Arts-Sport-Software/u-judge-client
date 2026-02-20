@@ -1,4 +1,6 @@
-rootProject.name = "u_judge_client"
+@file:Suppress("UnstableApiUsage")
+
+rootProject.name = "u-judge-client"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
@@ -7,6 +9,9 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
     }
+}
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
 dependencyResolutionManagement {
