@@ -60,6 +60,7 @@ kotlin {
             implementation(libs.ui.backhandler)
             implementation(libs.compose.components.resources)
             implementation(libs.compose.components.uiToolingPreview)
+
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.navigation.compose)
@@ -68,6 +69,8 @@ kotlin {
             implementation(libs.krop.core)
             implementation(libs.krop.ui)
             implementation(libs.kmp.capturable.compose)
+
+            implementation(libs.dns.sd.kt)
         }
 
         commonTest.dependencies {

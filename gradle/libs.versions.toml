@@ -1,11 +1,11 @@
 [versions]
 # Build Tools
-agp = "9.0.0"
-kotlin = "2.3.0"
+agp = "9.0.1"
+kotlin = "2.3.10"
 
 # Compose & UI Framework
-composeMultiplatform = "1.10.0"
-uiBackhandler = "1.10.0"
+composeMultiplatform = "1.10.1"
+uiBackhandler = "1.10.1"
 
 # AndroidX - Core
 annotation = "1.9.1"
@@ -13,17 +13,18 @@ appcompat = "1.7.1"
 coreSplashscreen = "1.2.0"
 
 # AndroidX - Activity & Lifecycle
-androidx-activity = "1.12.3"
+androidx-activity = "1.12.4"
 androidx-lifecycle = "2.9.6"
 
 # Navigation
-navigationCompose = "2.9.1"
+navigationCompose = "2.9.2"
 
 # Image & Media
 androidPdfview = "3.2.15"
 kmpCapturableCompose = "1.0.0"
 krop = "0.2.0"
 
+dnsSdKt = "1.0.5"
 
 [libraries]
 # Build & Language
@@ -63,6 +64,8 @@ kmp-capturable-compose = { module = "io.github.suwasto:kmp-capturable-compose", 
 krop-core = { module = "com.attafitamim.krop:core", version.ref = "krop" }
 krop-ui = { module = "com.attafitamim.krop:ui", version.ref = "krop" }
 
+# Multicast DNS
+dns-sd-kt = { group = "com.appstractive", name = "dns-sd-kt", version.ref = "dnsSdKt" }
 
 [plugins]
 # Android Gradle Plugin

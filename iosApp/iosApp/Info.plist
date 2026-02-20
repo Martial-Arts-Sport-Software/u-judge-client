@@ -5,6 +5,12 @@
 	<key>CFBundleDisplayName</key>
 	<string>U&apos;Judge - Client</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>Required to discover local network devices</string>
+    <key>NSBonjourServices</key>
+    <array>
+        <string>_u-judge._tcp</string>
+    </array>
 	<true/>
 </dict>
 </plist>

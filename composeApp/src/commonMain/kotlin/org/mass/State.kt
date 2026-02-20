@@ -1,10 +1,12 @@
 package org.mass
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Density
 import androidx.navigation.NavHostController
+import com.appstractive.dnssd.DiscoveredService
 import org.mass.entities.Rating
 import org.mass.enums.Categories
 import org.mass.enums.Disciplines
@@ -31,13 +33,16 @@ object State {
     var judgeSurname by mutableStateOf("")
     var serverAddress by mutableStateOf("")
     var currentError by mutableStateOf("")
-
     var currentDiscipline: Disciplines? = null
     var currentCategory: Categories? = null
     var currentRating: Rating? by mutableStateOf(null)
     var currentLocale by mutableStateOf(getLocale())
+
     var currentPopupMode by mutableStateOf(Popup.Modes.NONE)
 
+    var availableServers by mutableStateOf(mutableMapOf<String, DiscoveredService>())
+
+    var selectedServer by mutableStateOf(null)
     var isConnectedToServer by mutableStateOf(false)
     var isAnimating by mutableStateOf(false)
     var isOffline by mutableStateOf(true)
