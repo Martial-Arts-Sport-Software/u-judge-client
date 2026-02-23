@@ -33,6 +33,7 @@ import org.mass.screens.EntryScreen
 import org.mass.screens.FreestyleModeScreen
 import org.mass.screens.HosinsoolModeScreen
 import org.mass.screens.KerugiModeScreen
+import org.mass.screens.ServerConnectionScreen
 import org.mass.screens.TanbonModeScreen
 import org.mass.ui.popup.ConnectionLostPopupComponent
 import org.mass.ui.popup.Popup
@@ -64,7 +65,8 @@ fun App() {
                     contentScale = ContentScale.Crop
                 )
                 AnimatedVisibility(
-                    visible = State.isConnectedToServer ||
+                    visible = State.selectedServer == null ||
+                            State.isConnectedToServer ||
                             State.isOffline,
                     enter = fadeIn(),
                     exit = fadeOut()
@@ -82,6 +84,9 @@ fun App() {
                         ) {
                             animatedComposable(Routes.ENTRY) {
                                 EntryScreen.Load()
+                            }
+                            animatedComposable(Routes.SERVER_CONNECTION) {
+                                ServerConnectionScreen.Load()
                             }
                             animatedComposable(Routes.DISCIPLINE_SELECT) {
                                 DisciplineSelectScreen.Load()
@@ -105,7 +110,8 @@ fun App() {
                     }
                 }
                 AnimatedVisibility(
-                    visible = !State.isConnectedToServer &&
+                    visible = State.selectedServer != null &&
+                            !State.isConnectedToServer &&
                             !State.isOffline,
                     enter = fadeIn(),
                     exit = fadeOut()

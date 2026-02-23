@@ -7,6 +7,8 @@ import org.mass.screens.Screen
 enum class Routes(val path: String) {
     ENTRY("entry"),
 
+    SERVER_CONNECTION("server_connection"),
+
     DISCIPLINE_SELECT("discipline_select"),
     CATEGORY_SELECT("category_select"),
 

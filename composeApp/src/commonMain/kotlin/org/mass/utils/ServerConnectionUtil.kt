@@ -7,9 +7,11 @@ import org.mass.State.availableServers
 
 object ServerConnectionUtil {
     suspend fun scan() {
-        discoverServices("_u-judge._tcp").collect {
+        println("GOIDA STARTED!")
+        discoverServices("_u-judge._tcp.local.").collect {
             when (it) {
                 is DiscoveryEvent.Discovered -> {
+                    println("GOIDA FOUND!")
                     availableServers[it.service.key] = it.service
                     it.resolve()
                 }

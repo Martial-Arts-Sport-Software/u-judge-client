@@ -11,6 +11,8 @@ import org.mass.entities.Rating
 import org.mass.enums.Categories
 import org.mass.enums.Disciplines
 import org.mass.ui.popup.Popup
+import kotlin.collections.getValue
+import kotlin.collections.setValue
 
 /**
  * Singleton that controls current state of application
@@ -39,10 +41,8 @@ object State {
     var currentLocale by mutableStateOf(getLocale())
 
     var currentPopupMode by mutableStateOf(Popup.Modes.NONE)
-
-    var availableServers by mutableStateOf(mutableMapOf<String, DiscoveredService>())
-
-    var selectedServer by mutableStateOf(null)
+    var availableServers = mutableStateMapOf<String, DiscoveredService>()
+    var selectedServer: DiscoveredService? by mutableStateOf(null)
     var isConnectedToServer by mutableStateOf(false)
     var isAnimating by mutableStateOf(false)
     var isOffline by mutableStateOf(true)

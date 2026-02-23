@@ -182,7 +182,7 @@ fun clickWithTransition(
     route: Routes,
     inclusiveMode: Boolean = false
 ) {
-    if (State.isOffline || State.isConnectedToServer) {
+    if (State.isOffline || State.isConnectedToServer || State.selectedServer == null) {
         State.isAnimating = true
         if (route == Routes.BACK) {
             State.navController!!.popBackStack()

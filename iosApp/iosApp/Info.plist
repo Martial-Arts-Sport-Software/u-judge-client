@@ -3,14 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDisplayName</key>
-	<string>U&apos;Judge - Client</string>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<string>U'Judge - Client</string>
+    
     <key>NSLocalNetworkUsageDescription</key>
-    <string>Required to discover local network devices</string>
+    <string>App needs local network access to discover u-judge servers</string>
+        
     <key>NSBonjourServices</key>
     <array>
         <string>_u-judge._tcp</string>
     </array>
-	<true/>
+    
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+    <true/>
 </dict>
 </plist>
