@@ -116,7 +116,8 @@ object EntryScreen: Screen {
                         onChange = { inputValue ->  
                             State.serverAddress = inputValue
                             State.currentError = ""
-                        }
+                        },
+                        enabled = false
                     )
                     TextInputComponent(
                         Localization.getString("entry_judge_surname"),

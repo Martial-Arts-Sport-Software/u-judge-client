@@ -173,7 +173,7 @@ object FreestyleModeScreen : TechniqueScreen {
                                             Box(
                                                 Modifier
                                                     .fillMaxSize()
-                                                    .background(Colors.BUTTON_GRAY.color)
+                                                    .background(Colors.GRAY.color)
                                             ) {
                                                 Box(
                                                     Modifier
@@ -340,7 +340,7 @@ object FreestyleModeScreen : TechniqueScreen {
                                             Box(
                                                 Modifier
                                                     .fillMaxSize()
-                                                    .background(Colors.BUTTON_GRAY.color)
+                                                    .background(Colors.GRAY.color)
                                             ) {
                                                 Box(
                                                     Modifier
@@ -513,7 +513,7 @@ object FreestyleModeScreen : TechniqueScreen {
                                             Box(
                                                 Modifier
                                                     .fillMaxSize()
-                                                    .background(Colors.BUTTON_GRAY.color)
+                                                    .background(Colors.GRAY.color)
                                             ) {
                                                 Column(
                                                     Modifier

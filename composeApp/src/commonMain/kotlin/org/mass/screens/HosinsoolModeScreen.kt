@@ -162,7 +162,7 @@ object HosinsoolModeScreen : TechniqueScreen {
                                             Box(
                                                 Modifier
                                                     .fillMaxSize()
-                                                    .background(Colors.BUTTON_GRAY.color)
+                                                    .background(Colors.GRAY.color)
                                             ) {
                                                 Box(
                                                     Modifier
@@ -200,7 +200,7 @@ object HosinsoolModeScreen : TechniqueScreen {
                                             Box(
                                                 Modifier
                                                     .fillMaxSize()
-                                                    .background(Colors.BUTTON_GRAY.color)
+                                                    .background(Colors.GRAY.color)
                                             ) {
                                                 Box(
                                                     Modifier
@@ -277,7 +277,7 @@ object HosinsoolModeScreen : TechniqueScreen {
                                             Box(
                                                 Modifier
                                                     .fillMaxSize()
-                                                    .background(Colors.BUTTON_GRAY.color)
+                                                    .background(Colors.GRAY.color)
                                             ) {
                                                 Column(
                                                     Modifier

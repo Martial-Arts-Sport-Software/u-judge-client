@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
@@ -23,17 +24,20 @@ import androidx.compose.ui.unit.dp
  * @param labelText - label text above input
  * @param inputValue - initial value of text input
  * @param onChange - callback, that is called on component's value change
+ * @param enabled - is input available to fill or not, true by default
  */
 @Composable
 fun TextInputComponent(
     labelText: String? = null,
     inputValue: String = "",
-    onChange: (inputValue: String) -> Unit
+    onChange: (inputValue: String) -> Unit,
+    enabled: Boolean = true
 ) {
     Column(
         Modifier
             .padding(bottom = 10.dp)
             .fillMaxWidth(0.8f)
+            .alpha(if (enabled) 1f else 0.5f)
     ) {
         if (labelText != null) {
             Text(
@@ -49,6 +53,7 @@ fun TextInputComponent(
                 input.value = it
                 onChange(input.value)
             },
+            enabled = enabled,
             singleLine = true,
             modifier = Modifier
                 .background(

@@ -224,14 +224,8 @@ fun RangeInputComponent(
                         .fillMaxWidth()
                         .clip(CircleShape)
                         .background(
-
-                            brush = Brush.linearGradient(
-                                colors = if (showSlider) listOf(
-                                    Color(0xFF1E1355),
-                                    Color(0xFF361A73),
-                                    Color(0xFF552BB0),
-                                ) else listOf(Color.Transparent, Color.Transparent)
-                            )
+                            if (showSlider) Colors.PRIMARY.color
+                            else Color.Transparent
                         )
                         .onSizeChanged { trackSize = it },
                     verticalAlignment = Alignment.Bottom,
@@ -294,6 +288,16 @@ fun RangeInputComponent(
                                 ) {
                                     Box(
                                         Modifier
+                                            .align(Alignment.CenterStart)
+                                            .fillMaxWidth(
+                                                if (i != steps) 1f
+                                                else 0.5f
+                                            )
+                                            .fillMaxHeight(0.1f)
+                                            .background(Colors.SECONDARY.color.copy(0.5f))
+                                    )
+                                    Box(
+                                        Modifier
                                             .offset(
                                                 x = with(State.density!!) {
                                                     when(i) {
@@ -307,29 +311,7 @@ fun RangeInputComponent(
                                             .height(markSizeDp)
                                             .clip(RoundedCornerShape(2.dp))
                                             .align(Alignment.CenterStart)
-                                            .background(
-                                                when(i) {
-                                                    in 0..3 -> Color(0xFF552BB0)
-                                                    in 4..6 -> Color(0xFF7C45E2)
-                                                    else -> Color(0xFF9569EA)
-                                                }
-                                            )
-                                    )
-                                    Box(
-                                        Modifier
-                                            .align(Alignment.CenterStart)
-                                            .fillMaxWidth(
-                                                if (i != steps) 1f
-                                                else 0.5f
-                                            )
-                                            .fillMaxHeight(0.1f)
-                                            .background(
-                                                when(i) {
-                                                    in 0..3 -> Color(0xFF552BB0)
-                                                    in 4..6 -> Color(0xFF7C45E2)
-                                                    else -> Color(0xFF9569EA)
-                                                }
-                                            )
+                                            .background(Colors.SECONDARY.color)
                                     )
                                 }
                             }

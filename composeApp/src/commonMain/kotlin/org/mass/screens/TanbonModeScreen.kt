@@ -114,7 +114,7 @@ object TanbonModeScreen : Screen {
                             ) {
                                 CombatButtonComponent(
                                     position = CombatButtonPositions.LEFT,
-                                    color = Colors.BUTTON_BLUE,
+                                    color = Colors.BLUE,
                                     icon = Res.drawable.kerugi_helmet,
                                     onclick = {},
                                     modifier = Modifier
@@ -123,7 +123,7 @@ object TanbonModeScreen : Screen {
                                 Spacer(Modifier.weight(0.02f))
                                 CombatButtonComponent(
                                     position = CombatButtonPositions.RIGHT,
-                                    color = Colors.BUTTON_RED,
+                                    color = Colors.RED,
                                     icon = Res.drawable.kerugi_helmet,
                                     onclick = {},
                                     modifier = Modifier
@@ -137,7 +137,7 @@ object TanbonModeScreen : Screen {
                             ) {
                                 CombatButtonComponent(
                                     position = CombatButtonPositions.LEFT,
-                                    color = Colors.BUTTON_BLUE,
+                                    color = Colors.BLUE,
                                     icon = Res.drawable.tanbon_body,
                                     onclick = {},
                                     modifier = Modifier
@@ -146,7 +146,7 @@ object TanbonModeScreen : Screen {
                                 Spacer(Modifier.weight(0.04f))
                                 CombatButtonComponent(
                                     position = CombatButtonPositions.CENTER,
-                                    color = Colors.BUTTON_GRAY,
+                                    color = Colors.GRAY,
                                     icon = Res.drawable.tanbon_cross,
                                     onclick = {},
                                     modifier = Modifier
@@ -155,7 +155,7 @@ object TanbonModeScreen : Screen {
                                 Spacer(Modifier.weight(0.04f))
                                 CombatButtonComponent(
                                     position = CombatButtonPositions.RIGHT,
-                                    color = Colors.BUTTON_RED,
+                                    color = Colors.RED,
                                     icon = Res.drawable.tanbon_body,
                                     onclick = {},
                                     modifier = Modifier

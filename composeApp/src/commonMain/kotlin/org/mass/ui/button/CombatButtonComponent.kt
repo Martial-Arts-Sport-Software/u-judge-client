@@ -48,7 +48,7 @@ fun CombatButtonComponent(
                 if (position == CombatButtonPositions.RIGHT)
                     scaleX = -1f
             },
-        border = BorderStroke(3.dp, Colors.BUTTON_BROWN.color),
+        border = BorderStroke(3.dp, Colors.BROWN.color),
         shape = when (position) {
             CombatButtonPositions.CENTER -> RoundedCornerShape(
                 topStart = 20.dp,

@@ -63,7 +63,7 @@ fun NavbarComponent(
             Box(
                 modifier
                     .clip(RoundedCornerShape(15.dp))
-                    .background(Colors.BUTTON_GRAY.color)
+                    .background(Colors.GRAY.color)
                     .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
@@ -120,7 +120,7 @@ fun NavbarComponent(
                                 .padding(horizontal = 5.dp)
                                 .aspectRatio(1f)
                                 .clip(RoundedCornerShape(15))
-                                .background(Colors.BUTTON_GREEN.color),
+                                .background(Colors.GREEN.color),
                             style = ButtonStyles.Solid,
                             text = "+0.3",
                             enabled = rating.extraPoints < 0f,
@@ -135,7 +135,7 @@ fun NavbarComponent(
                                 .padding(horizontal = 5.dp)
                                 .aspectRatio(1f)
                                 .clip(RoundedCornerShape(15))
-                                .background(Colors.BUTTON_RED.color),
+                                .background(Colors.RED.color),
                             style = ButtonStyles.Solid,
                             text = "-0.3",
                             enabled = rating.totalScore >= 0.3f,
@@ -150,7 +150,7 @@ fun NavbarComponent(
             Box(
                 modifier
                     .clip(RoundedCornerShape(15.dp))
-                    .background(Colors.BUTTON_GRAY.color)
+                    .background(Colors.GRAY.color)
                     .fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
@@ -212,7 +212,7 @@ fun NavbarComponent(
             Box(
                 modifier
                     .clip(RoundedCornerShape(15.dp))
-                    .background(Colors.BUTTON_GRAY.color)
+                    .background(Colors.GRAY.color)
                     .fillMaxSize()
             ) {
                 Row(

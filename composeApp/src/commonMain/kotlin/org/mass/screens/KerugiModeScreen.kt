@@ -112,7 +112,7 @@ object KerugiModeScreen : Screen {
                             ) {
                                 CombatButtonComponent(
                                     position = CombatButtonPositions.LEFT,
-                                    color = Colors.BUTTON_BLUE,
+                                    color = Colors.BLUE,
                                     icon = Res.drawable.kerugi_helmet,
                                     onclick = {},
                                     modifier = Modifier
@@ -121,7 +121,7 @@ object KerugiModeScreen : Screen {
                                 Spacer(Modifier.weight(0.02f))
                                 CombatButtonComponent(
                                     position = CombatButtonPositions.RIGHT,
-                                    color = Colors.BUTTON_RED,
+                                    color = Colors.RED,
                                     icon = Res.drawable.kerugi_helmet,
                                     onclick = {},
                                     modifier = Modifier
@@ -135,7 +135,7 @@ object KerugiModeScreen : Screen {
                             ) {
                                 CombatButtonComponent(
                                     position = CombatButtonPositions.LEFT,
-                                    color = Colors.BUTTON_BLUE,
+                                    color = Colors.BLUE,
                                     icon = Res.drawable.kerugi_chestplate,
                                     onclick = {},
                                     modifier = Modifier
@@ -144,7 +144,7 @@ object KerugiModeScreen : Screen {
                                 Spacer(Modifier.weight(0.02f))
                                 CombatButtonComponent(
                                     position = CombatButtonPositions.RIGHT,
-                                    color = Colors.BUTTON_RED,
+                                    color = Colors.RED,
                                     icon = Res.drawable.kerugi_chestplate,
                                     onclick = {},
                                     modifier = Modifier
