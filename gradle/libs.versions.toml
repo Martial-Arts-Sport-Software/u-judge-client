@@ -1,20 +1,20 @@
 [versions]
 # Build Tools
-agp = "9.0.1"
-kotlin = "2.3.10"
+agp = "9.2.1"
+kotlin = "2.4.0"
 
 # Compose & UI Framework
-composeMultiplatform = "1.10.1"
-uiBackhandler = "1.10.1"
+composeMultiplatform = "1.11.1"
+uiBackhandler = "1.11.1"
 
 # AndroidX - Core
-annotation = "1.9.1"
+annotation = "1.10.0"
 appcompat = "1.7.1"
 coreSplashscreen = "1.2.0"
 
 # AndroidX - Activity & Lifecycle
-androidx-activity = "1.12.4"
-androidx-lifecycle = "2.9.6"
+androidx-activity = "1.13.0"
+androidx-lifecycle = "2.10.0"
 
 # Navigation
 navigationCompose = "2.9.2"
@@ -24,7 +24,7 @@ androidPdfview = "3.2.15"
 kmpCapturableCompose = "1.0.0"
 krop = "0.2.0"
 
-dnsSdKt = "1.0.5"
+dnsSdKt = "1.1.0"
 
 [libraries]
 # Build & Language
