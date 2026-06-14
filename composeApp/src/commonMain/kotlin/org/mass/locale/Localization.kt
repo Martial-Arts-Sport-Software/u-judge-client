@@ -13,10 +13,11 @@ object Localization {
             "entry_quote" to "A good judge is always fair...",
             "entry_description" to "Olympic Taekwondo\n" +
                     "Sport and combat Hapkido",
-            "entry_login" to "Online",
-            "entry_offline" to "Offline",
-            "entry_server_address" to "Server address",
+            "entry_login" to "Enter the system",
+            "entry_offline" to "Offline mode",
             "entry_judge_surname" to "Judge surname",
+
+            "connection_title" to "Server Connection",
 
             "discipline_title" to "Choose discipline",
             "discipline_kerugi" to "Kerugi",
@@ -101,10 +102,11 @@ object Localization {
             "entry_quote" to "Хороший судья беспристрастен...",
             "entry_description" to "Олимпийское Тхэквондо\n" +
                     "Спортивное и боевое Хапкидо",
-            "entry_login" to "Онлайн",
-            "entry_offline" to "Офлайн",
-            "entry_server_address" to "Адрес сервера",
+            "entry_login" to "Войти в систему",
+            "entry_offline" to "Офлайн режим",
             "entry_judge_surname" to "Фамилия судьи",
+
+            "connection_title" to "Подключение к серверу",
 
             "discipline_title" to "Выберите дисциплину",
             "discipline_kerugi" to "Весовые категории",

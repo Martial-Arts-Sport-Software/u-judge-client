@@ -108,17 +108,8 @@ object EntryScreen: Screen {
                     verticalArrangement = Arrangement.Center
                 ) {
 
-                    Spacer(Modifier.weight(0.8f))
+                    Spacer(Modifier.weight(1.5f))
 
-                    TextInputComponent(
-                        Localization.getString("entry_server_address"),
-                        inputValue = State.serverAddress,
-                        onChange = { inputValue ->  
-                            State.serverAddress = inputValue
-                            State.currentError = ""
-                        },
-                        enabled = false
-                    )
                     TextInputComponent(
                         Localization.getString("entry_judge_surname"),
                         inputValue = State.judgeSurname,
@@ -137,32 +128,25 @@ object EntryScreen: Screen {
                         clickWithTransition(Routes.DISCIPLINE_SELECT)
                     } }
 
-                    Spacer(Modifier.weight(0.2f))
-
-                    Row(
-                        Modifier
-                            .fillMaxWidth(0.8f)
-                            .fillMaxHeight(0.2f)
-                    ) {
-                        ButtonComponent(
-                            text = Localization.getString("entry_login"),
-                            onclick = loginOnClick,
-                            modifier = Modifier.weight(1f),
-                            enabled = State.serverAddress.isNotBlank()
-                                    && State.judgeSurname.isNotBlank()
-                        )
-
-                        Spacer(Modifier.width(10.dp))
-
-                        ButtonComponent(
-                            Localization.getString("entry_offline"),
-                            onclick = offlineOnClick,
-                            style = ButtonStyles.Secondary,
-                            modifier = Modifier.weight(1f),
-                            enabled = State.judgeSurname.isNotBlank()
-                        )
-                    }
                     Spacer(Modifier.weight(0.3f))
+
+                    ButtonComponent(
+                        text = Localization.getString("entry_login"),
+                        onclick = loginOnClick,
+                        modifier = Modifier.weight(1f),
+                        enabled = State.judgeSurname.isNotBlank()
+                    )
+
+                    Spacer(Modifier.weight(0.3f))
+
+                    ButtonComponent(
+                        Localization.getString("entry_offline"),
+                        onclick = offlineOnClick,
+                        style = ButtonStyles.Secondary,
+                        modifier = Modifier.weight(1f),
+                        enabled = State.judgeSurname.isNotBlank()
+                    )
+
                     Text(
                         modifier = Modifier.fillMaxWidth(0.8f),
                         style = TextStyle(
