@@ -182,7 +182,7 @@ fun clickWithTransition(
     route: Routes,
     inclusiveMode: Boolean = false
 ) {
-    if (State.isOffline || State.isConnectedToServer || State.selectedServer == null) {
+    if (route == Routes.SERVER_CONNECTION || State.isOffline || State.connection.isPaired) {
         State.isAnimating = true
         if (route == Routes.BACK) {
             State.navController!!.popBackStack()
@@ -192,5 +192,5 @@ fun clickWithTransition(
             }
             launchSingleTop = inclusiveMode
         }
-    } else State.isConnectedToServer = false
+    }
 }

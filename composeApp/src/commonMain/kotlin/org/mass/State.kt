@@ -7,6 +7,9 @@ import androidx.compose.ui.unit.Density
 import androidx.navigation.NavHostController
 import com.appstractive.dnssd.DiscoveredService
 import com.appstractive.dnssd.key
+import org.mass.connection.ConnectionEvent
+import org.mass.connection.ConnectionState
+import org.mass.connection.ConnectionStateStore
 import org.mass.discovery.ServerDiscoveryStore
 import org.mass.entities.Rating
 import org.mass.enums.Categories
@@ -26,9 +29,7 @@ import kotlin.collections.setValue
  * @property currentRating rating of current bout/performance
  * @property currentLocale selected interface language
  * @property currentPopupMode active [Popup.Modes] mode
- * @property isConnectedToServer is application connected to server or not
  * @property isAnimating flag for ui animations. True if some animation/transition is active, false otherwise
- * @property isOffline flag of application Mode. If true application's functions, that require server connection,  are locked
  */
 object State {
     var density: Density? = null
@@ -44,7 +45,30 @@ object State {
     var currentPopupMode by mutableStateOf(Popup.Modes.NONE)
     val availableServers = ServerDiscoveryStore<DiscoveredService> { it.key }
     var selectedServer: DiscoveredService? by mutableStateOf(null)
-    var isConnectedToServer by mutableStateOf(false)
+    val connection = ConnectionStateStore()
+    val isOffline: Boolean
+        get() = connection.state == ConnectionState.Offline
     var isAnimating by mutableStateOf(false)
-    var isOffline by mutableStateOf(true)
+
+    fun useOffline() {
+        selectedServer = null
+        connection.dispatch(ConnectionEvent.UseOffline)
+    }
+
+    fun startDiscovery() {
+        selectedServer = null
+        connection.dispatch(ConnectionEvent.StartDiscovery)
+    }
+
+    fun selectServer(server: DiscoveredService) {
+        selectedServer = server
+        connection.dispatch(ConnectionEvent.SelectServer(server.key))
+    }
+
+    fun removeServer(serverKey: String) {
+        if (selectedServer?.key == serverKey) {
+            selectedServer = null
+            connection.dispatch(ConnectionEvent.StartDiscovery)
+        }
+    }
 }

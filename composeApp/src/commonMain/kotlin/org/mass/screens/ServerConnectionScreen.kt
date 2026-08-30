@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.appstractive.dnssd.key
 import org.mass.State.availableServers
 import org.mass.State.selectedServer
+import org.mass.State.selectServer
 import org.mass.enums.Colors
 import org.mass.enums.Routes
 import org.mass.locale.Localization
@@ -110,7 +111,7 @@ object ServerConnectionScreen : Screen {
                                     .background((if (service == selectedServer) Colors.SECONDARY else Colors.PRIMARY).color),
                                 text = "${service.name} (${service.addresses.joinToString()})",
                                 onclick = {
-                                    selectedServer = service
+                                    selectServer(service)
                                 }
                             )
                         }

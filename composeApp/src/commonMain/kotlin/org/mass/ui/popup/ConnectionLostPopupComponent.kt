@@ -70,7 +70,7 @@ fun ConnectionLostPopupComponent() {
                         "connection_lost_change_server"
                     ),
                     onclick = {
-                        State.isOffline = true
+                        State.useOffline()
                         State.currentPopupMode = Popup.Modes.NONE
                         clickWithTransition(Routes.ENTRY)
                     },
