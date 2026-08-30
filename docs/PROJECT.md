@@ -234,18 +234,18 @@ Rejected
 - локальные модели критериев и расчёт индивидуальной суммы;
 - unit tests граничных значений и формул `TechniqueCriteria`, `PresentationCriteria` и `TechniqueRating`;
 - информационные PDF и popup;
-- mDNS discovery `_u-judge._tcp.local.` и список сервисов.
+- mDNS discovery `_u-judge._tcp.local.` с дедупликацией по service key, удалением unavailable service и единственной отменяемой scan job;
+- локализованный список площадок с понятными именем и адресом.
 
 ### 9.2. Частично или не реализовано
 
-- выбор server только присваивает `selectedServer` и `isConnectedToServer = true`;
+- выбор server только сохраняет выбранную площадку и не означает connected state;
 - HTTP/WebSocket client и настоящий handshake отсутствуют;
 - server pairing, protocol version и текущий bout не получаются;
 - кнопки Kerugi/Tanbon имеют пустые `onclick`;
 - `Save` и `Send` имеют пустые `onclick` и сейчас обе выключены offline;
 - durable outbox, ACK, retry, heartbeat и resync отсутствуют;
 - глобальный singleton `State` смешивает navigation, UI, domain и connection state;
-- `scan()` собирает бесконечный flow при каждом запуске и не управляет предыдущей job;
 - minimum iOS version и compatibility matrix не зафиксированы.
 
 ## 10. Ресурсы правил
