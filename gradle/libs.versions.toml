@@ -1,29 +1,26 @@
 [versions]
 # Build Tools
-agp = "8.13.2"
-kotlin = "2.3.0"
+agp = "9.2.1"
+kotlin = "2.4.10"
 
 # Compose & UI Framework
-composeMultiplatform = "1.10.0"
-uiBackhandler = "1.10.0"
+composeMultiplatform = "1.12.0"
+uiBackhandler = "1.12.0"
 
 # AndroidX - Core
-annotation = "1.9.1"
-appcompat = "1.7.1"
+annotation = "1.10.0"
 coreSplashscreen = "1.2.0"
 
-# AndroidX - Activity & Lifecycle
-androidx-activity = "1.12.2"
-androidx-lifecycle = "2.9.6"
+# AndroidX - Activity
+androidx-activity = "1.13.0"
 
 # Navigation
-navigationCompose = "2.9.1"
+navigationCompose = "2.9.2"
 
 # Image & Media
-androidPdfview = "3.2.15"
-kmpCapturableCompose = "1.0.0"
-krop = "0.2.0"
+androidPdfview = "3.2.17"
 
+dnsSdKt = "1.1.0"
 
 [libraries]
 # Build & Language
@@ -32,14 +29,9 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotl
 # AndroidX - Core
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 
 # AndroidX - Activity & Compose
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
-
-# AndroidX - Lifecycle
-androidx-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
-androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 
 # Navigation
 navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
@@ -55,14 +47,11 @@ compose-ui-tooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.r
 compose-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "composeMultiplatform" }
 ui-backhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", version.ref = "uiBackhandler" }
 
-# Image Processing & Capture
+# PDF Viewer
 android-pdfview = { module = "com.github.Infomaniak:android-pdfview", version.ref = "androidPdfview" }
-kmp-capturable-compose = { module = "io.github.suwasto:kmp-capturable-compose", version.ref = "kmpCapturableCompose" }
 
-# Image Cropping (Krop)
-krop-core = { module = "com.attafitamim.krop:core", version.ref = "krop" }
-krop-ui = { module = "com.attafitamim.krop:ui", version.ref = "krop" }
-
+# Multicast DNS
+dns-sd-kt = { group = "com.appstractive", name = "dns-sd-kt", version.ref = "dnsSdKt" }
 
 [plugins]
 # Android Gradle Plugin

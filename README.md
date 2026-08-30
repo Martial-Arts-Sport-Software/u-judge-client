@@ -1,29 +1,54 @@
-## Short Info
-<b>U'Judge - Client</b> is mobile application for Android & IOS, designed for judging sport competitions
-- Based on Kotlin Multiplatform technology
-- Part of U'Judge Platform, client & server system for judging Taekwondo & Hapkido sport competition
-- The appearance of the application is designed in accordance with our <a href="https://www.figma.com/design/x5vY9DbXh3a0kv0lBPcNru/Judging-app?node-id=51-128&t=r4o8EgEnSLslF1dG-0">specific design</a>
+# U'Judge Client
 
-## License
-[![License](https://img.shields.io/github/license/TheGeniusOfEternity/u-judge-client?color=purple)](LICENSE)
-- **Public for portfolio/showcase only**
-- **All Rights Reserved** — cannot copy/use commercially
-- **Forking/Cloning prohibited**
+Мобильный судейский пульт U'Judge System для Android и iPhone, построенный на Kotlin Multiplatform и Compose Multiplatform.
 
-## Features
-Application has two main modes - online and offline
-Note: both modes requires username filled to work
+Проект находится в разработке. Целевая версия U'Judge v1 Pilot предназначена для полевого испытания и не является production-релизом.
 
-### Offline Mode (No server required)
-- Does not need server, but some of disciplines are locked to judge (kerugi & tanbon, they require server to display information about current bout)
-- From all discipline screens there is settings button, that toggles settings menu. Menu differs depending on current discipline.
-- Support two languages, russian & english, korean language also is planning to be added. Language select is available on entry screen and in settings for every discipline
-- Technical disciplines (hosinsool & freestyle) are available, but "Send" button is disabled, user can only save his judging ratings
-- In technical disciplines there is info button, that shows information in selected language to remind competition rules
+## Возможности pilot
 
-### Online Mode (Server required)
-- This mode has all disciplines available, but requires server connection.
-- To use online mode, user must enter server's IP address, that can be got from server application.
-- In combat disciplines (kerugi & tanbon), user can click on buttons that represent different hits by competitors.
-- In case if something is wrong, there is "Attention button", that send signal to server, and bout is stopped.
-- All offline mode features are also available
+- русский и английский интерфейс;
+- online-подключение к площадке через mDNS, pairing и WebSocket;
+- offline-калькулятор технических дисциплин;
+- Kerugi, Tanbon, Hosinsool, Pair Freestyle, Group Freestyle и Weapon Freestyle;
+- надёжная доставка событий через durable outbox, ACK и reconnect;
+- локальное сохранение технической оценки через `Save`;
+- окончательная отправка оценки через `Send`.
+
+## Текущее состояние
+
+UI всех шести дисциплин и локальные модели технической оценки уже существуют. mDNS находит `_u-judge._tcp.local.`, но настоящий handshake, pairing, HTTP/WebSocket transport, ACK/outbox и отправка оценок ещё не реализованы. Боевые кнопки и `Save`/`Send` пока содержат пустые обработчики.
+
+Подробное разделение текущего и целевого состояния находится в [описании проекта](docs/PROJECT.md).
+
+## Модули
+
+| Путь | Назначение |
+| --- | --- |
+| `composeApp/` | Общая Compose UI, модели, ресурсы и platform-specific Kotlin code |
+| `androidApp/` | Android application wrapper |
+| `iosApp/` | Xcode-проект iOS application |
+| `docs/` | Описание, требования и roadmap |
+
+## Запуск
+
+Требуется JDK 21. Для iOS также нужны macOS и Xcode.
+
+Сборка Android debug APK:
+
+```shell
+./gradlew :androidApp:assembleDebug
+```
+
+Запуск Android выполняется из Android Studio. Для iOS откройте `iosApp/iosApp.xcodeproj` в Xcode и запустите схему `iosApp`.
+
+## Документация
+
+- [Описание U'Judge Client](docs/PROJECT.md)
+- [Клиентские требования](docs/REQUIREMENTS.md)
+- [Roadmap клиента](docs/ROADMAP.md)
+- [Системная документация U'Judge Server](https://github.com/Martial-Arts-Sport-Software/u-judge-server/tree/main/docs)
+- [Макеты Figma](https://www.figma.com/design/x5vY9DbXh3a0kv0lBPcNru/Judging-app)
+
+## Лицензия
+
+См. [LICENSE](LICENSE). Исходный код опубликован только для портфолио и демонстрации; копирование и коммерческое использование не разрешены условиями правообладателя.

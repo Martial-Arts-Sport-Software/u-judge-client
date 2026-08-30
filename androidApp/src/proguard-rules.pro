@@ -7,7 +7,7 @@
 -dontwarn kotlinx.coroutines.**
 
 # Compose Multiplatform
--keep class org.u_judge_client.** { *; }
+-keep class org.mass.** { *; }
 -keepattributes **Annotation**
 -keepattributes Signature
 -keepattributes InnerClasses
