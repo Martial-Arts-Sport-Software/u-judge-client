@@ -236,16 +236,16 @@ Rejected
 - информационные PDF и popup;
 - mDNS discovery `_u-judge._tcp.local.` с дедупликацией по service key, удалением unavailable service и единственной отменяемой scan job;
 - локализованный список площадок с понятными именем и адресом.
+- явная connection state machine: выбор mDNS-площадки не даёт paired/online access.
 
 ### 9.2. Частично или не реализовано
 
-- выбор server только сохраняет выбранную площадку и не означает connected state;
-- HTTP/WebSocket client и настоящий handshake отсутствуют;
+- HTTP metadata handshake, protocol version check, server pairing и WebSocket client отсутствуют; выбор площадки остаётся состоянием `ServerSelected` и не даёт online access;
 - server pairing, protocol version и текущий bout не получаются;
 - кнопки Kerugi/Tanbon имеют пустые `onclick`;
 - `Save` и `Send` имеют пустые `onclick` и сейчас обе выключены offline;
 - durable outbox, ACK, retry, heartbeat и resync отсутствуют;
-- глобальный singleton `State` смешивает navigation, UI, domain и connection state;
+- глобальный singleton `State` всё ещё хранит navigation/UI/domain state; connection lifecycle выделен в отдельную state machine;
 - minimum iOS version и compatibility matrix не зафиксированы.
 
 ## 10. Ресурсы правил
