@@ -21,9 +21,10 @@ class TechniqueRating(
     val presentationCriteria by mutableStateOf(presentationCriteria)
     var extraPoints by mutableStateOf(exPoints)
     val totalScore by derivedStateOf {
+        // Scores are decimal tenths; compensate for their Float representation before rounding.
         val sum = round((extraPoints +
                 techniqueCriteria.getTotalScore() +
-                presentationCriteria.getTotalScore()) * 10) / 10f
+                presentationCriteria.getTotalScore() + 0.00001f) * 10) / 10f
         if (sum < 0f) return@derivedStateOf 0f
         return@derivedStateOf sum
     }
