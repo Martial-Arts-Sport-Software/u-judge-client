@@ -33,7 +33,6 @@ object ServerConnectionUtil {
                 }
             }
         }
-        }
     }
 
     fun stopScan() {
