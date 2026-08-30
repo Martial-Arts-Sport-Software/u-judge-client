@@ -2,7 +2,7 @@
 
 Мобильный судейский пульт U'Judge System для Android и iPhone, построенный на Kotlin Multiplatform и Compose Multiplatform.
 
-Проект находится в разработке. Целевая версия U'Judge v1 Pilot предназначена для полевого испытания и не является production-релизом.
+Проект находится в разработке. Текущая версия `0.1.0` является U'Judge v1 Pilot для полевого испытания и не является production-релизом.
 
 ## Возможности pilot
 
@@ -46,6 +46,7 @@ UI всех шести дисциплин и локальные модели т�
 - [Описание U'Judge Client](docs/PROJECT.md)
 - [Клиентские требования](docs/REQUIREMENTS.md)
 - [Roadmap клиента](docs/ROADMAP.md)
+- [Release notes](docs/RELEASE_NOTES.md)
 - [Системная документация U'Judge Server](https://github.com/Martial-Arts-Sport-Software/u-judge-server/tree/main/docs)
 - [Макеты Figma](https://www.figma.com/design/x5vY9DbXh3a0kv0lBPcNru/Judging-app)
 

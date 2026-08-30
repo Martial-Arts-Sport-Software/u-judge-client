@@ -27,7 +27,7 @@
 - Добавить CI для Android/shared tests и iOS framework compilation.
 - Закрепить Java 21 и воспроизводимые Gradle-команды.
 - Добавлены unit tests существующих `TechniqueCriteria`, `PresentationCriteria` и `TechniqueRating` (#6).
-- Исправить release naming: текущий `1.0` не должен означать production-ready.
+- Release naming использует `0.1.0` для pilot, а не production-ready `1.0` (#8).
 - Зафиксировать список физических Android/iPhone устройств и минимальные ОС.
 
 ### Gate C0

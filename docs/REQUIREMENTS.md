@@ -153,7 +153,7 @@
 | CLI-104 | Must      | Planned | Critical UI flow покрыт smoke tests         | Entry -> connect/offline -> discipline -> event/save/send проходит на Android/iOS |
 | CLI-105 | Must      | Planned | APK устанавливается без developer tooling   | Pilot Android devices запускают release build                                     |
 | CLI-106 | Must      | Planned | TestFlight build устанавливается на iPhone  | Local Network permission и discovery работают после чистой установки              |
-| CLI-107 | Must      | Planned | Известные ограничения опубликованы          | Release notes называют версию pilot, а не production `1.0`                        |
+| CLI-107 | Must      | Implemented | Известные ограничения опубликованы       | Release notes называют версию pilot, а не production `1.0`                        |
 
 ## 12. Не входит в клиент v1 Pilot
 
