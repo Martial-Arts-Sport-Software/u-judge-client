@@ -68,7 +68,7 @@ object ServerConnectionScreen : Screen {
                 )
                 Spacer(Modifier.weight(0.8f))
                 Text(
-                    text = Localization.getString("discipline_title"),
+                    text = Localization.getString("connection_title"),
                     style = MaterialTheme.typography.titleLarge,
                 )
                 Spacer(Modifier.weight(1f))
@@ -82,7 +82,7 @@ object ServerConnectionScreen : Screen {
                         ServerConnectionUtil.scan()
                     }
                 },
-                text = "Search"
+                text = Localization.getString("connection_search_btn")
             )
             Box(
                 Modifier
@@ -93,7 +93,7 @@ object ServerConnectionScreen : Screen {
             ) {
                 if (availableServers.isEmpty()) {
                     Text(
-                        text = "Серверы не найдены",
+                        text = Localization.getString("connection_server_not_found"),
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(16.dp)
                     )

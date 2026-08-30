@@ -9,7 +9,6 @@ plugins {
 
 kotlin {
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
@@ -19,10 +18,12 @@ kotlin {
         }
     }
 
-    androidLibrary {
+    android {
         namespace = "org.mass"
-        compileSdk = 36
+        compileSdk = 37
         minSdk = 24
+
+        withHostTest {}
 
         androidResources {
             enable = true
@@ -45,9 +46,10 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.annotation)
+            implementation(libs.androidx.core.splashscreen)
             implementation(libs.android.pdfview)
 
-            implementation(libs.appcompat)
             implementation(libs.compose.ui.tooling)
         }
 
@@ -61,14 +63,7 @@ kotlin {
             implementation(libs.compose.components.resources)
             implementation(libs.compose.components.uiToolingPreview)
 
-            implementation(libs.androidx.lifecycle.viewmodel)
-            implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.navigation.compose)
-            implementation(libs.androidx.annotation)
-            implementation(libs.androidx.core.splashscreen)
-            implementation(libs.krop.core)
-            implementation(libs.krop.ui)
-            implementation(libs.kmp.capturable.compose)
 
             implementation(libs.dns.sd.kt)
         }
