@@ -1,12 +1,13 @@
 package org.mass
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.Density
 import androidx.navigation.NavHostController
 import com.appstractive.dnssd.DiscoveredService
+import com.appstractive.dnssd.key
+import org.mass.discovery.ServerDiscoveryStore
 import org.mass.entities.Rating
 import org.mass.enums.Categories
 import org.mass.enums.Disciplines
@@ -41,7 +42,7 @@ object State {
     var currentLocale by mutableStateOf(getLocale())
 
     var currentPopupMode by mutableStateOf(Popup.Modes.NONE)
-    var availableServers = mutableStateMapOf<String, DiscoveredService>()
+    val availableServers = ServerDiscoveryStore<DiscoveredService> { it.key }
     var selectedServer: DiscoveredService? by mutableStateOf(null)
     var isConnectedToServer by mutableStateOf(false)
     var isAnimating by mutableStateOf(false)

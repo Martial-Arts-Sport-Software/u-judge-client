@@ -18,6 +18,8 @@ object Localization {
             "entry_judge_surname" to "Judge surname",
 
             "connection_title" to "Server Connection",
+            "connection_search_btn" to "Search for courts",
+            "connection_server_not_found" to "No courts found. Start a search to discover servers on this network.",
 
             "discipline_title" to "Choose discipline",
             "discipline_kerugi" to "Kerugi",
@@ -107,6 +109,8 @@ object Localization {
             "entry_judge_surname" to "Фамилия судьи",
 
             "connection_title" to "Подключение к серверу",
+            "connection_search_btn" to "Найти площадки",
+            "connection_server_not_found" to "Площадки не найдены. Запустите поиск серверов в этой сети.",
 
             "discipline_title" to "Выберите дисциплину",
             "discipline_kerugi" to "Весовые категории",
