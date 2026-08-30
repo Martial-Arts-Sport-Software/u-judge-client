@@ -146,7 +146,7 @@
 
 | ID      | Приоритет | Статус  | Требование                                  | Критерий приёмки                                                                  |
 |---------|-----------|---------|---------------------------------------------|-----------------------------------------------------------------------------------|
-| CLI-100 | Must      | Planned | Формулы rating покрыты unit tests           | Есть boundary cases для всех criteria models и rounding                           |
+| CLI-100 | Must      | Implemented | Формулы rating покрыты unit tests        | Есть boundary cases для всех criteria models и rounding                           |
 | CLI-101 | Must      | Planned | Discovery/pairing покрыты integration tests | Проверены discovered/resolved/removed, accept/reject и version mismatch           |
 | CLI-102 | Must      | Planned | Outbox покрыт fault-injection tests         | Drop, duplicate, reorder, app kill и reconnect не теряют/не дублируют events      |
 | CLI-103 | Must      | Planned | DTO совместимы с server contract tests      | Несовпадение protocol/schema блокирует CI                                         |

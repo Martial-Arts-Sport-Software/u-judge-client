@@ -26,7 +26,7 @@
 - Согласовать protocol DTO и requirement IDs с server.
 - Добавить CI для Android/shared tests и iOS framework compilation.
 - Закрепить Java 21 и воспроизводимые Gradle-команды.
-- Добавить unit tests существующих `TechniqueCriteria`, `PresentationCriteria` и `TechniqueRating`.
+- Добавлены unit tests существующих `TechniqueCriteria`, `PresentationCriteria` и `TechniqueRating` (#6).
 - Исправить release naming: текущий `1.0` не должен означать production-ready.
 - Зафиксировать список физических Android/iPhone устройств и минимальные ОС.
 
