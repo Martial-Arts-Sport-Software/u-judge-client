@@ -17,15 +17,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
+import com.appstractive.dnssd.key
 import org.mass.State.availableServers
-import org.mass.State.isConnectedToServer
 import org.mass.State.selectedServer
 import org.mass.enums.Colors
 import org.mass.enums.Routes
@@ -46,6 +46,10 @@ object ServerConnectionScreen : Screen {
         } }
 
         val coroutineScope = rememberCoroutineScope()
+
+        DisposableEffect(Unit) {
+            onDispose(ServerConnectionUtil::stopScan)
+        }
 
         Column(
             modifier = Modifier
@@ -78,9 +82,7 @@ object ServerConnectionScreen : Screen {
 
             ButtonComponent(
                 onclick = {
-                    coroutineScope.launch {
-                        ServerConnectionUtil.scan()
-                    }
+                    ServerConnectionUtil.scan(coroutineScope)
                 },
                 text = Localization.getString("connection_search_btn")
             )
@@ -91,26 +93,24 @@ object ServerConnectionScreen : Screen {
                     .clip(RoundedCornerShape(15.dp))
                     .background(Colors.SECONDARY.color),
             ) {
-                if (availableServers.isEmpty()) {
+                if (availableServers.servers.isEmpty()) {
                     Text(
                         text = Localization.getString("connection_server_not_found"),
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(16.dp)
                     )
                 } else {
-                    Text("Серверов: ${availableServers.size}")
                     LazyColumn(
                         modifier = Modifier.fillMaxSize().padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(availableServers.values.toList()) { service ->
+                        items(availableServers.servers, key = { it.key }) { service ->
                             ButtonComponent(
                                 modifier = Modifier
                                     .background((if (service == selectedServer) Colors.SECONDARY else Colors.PRIMARY).color),
-                                text = "${service.name}:${service.addresses}",
+                                text = "${service.name} (${service.addresses.joinToString()})",
                                 onclick = {
                                     selectedServer = service
-                                    isConnectedToServer = true
                                 }
                             )
                         }

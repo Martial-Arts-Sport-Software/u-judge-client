@@ -35,7 +35,6 @@ import org.mass.screens.HosinsoolModeScreen
 import org.mass.screens.KerugiModeScreen
 import org.mass.screens.ServerConnectionScreen
 import org.mass.screens.TanbonModeScreen
-import org.mass.ui.popup.ConnectionLostPopupComponent
 import org.mass.ui.popup.Popup
 
 /**
@@ -65,9 +64,7 @@ fun App() {
                     contentScale = ContentScale.Crop
                 )
                 AnimatedVisibility(
-                    visible = State.selectedServer == null ||
-                            State.isConnectedToServer ||
-                            State.isOffline,
+                    visible = true,
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {
@@ -107,32 +104,6 @@ fun App() {
                                 FreestyleModeScreen.Load()
                             }
                         }
-                    }
-                }
-                AnimatedVisibility(
-                    visible = State.selectedServer != null &&
-                            !State.isConnectedToServer &&
-                            !State.isOffline,
-                    enter = fadeIn(),
-                    exit = fadeOut()
-                ) {
-                    BackHandler {
-                        if (State.navController!!.currentBackStackEntry?.destination?.route !in arrayOf(
-                                Routes.KERUGI_MODE.path,
-                                Routes.TANBON_MODE.path,
-                                Routes.HOSINSOOL_MODE.path,
-                                Routes.FREESTYLE_MODE.path,
-                                Routes.ENTRY.path
-                            )
-                        ) State.navController!!.popBackStack()
-                    }
-
-                    Box(
-                        Modifier
-                            .fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        ConnectionLostPopupComponent()
                     }
                 }
             }
