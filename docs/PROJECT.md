@@ -232,6 +232,7 @@ Rejected
 - UI Kerugi и Tanbon;
 - экраны критериев, презентации и результата технических дисциплин;
 - локальные модели критериев и расчёт индивидуальной суммы;
+- unit tests граничных значений и формул `TechniqueCriteria`, `PresentationCriteria` и `TechniqueRating`;
 - информационные PDF и popup;
 - mDNS discovery `_u-judge._tcp.local.` и список сервисов.
 
@@ -245,7 +246,6 @@ Rejected
 - durable outbox, ACK, retry, heartbeat и resync отсутствуют;
 - глобальный singleton `State` смешивает navigation, UI, domain и connection state;
 - `scan()` собирает бесконечный flow при каждом запуске и не управляет предыдущей job;
-- автоматические тесты фактически отсутствуют;
 - minimum iOS version и compatibility matrix не зафиксированы.
 
 ## 10. Ресурсы правил

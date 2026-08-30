@@ -146,14 +146,14 @@
 
 | ID      | Приоритет | Статус  | Требование                                  | Критерий приёмки                                                                  |
 |---------|-----------|---------|---------------------------------------------|-----------------------------------------------------------------------------------|
-| CLI-100 | Must      | Planned | Формулы rating покрыты unit tests           | Есть boundary cases для всех criteria models и rounding                           |
+| CLI-100 | Must      | Implemented | Формулы rating покрыты unit tests        | Есть boundary cases для всех criteria models и rounding                           |
 | CLI-101 | Must      | Planned | Discovery/pairing покрыты integration tests | Проверены discovered/resolved/removed, accept/reject и version mismatch           |
 | CLI-102 | Must      | Planned | Outbox покрыт fault-injection tests         | Drop, duplicate, reorder, app kill и reconnect не теряют/не дублируют events      |
 | CLI-103 | Must      | Planned | DTO совместимы с server contract tests      | Несовпадение protocol/schema блокирует CI                                         |
 | CLI-104 | Must      | Planned | Critical UI flow покрыт smoke tests         | Entry -> connect/offline -> discipline -> event/save/send проходит на Android/iOS |
 | CLI-105 | Must      | Planned | APK устанавливается без developer tooling   | Pilot Android devices запускают release build                                     |
 | CLI-106 | Must      | Planned | TestFlight build устанавливается на iPhone  | Local Network permission и discovery работают после чистой установки              |
-| CLI-107 | Must      | Planned | Известные ограничения опубликованы          | Release notes называют версию pilot, а не production `1.0`                        |
+| CLI-107 | Must      | Implemented | Известные ограничения опубликованы       | Release notes называют версию pilot, а не production `1.0`                        |
 
 ## 12. Не входит в клиент v1 Pilot
 
