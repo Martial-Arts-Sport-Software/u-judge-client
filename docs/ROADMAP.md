@@ -20,15 +20,29 @@
 - работает как offline-калькулятор технических дисциплин;
 - ясно различает локальное действие и server ACK.
 
+## Статус выполнения на `main`
+
+Статус сверяется только с влитыми в `main` изменениями и их тестами. Частично выполненная неделя не закрывает gate.
+
+- [ ] Gate C0: baseline частично готов; CI и инвентаризация устройств не готовы.
+- [ ] Gate C1: discovery lifecycle готов частично; handshake, pairing и reconnect не готовы.
+- [ ] Gate C2: не готов.
+- [ ] Gate C3: не готов.
+- [ ] Gate C4: не готов.
+- [ ] Gate C5: не готов.
+- [ ] Gate C6: не готов.
+- [ ] Gate C7: не готов.
+- [ ] Gate C8: не готов.
+
 ## 2. Неделя 1: baseline и тестовая основа
 
-- Зафиксировать актуальную ветку `feat/server-connection` как исходную точку.
-- Согласовать protocol DTO и requirement IDs с server.
-- Добавить CI для Android/shared tests и iOS framework compilation.
-- Закрепить Java 21 и воспроизводимые Gradle-команды.
-- Добавлены unit tests существующих `TechniqueCriteria`, `PresentationCriteria` и `TechniqueRating` (#6).
-- Release naming использует `0.1.0` для pilot, а не production-ready `1.0` (#8).
-- Зафиксировать список физических Android/iPhone устройств и минимальные ОС.
+- [x] Зафиксировать актуальную ветку `feat/server-connection` как исходную точку.
+- [ ] Согласовать protocol DTO и requirement IDs с server.
+- [ ] Добавить CI для Android/shared tests и iOS framework compilation.
+- [ ] Закрепить Java 21 и воспроизводимые Gradle-команды.
+- [x] Добавлены unit tests существующих `TechniqueCriteria`, `PresentationCriteria` и `TechniqueRating` (#6).
+- [x] Release naming использует `0.1.0` для pilot, а не production-ready `1.0` (#8).
+- [ ] Зафиксировать список физических Android/iPhone устройств и минимальные ОС.
 
 ### Gate C0
 
@@ -37,14 +51,14 @@ Shared/Android/iOS targets собираются в CI, формулы текущ
 
 ## 3. Недели 1-2: discovery и realtime spike
 
-- Управлять единственной mDNS discovery job и её lifecycle.
-- Показывать понятные имя площадки, адрес и статус.
-- Реализовать HTTP metadata/handshake и protocol version check.
-- Реализовать WebSocket connect, heartbeat и typed envelope.
-- Получать pairing pending/accepted/rejected.
-- Согласовать clock offset.
-- Отправить событие, получить ACK, разорвать сеть и повторить тот же ID.
-- Проверить iOS Local Network permission и mDNS на TestFlight-like build.
+- [x] Управлять единственной mDNS discovery job и её lifecycle.
+- [ ] Показывать понятные имя площадки, адрес и статус.
+- [ ] Реализовать HTTP metadata/handshake и protocol version check.
+- [ ] Реализовать WebSocket connect, heartbeat и typed envelope.
+- [ ] Получать pairing pending/accepted/rejected.
+- [ ] Согласовать clock offset.
+- [ ] Отправить событие, получить ACK, разорвать сеть и повторить тот же ID.
+- [ ] Проверить iOS Local Network permission и mDNS на TestFlight-like build.
 
 ### Gate C1
 
