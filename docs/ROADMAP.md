@@ -24,7 +24,7 @@
 
 Статус сверяется только с влитыми в `main` изменениями и их тестами. Частично выполненная неделя не закрывает gate.
 
-- [ ] Gate C0: baseline частично готов; CI и инвентаризация устройств не готовы.
+- [ ] Gate C0: baseline частично готов; CI готов, инвентаризация устройств не готова.
 - [ ] Gate C1: discovery lifecycle готов частично; handshake, pairing и reconnect не готовы.
 - [ ] Gate C2: не готов.
 - [ ] Gate C3: не готов.
@@ -38,8 +38,8 @@
 
 - [x] Зафиксировать актуальную ветку `feat/server-connection` как исходную точку.
 - [ ] Согласовать protocol DTO и requirement IDs с server.
-- [ ] Добавить CI для Android/shared tests и iOS framework compilation.
-- [ ] Закрепить Java 21 и воспроизводимые Gradle-команды.
+- [x] Добавлен CI для Android/shared tests и iOS framework compilation (#17).
+- [x] Закреплены Java 21 и воспроизводимые Gradle-команды (#17).
 - [x] Добавлены unit tests существующих `TechniqueCriteria`, `PresentationCriteria` и `TechniqueRating` (#6).
 - [x] Release naming использует `0.1.0` для pilot, а не production-ready `1.0` (#8).
 - [ ] Зафиксировать список физических Android/iPhone устройств и минимальные ОС.
