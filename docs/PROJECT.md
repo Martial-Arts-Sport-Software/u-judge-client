@@ -23,9 +23,11 @@ U'Judge Client - мобильный судейский пульт U'Judge System
 - iOS framework `ComposeApp` и `MainViewController`;
 - Compose Resources для строк, изображений и PDF;
 - `dns-sd-kt` для mDNS discovery;
-- Android `minSdk = 24` в текущей конфигурации.
+- Android `minSdk = 24` в текущей конфигурации; Android 5.1/TZ55 compatibility track deferred beyond v1 Pilot.
 
-Окончательные минимальные Android/iOS версии для пилота определяются после инвентаризации физических устройств. Текущая build-конфигурация сама по себе не считается подтверждением совместимости.
+Для v1 Pilot минимальная версия iOS — 18; обязательны smoke tests на iOS 18 и iOS 26. Android 5.1/TZ55 не входит в
+v1 Pilot и будет поддержан позже отдельной облегчённой версией клиента. Текущая build-конфигурация сама по себе не
+считается подтверждением совместимости.
 
 ## 3. Пользовательский поток
 
@@ -246,7 +248,8 @@ Rejected
 - `Save` и `Send` имеют пустые `onclick` и сейчас обе выключены offline;
 - durable outbox, ACK, retry, heartbeat и resync отсутствуют;
 - глобальный singleton `State` всё ещё хранит navigation/UI/domain state; connection lifecycle выделен в отдельную state machine;
-- minimum iOS version и compatibility matrix не зафиксированы.
+- v1 minimum iOS version is 18; iOS 18 and iOS 26 require physical-device smoke coverage.
+- Android 5.1/TZ55 compatibility is deferred to a separate lightweight client track after v1.
 
 ## 10. Ресурсы правил
 

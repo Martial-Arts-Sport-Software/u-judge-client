@@ -8,6 +8,8 @@
 - Kerugi и Tanbon не отправляют официальные события: кнопки пока не имеют обработчиков.
 - `Save` и `Send` технических оценок пока не реализованы.
 - Durable outbox, ACK, retry, reconnect и session resync отсутствуют.
-- Минимальная версия iOS и compatibility matrix pilot devices ещё не зафиксированы.
+- Для v1 Pilot минимальная версия iOS — 18; iOS 18 и iOS 26 требуют physical-device smoke tests. Android 5.1/TZ55
+  deferred to a separate lightweight client track after v1.
+- English UI/rules deferred beyond v1; Russian rules are the Pilot baseline.
 
 Полное текущее состояние и план работ приведены в [PROJECT.md](PROJECT.md) и [ROADMAP.md](ROADMAP.md).

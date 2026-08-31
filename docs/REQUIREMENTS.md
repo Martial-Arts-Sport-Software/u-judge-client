@@ -32,7 +32,7 @@
 | CLI-003 | Must      | Partial | Клиент поддерживает online и offline                      | Выбранный режим явно виден и не меняется из-за навигации                           |
 | CLI-004 | Must      | Partial | Offline разрешает только технические дисциплины           | Kerugi/Tanbon заблокированы с объяснением причины                                  |
 | CLI-005 | Must      | Planned | Online-функции доступны только после handshake и pairing  | Простого выбора mDNS service недостаточно для connected state                      |
-| CLI-006 | Must      | Partial | Интерфейс переключается между RU/EN                       | Все строки текущего flow локализованы; отсутствуют hardcoded mixed-language строки |
+| CLI-006 | Should    | Planned | Post-v1 интерфейс переключается между RU/EN               | Все строки текущего flow локализованы; v1 Pilot требует русский интерфейс          |
 | CLI-007 | Should    | Planned | Фамилия, язык и локальные черновики переживают перезапуск | После restart значения восстановлены из локального persistence                     |
 
 ## 3. Discovery и pairing

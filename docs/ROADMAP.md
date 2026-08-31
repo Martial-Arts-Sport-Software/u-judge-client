@@ -24,7 +24,7 @@
 
 Статус сверяется только с влитыми в `main` изменениями и их тестами. Частично выполненная неделя не закрывает gate.
 
-- [ ] Gate C0: baseline частично готов; CI готов, инвентаризация устройств не готова.
+- [ ] Gate C0: baseline частично готов; CI готов, physical-device acceptance ещё не готова.
 - [ ] Gate C1: discovery lifecycle готов частично; handshake, pairing и reconnect не готовы.
 - [ ] Gate C2: не готов.
 - [ ] Gate C3: не готов.
@@ -38,6 +38,7 @@
 
 - [x] Требования client/server metadata, pairing, TLS, WebSocket, durable ACK, resync и clock synchronization зафиксированы в [PROTOCOL-DECISIONS.md](PROTOCOL-DECISIONS.md); implementation evidence ещё не готово.
 - [x] Kerugi conflict resolution использует `1000 мс` coincidence window и minimum-score policy на server; client не вычисляет итоговый score. Implementation evidence ещё не готово.
+- [x] v1 device/language scope определён: iOS 18 minimum с тестом на iOS 26; Android 5.1/TZ55 и English UI deferred beyond v1. Implementation evidence ещё не готово.
 
 ## 2. Неделя 1: baseline и тестовая основа
 
@@ -47,7 +48,7 @@
 - [x] Закреплены Java 21 и воспроизводимые Gradle-команды (#17).
 - [x] Добавлены unit tests существующих `TechniqueCriteria`, `PresentationCriteria` и `TechniqueRating` (#6).
 - [x] Release naming использует `0.1.0` для pilot, а не production-ready `1.0` (#8).
-- [ ] Зафиксировать список физических Android/iPhone устройств и минимальные ОС.
+- [x] Зафиксировать v1 device baseline: iOS 18 minimum, iOS 26 compatibility smoke test; Android 5.1/TZ55 deferred.
 
 ### Gate C0
 
@@ -143,7 +144,7 @@ Send применяется один раз и становится read-only.
 - Убрать hardcoded строки из screens и debug `println`.
 - Проверить полноту RU/EN resources.
 - Проверить соответствие PDF выбранным языку и дисциплине.
-- Не считать English PDF готовыми, пока они являются копиями RU.
+- Не считать English PDF готовыми, пока они являются копиями RU; English rules and UI are deferred beyond v1.
 - Проверить landscape на минимальном и максимальном pilot screens.
 - Добавить accessible names для icons/combat buttons.
 - Проверить text scaling, contrast и touch target sizes.
