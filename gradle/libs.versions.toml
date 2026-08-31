@@ -21,6 +21,9 @@ navigationCompose = "2.9.2"
 androidPdfview = "3.2.17"
 
 dnsSdKt = "1.1.0"
+kotlinxSerialization = "1.11.0"
+kotlinxCoroutines = "1.11.0"
+ktor = "3.5.2"
 
 [libraries]
 # Build & Language
@@ -52,6 +55,10 @@ android-pdfview = { module = "com.github.Infomaniak:android-pdfview", version.re
 
 # Multicast DNS
 dns-sd-kt = { group = "com.appstractive", name = "dns-sd-kt", version.ref = "dnsSdKt" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 
 [plugins]
 # Android Gradle Plugin

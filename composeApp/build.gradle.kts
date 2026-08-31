@@ -68,10 +68,14 @@ kotlin {
             implementation(libs.navigation.compose)
 
             implementation(libs.dns.sd.kt)
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.ktor.client.core)
         }
 
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.ktor.client.mock)
         }
     }
 }

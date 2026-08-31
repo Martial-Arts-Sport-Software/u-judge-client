@@ -59,7 +59,7 @@ Shared/Android/iOS targets собираются в CI, формулы текущ
 
 - [x] Управлять единственной mDNS discovery job и её lifecycle.
 - [x] Показывать понятные имя площадки, адрес и статус (`CLI-013`; resolved и resolving состояния покрыты shared unit tests).
-- [ ] Реализовать HTTP metadata/handshake, protocol version/capability check и manual host/IP fallback (shared validation domain model готов; HTTP/TLS/manual fallback pending).
+- [ ] Реализовать HTTP metadata/handshake, protocol version/capability check и manual host/IP fallback (shared HTTP client и validation domain model готовы; discovery/TLS/manual fallback pending).
 - [ ] Реализовать WebSocket connect, heartbeat и typed envelope.
 - [ ] Получать pairing pending/accepted/rejected.
 - [ ] Согласовать clock offset.
