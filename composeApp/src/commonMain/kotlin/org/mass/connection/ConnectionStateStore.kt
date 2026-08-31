@@ -49,6 +49,10 @@ sealed interface ConnectionFailure {
     ) : ConnectionFailure {
         override val localizationKey = "connection_error_missing_capabilities"
     }
+
+    data object MetadataUnavailable : ConnectionFailure {
+        override val localizationKey = "connection_error_metadata_unavailable"
+    }
 }
 
 sealed interface ConnectionEvent {
@@ -56,6 +60,7 @@ sealed interface ConnectionEvent {
     data object StartDiscovery : ConnectionEvent
     data class SelectServer(val serverKey: String) : ConnectionEvent
     data class ValidateMetadata(val metadata: ServerMetadata) : ConnectionEvent
+    data class RejectMetadata(val failure: ConnectionFailure) : ConnectionEvent
     data object RequestPairing : ConnectionEvent
     data class AcceptPairing(val deviceId: String) : ConnectionEvent
 }
@@ -80,6 +85,10 @@ class ConnectionStateStore(
             }
             is ConnectionEvent.ValidateMetadata -> when (val currentState = state) {
                 is ConnectionState.ServerSelected -> validateMetadata(currentState.serverKey, event.metadata)
+                else -> state
+            }
+            is ConnectionEvent.RejectMetadata -> when (val currentState = state) {
+                is ConnectionState.ServerSelected -> ConnectionState.Rejected(currentState.serverKey, event.failure)
                 else -> state
             }
             ConnectionEvent.RequestPairing -> when (val currentState = state) {

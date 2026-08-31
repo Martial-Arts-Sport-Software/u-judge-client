@@ -53,6 +53,11 @@ kotlin {
             implementation(libs.android.pdfview)
 
             implementation(libs.compose.ui.tooling)
+            implementation(libs.ktor.client.okhttp)
+        }
+
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
         }
 
         commonMain.dependencies {
