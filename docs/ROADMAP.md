@@ -34,6 +34,11 @@
 - [ ] Gate C7: не готов.
 - [ ] Gate C8: не готов.
 
+## Принятые protocol decisions
+
+- [x] Требования client/server metadata, pairing, TLS, WebSocket, durable ACK, resync и clock synchronization зафиксированы в [PROTOCOL-DECISIONS.md](PROTOCOL-DECISIONS.md); implementation evidence ещё не готово.
+- [x] Kerugi conflict resolution использует `1000 мс` coincidence window и minimum-score policy на server; client не вычисляет итоговый score. Implementation evidence ещё не готово.
+
 ## 2. Неделя 1: baseline и тестовая основа
 
 - [x] Зафиксировать актуальную ветку `feat/server-connection` как исходную точку.
@@ -53,7 +58,7 @@ Shared/Android/iOS targets собираются в CI, формулы текущ
 
 - [x] Управлять единственной mDNS discovery job и её lifecycle.
 - [x] Показывать понятные имя площадки, адрес и статус (`CLI-013`; resolved и resolving состояния покрыты shared unit tests).
-- [ ] Реализовать HTTP metadata/handshake и protocol version check.
+- [ ] Реализовать HTTP metadata/handshake, protocol version/capability check и manual host/IP fallback.
 - [ ] Реализовать WebSocket connect, heartbeat и typed envelope.
 - [ ] Получать pairing pending/accepted/rejected.
 - [ ] Согласовать clock offset.
@@ -218,4 +223,5 @@ Client не потерял и не продублировал подтвержд
 
 - [Описание клиента](PROJECT.md)
 - [Клиентские требования](REQUIREMENTS.md)
+- [Принятые protocol decisions](PROTOCOL-DECISIONS.md)
 - [Системный roadmap](https://github.com/Martial-Arts-Sport-Software/u-judge-server/blob/main/docs/ROADMAP.md)

@@ -48,6 +48,7 @@
 | CLI-016 | Must      | Planned | UI показывает pending, accepted и rejected                     | Судья не попадает на рабочий экран до accepted                                        |
 | CLI-017 | Must      | Planned | Pairing session восстанавливается при кратком reconnect        | Подтверждённый клиент не требует ручного pairing после каждого packet loss            |
 | CLI-018 | Must      | Planned | Отзыв server немедленно блокирует новые события                | Client показывает disconnected/rejected и сохраняет только допустимые pending records |
+| CLI-019 | Must      | Planned | Client поддерживает manual host/IP fallback после mDNS         | Endpoint проходит metadata, protocol и TLS validation до online state                |
 
 ## 4. Выбор дисциплины и сессии
 
@@ -69,7 +70,7 @@
 | CLI-031 | Must      | Partial | Tanbon имеет `HEAD`/`BODY` для blue/red и `CROSS`       | Пять кнопок создают правильные typed events                            |
 | CLI-032 | Must      | Planned | Каждое физическое нажатие получает уникальный event ID  | Два намеренных нажатия различаются, transport retry сохраняет ID       |
 | CLI-033 | Must      | Planned | Client отправляет client sequence и timestamp           | Server может восстановить локальный порядок и clock offset             |
-| CLI-034 | Must      | Planned | Client не вычисляет кворум и итоговый балл              | UI не объявляет score accepted до server ACK/state update              |
+| CLI-034 | Must      | Planned | Client не вычисляет кворум и итоговый балл              | UI не объявляет score accepted до server ACK/state update; server разрешает конфликт score candidates по минимальной оценке |
 | CLI-035 | Must      | Planned | Нажатие немедленно попадает в durable outbox            | App kill до ACK не теряет событие                                      |
 | CLI-036 | Must      | Planned | Client отображает pending/accepted/rejected             | Состояние каждого недавнего события понятно судье                      |
 | CLI-037 | Must      | Planned | Warning/attention отправляется отдельно от scoring      | Server получает judge, device, session и timestamp; счёт не меняется   |
@@ -107,7 +108,7 @@
 | CLI-065 | Must      | Planned | Event ordering сохраняется для одного client               | Поздний ACK не удаляет более новое pending event                       |
 | CLI-066 | Must      | Planned | Rejected terminal event не повторяется бесконечно          | Outbox отмечает final rejection и показывает действие пользователю     |
 | CLI-067 | Must      | Planned | Logout/смена server не удаляет pending events молча        | Требуется успешная доставка или явное подтверждённое discard с аудитом |
-| CLI-068 | Must      | Planned | Clock offset согласуется при handshake/reconnect           | Combat timestamp не полагается только на device wall clock             |
+| CLI-068 | Must      | Planned | Clock offset согласуется при handshake/reconnect           | Four-timestamp exchange оценивает offset/round-trip; combat timestamp не полагается только на device wall clock |
 
 ## 8. Состояние и навигация
 
@@ -180,4 +181,5 @@
 
 - [Описание клиента](PROJECT.md)
 - [Клиентский roadmap](ROADMAP.md)
+- [Принятые protocol decisions](PROTOCOL-DECISIONS.md)
 - [Системные требования](https://github.com/Martial-Arts-Sport-Software/u-judge-server/blob/main/docs/REQUIREMENTS.md)
