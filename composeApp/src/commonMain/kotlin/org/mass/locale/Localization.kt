@@ -23,6 +23,8 @@ object Localization {
             "connection_court_address" to "Address",
             "connection_court_available" to "Available",
             "connection_court_resolving" to "Checking address",
+            "connection_error_protocol_version" to "The server uses an unsupported protocol version",
+            "connection_error_missing_capabilities" to "The server does not support required features",
 
             "discipline_title" to "Choose discipline",
             "discipline_kerugi" to "Kerugi",
@@ -117,6 +119,8 @@ object Localization {
             "connection_court_address" to "Адрес",
             "connection_court_available" to "Доступна",
             "connection_court_resolving" to "Проверяем адрес",
+            "connection_error_protocol_version" to "Сервер использует неподдерживаемую версию протокола",
+            "connection_error_missing_capabilities" to "Сервер не поддерживает обязательные возможности",
 
             "discipline_title" to "Выберите дисциплину",
             "discipline_kerugi" to "Весовые категории",
