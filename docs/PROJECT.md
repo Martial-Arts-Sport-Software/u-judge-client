@@ -6,7 +6,7 @@
 
 ## 1. Назначение
 
-U'Judge Client - мобильный судейский пульт U'Judge System для Android и iPhone. Приложение предоставляет боковому судье специализированный интерфейс для шести дисциплин хапкидо и работает в двух режимах:
+U'Judge Client - мобильный судейский пульт U'Judge System для Android и iPhone. Приложение предоставляет боковому судье специализированный интерфейс для восьми дисциплин из PDF 1 и отдельной продуктовой дисциплины Tanbon и работает в двух режимах:
 
 | Режим   | Назначение                                                                                     |
 |---------|------------------------------------------------------------------------------------------------|
@@ -23,9 +23,11 @@ U'Judge Client - мобильный судейский пульт U'Judge System
 - iOS framework `ComposeApp` и `MainViewController`;
 - Compose Resources для строк, изображений и PDF;
 - `dns-sd-kt` для mDNS discovery;
-- Android `minSdk = 24` в текущей конфигурации.
+- Android `minSdk = 24` в текущей конфигурации; Android 5.1/TZ55 compatibility track deferred beyond v1 Pilot.
 
-Окончательные минимальные Android/iOS версии для пилота определяются после инвентаризации физических устройств. Текущая build-конфигурация сама по себе не считается подтверждением совместимости.
+Для v1 Pilot минимальная версия iOS — 18; обязательны smoke tests на iOS 18 и iOS 26. Android 5.1/TZ55 не входит в
+v1 Pilot и будет поддержан позже отдельной облегчённой версией клиента. Текущая build-конфигурация сама по себе не
+считается подтверждением совместимости.
 
 ## 3. Пользовательский поток
 
@@ -59,7 +61,7 @@ U'Judge Client - мобильный судейский пульт U'Judge System
 ### 3.3. Offline
 
 - Kerugi и Tanbon недоступны, потому что зависят от текущего поединка, кворума и серверного scoring.
-- Hosinsool, Pair, Group и Weapon Freestyle работают как локальный калькулятор.
+- Hosinsool, Pair, Group, Sword, Pole, Paired Nunchaku и Paired Fans работают как локальный калькулятор.
 - `Save` сохраняет черновик оценки локально на устройстве.
 - `Send` недоступна, пока нет подтверждённой online-сессии.
 - Offline-оценка не становится официальным результатом и не синхронизируется автоматически как событие уже завершённого выступления.
@@ -73,9 +75,12 @@ U'Judge Client - мобильный судейский пульт U'Judge System
 | `HOSINSOOL`        | Hosinsool        | Техника, презентация, результат                        | Juniors/Adults              |
 | `FREESTYLE_PAIR`   | Pair Freestyle   | Техника, презентация, результат                        | Juniors/Adults              |
 | `FREESTYLE_GROUP`  | Group Freestyle  | 6 технических и 4 презентационных критерия             | Определяется сеткой         |
-| `FREESTYLE_WEAPON` | Weapon Freestyle | 6 технических и 4 презентационных критерия             | Определяется сеткой         |
+| `FREESTYLE_SWORD`  | Sword Freestyle  | 6 технических и 4 презентационных критерия             | Определяется сеткой         |
+| `FREESTYLE_POLE`   | Pole Freestyle   | 6 технических и 4 презентационных критерия             | Определяется сеткой         |
+| `FREESTYLE_NUNCHAKU` | Paired Nunchaku | 6 технических и 4 презентационных критерия             | Определяется сеткой         |
+| `FREESTYLE_FANS`   | Paired Fans      | 6 технических и 4 презентационных критерия             | Определяется сеткой         |
 
-Weapon Freestyle остаётся одним общим клиентским режимом в v1 Pilot.
+Четыре weapon-дисциплины являются отдельными клиентскими режимами в v1 Pilot.
 
 ## 5. События боевых дисциплин
 
@@ -148,7 +153,7 @@ Tap -> local durable outbox -> WebSocket send -> server validation -> ACK
 
 Презентация: креативность, сила, баланс и хореография.
 
-### 6.4. Weapon Freestyle
+### 6.4. Sword, Pole, Paired Nunchaku и Paired Fans
 
 Технические критерии:
 
@@ -226,8 +231,8 @@ Rejected
 ### 9.1. Реализовано
 
 - общая Compose UI-кодовая база для Android/iOS;
-- стартовый экран, фамилия, выбор online/offline и RU/EN;
-- навигация по шести дисциплинам;
+- стартовый экран, фамилия, выбор online/offline и русский язык;
+- навигация по восьми дисциплинам;
 - выбор Juniors/Adults для Hosinsool и Pair Freestyle;
 - UI Kerugi и Tanbon;
 - экраны критериев, презентации и результата технических дисциплин;
@@ -246,7 +251,8 @@ Rejected
 - `Save` и `Send` имеют пустые `onclick` и сейчас обе выключены offline;
 - durable outbox, ACK, retry, heartbeat и resync отсутствуют;
 - глобальный singleton `State` всё ещё хранит navigation/UI/domain state; connection lifecycle выделен в отдельную state machine;
-- minimum iOS version и compatibility matrix не зафиксированы.
+- v1 minimum iOS version is 18; iOS 18 and iOS 26 require physical-device smoke coverage.
+- Android 5.1/TZ55 compatibility is deferred to a separate lightweight client track after v1.
 
 ## 10. Ресурсы правил
 

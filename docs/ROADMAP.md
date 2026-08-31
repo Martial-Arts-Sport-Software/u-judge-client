@@ -24,7 +24,7 @@
 
 Статус сверяется только с влитыми в `main` изменениями и их тестами. Частично выполненная неделя не закрывает gate.
 
-- [ ] Gate C0: baseline частично готов; CI готов, инвентаризация устройств не готова.
+- [ ] Gate C0: baseline частично готов; CI готов, physical-device acceptance ещё не готова.
 - [ ] Gate C1: discovery lifecycle готов частично; handshake, pairing и reconnect не готовы.
 - [ ] Gate C2: не готов.
 - [ ] Gate C3: не готов.
@@ -38,6 +38,7 @@
 
 - [x] Требования client/server metadata, pairing, TLS, WebSocket, durable ACK, resync и clock synchronization зафиксированы в [PROTOCOL-DECISIONS.md](PROTOCOL-DECISIONS.md); implementation evidence ещё не готово.
 - [x] Kerugi conflict resolution использует `1000 мс` coincidence window и minimum-score policy на server; client не вычисляет итоговый score. Implementation evidence ещё не готово.
+- [x] v1 device/language scope определён: iOS 18 minimum с тестом на iOS 26; Android 5.1/TZ55 и English UI deferred beyond v1. Implementation evidence ещё не готово.
 
 ## 2. Неделя 1: baseline и тестовая основа
 
@@ -47,7 +48,7 @@
 - [x] Закреплены Java 21 и воспроизводимые Gradle-команды (#17).
 - [x] Добавлены unit tests существующих `TechniqueCriteria`, `PresentationCriteria` и `TechniqueRating` (#6).
 - [x] Release naming использует `0.1.0` для pilot, а не production-ready `1.0` (#8).
-- [ ] Зафиксировать список физических Android/iPhone устройств и минимальные ОС.
+- [x] Зафиксировать v1 device baseline: iOS 18 minimum, iOS 26 compatibility smoke test; Android 5.1/TZ55 deferred.
 
 ### Gate C0
 
@@ -135,15 +136,15 @@ audit содержит каждый physical tap один раз.
 
 ### Gate C5
 
-Все шесть дисциплин проходят client/server contract tests; offline Save переживает restart, а online
+Все восемь дисциплин PDF 1 и Tanbon проходят client/server contract tests; offline Save переживает restart, а online
 Send применяется один раз и становится read-only.
 
 ## 8. Недели 9-10: локализация и UX hardening
 
 - Убрать hardcoded строки из screens и debug `println`.
-- Проверить полноту RU/EN resources.
-- Проверить соответствие PDF выбранным языку и дисциплине.
-- Не считать English PDF готовыми, пока они являются копиями RU.
+- Проверить полноту русских resources.
+- Проверить соответствие PDF выбранной дисциплине; English resources и rules deferred beyond v1.
+- English PDF, rules and UI deferred beyond v1.
 - Проверить landscape на минимальном и максимальном pilot screens.
 - Добавить accessible names для icons/combat buttons.
 - Проверить text scaling, contrast и touch target sizes.
@@ -151,7 +152,7 @@ Send применяется один раз и становится read-only.
 
 ### Gate C6
 
-RU/EN critical flows не содержат смешанных строк; pilot devices не имеют clipped controls; blind
+Русские critical flows не содержат смешанных строк; pilot devices не имеют clipped controls; blind
 semantics audit различает все критические действия.
 
 ## 9. Недели 10-11: release hardening
@@ -171,9 +172,9 @@ APK и TestFlight устанавливаются на всех инвентар�
 
 ## 10. Неделя 12: полевой pilot
 
-- Подключить реальное число судей на нескольких площадках.
+- Подключить 5-7 судей к одному peer через выделенный Wi-Fi роутер площадки.
 - Провести Kerugi и Tanbon с контролируемым mobile disconnect.
-- Провести Hosinsool, Pair, Group и Weapon Freestyle.
+- Провести Hosinsool, Pair, Group, Sword, Pole, Paired Nunchaku и Paired Fans.
 - Сравнить client feedback, server audit и ручной протокол.
 - Собрать anonymized diagnostics и UX observations.
 - Зафиксировать battery/network/device-specific issues.
@@ -192,8 +193,8 @@ Client не потерял и не продублировал подтвержд
 - Combat event применяется server не более одного раза.
 - `Save` локален и доступен offline.
 - `Send` окончателен, подтверждается и блокирует изменение после ACK.
-- Все шесть дисциплин проверены экспертными test vectors.
-- RU/EN critical flows завершены.
+- Все восемь дисциплин PDF 1 и Tanbon проверены соответствующими test vectors.
+- Русский critical flow завершён; English localization deferred beyond v1.
 - Accessibility labels присутствуют у критических controls.
 - Release notes явно называют сборку pilot.
 
@@ -206,8 +207,8 @@ Client не потерял и не продублировал подтвержд
 | Outbox реализован слишком поздно                 | Критическое | Ввести до Kerugi vertical slice                                     |
 | Текущие empty handlers выглядят готовыми         | Высокое     | Не считать UI completion функциональной готовностью                 |
 | `Save` сейчас отключена offline                  | Среднее     | Разделить Save/Send semantics и добавить persistence                |
-| Нет iOS minimum version                          | Среднее     | Инвентаризация pilot devices на неделе 1                            |
-| Английские PDF не локализованы                   | Среднее     | Явный blocker `CLI-082`, не маскировать fallback                    |
+| Physical-device compatibility ещё не проверена   | Среднее     | Зафиксированы iOS 18 minimum и smoke test на iOS 26                 |
+| Английские PDF не локализованы                   | Низкое      | English rules явно deferred beyond v1                                |
 | Один разработчик и два приложения                | Высокое     | Shared contract tests, минимальная architecture, вертикальные gates |
 
 ## 13. После pilot
