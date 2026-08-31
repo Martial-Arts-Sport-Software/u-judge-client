@@ -12,7 +12,25 @@ class ServerDiscoveryStoreTest {
         store.resolved(Server("court-1", "Main court", listOf("192.168.1.10")))
 
         assertEquals(
-            listOf(Server("court-1", "Main court", listOf("192.168.1.10"))),
+            listOf(
+                DiscoveredServer(
+                    server = Server("court-1", "Main court", listOf("192.168.1.10")),
+                    status = DiscoveryStatus.Available
+                )
+            ),
+            store.servers
+        )
+    }
+
+    @Test
+    fun discoveredServerIsResolvingUntilItsDetailsAreAvailable() {
+        val store = ServerDiscoveryStore<Server> { it.key }
+        val server = Server("court-1", "Court 1", emptyList())
+
+        store.discovered(server)
+
+        assertEquals(
+            listOf(DiscoveredServer(server, DiscoveryStatus.Resolving)),
             store.servers
         )
     }

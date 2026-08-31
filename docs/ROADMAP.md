@@ -52,7 +52,7 @@ Shared/Android/iOS targets собираются в CI, формулы текущ
 ## 3. Недели 1-2: discovery и realtime spike
 
 - [x] Управлять единственной mDNS discovery job и её lifecycle.
-- [ ] Показывать понятные имя площадки, адрес и статус.
+- [x] Показывать понятные имя площадки, адрес и статус (`CLI-013`; resolved и resolving состояния покрыты shared unit tests).
 - [ ] Реализовать HTTP metadata/handshake и protocol version check.
 - [ ] Реализовать WebSocket connect, heartbeat и typed envelope.
 - [ ] Получать pairing pending/accepted/rejected.
