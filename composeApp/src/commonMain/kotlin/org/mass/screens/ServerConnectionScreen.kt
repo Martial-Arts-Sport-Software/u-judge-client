@@ -25,10 +25,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.appstractive.dnssd.key
+import kotlinx.coroutines.launch
 import org.mass.discovery.DiscoveryStatus
 import org.mass.State.availableServers
+import org.mass.State.connection
 import org.mass.State.selectedServer
 import org.mass.State.selectServer
+import org.mass.connection.ServerMetadataClient
+import org.mass.connection.createHttpClient
+import org.mass.connection.metadataEndpoint
 import org.mass.enums.Colors
 import org.mass.enums.Routes
 import org.mass.locale.Localization
@@ -120,6 +125,17 @@ object ServerConnectionScreen : Screen {
                                 text = "${service.name}\n${Localization.getString("connection_court_address")}: ${service.addresses.joinToString()}\n$status",
                                 onclick = {
                                     selectServer(service)
+                                    coroutineScope.launch {
+                                        val address = service.addresses.firstOrNull()
+                                        if (address != null) {
+                                            createHttpClient().use { httpClient ->
+                                                ServerMetadataClient(
+                                                    httpClient,
+                                                    metadataEndpoint(address, service.port)
+                                                ).fetchInto(connection)
+                                            }
+                                        }
+                                    }
                                 },
                                 enabled = isAvailable
                             )

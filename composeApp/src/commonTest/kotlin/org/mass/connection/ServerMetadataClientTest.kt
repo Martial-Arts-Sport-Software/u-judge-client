@@ -12,6 +12,14 @@ import kotlinx.coroutines.test.runTest
 
 class ServerMetadataClientTest {
     @Test
+    fun buildsMetadataEndpointFromResolvedAddressAndPort() {
+        assertEquals(
+            Url("http://192.168.1.10:8080"),
+            metadataEndpoint("192.168.1.10", 8080)
+        )
+    }
+
+    @Test
     fun fetchesAndDecodesAcceptedServerMetadata() = runTest {
         val client = clientReturning("""
             {
@@ -78,6 +86,24 @@ class ServerMetadataClientTest {
         """.trimIndent()).fetchInto(store)
 
         assertIs<ConnectionState.MetadataValidated>(store.state)
+    }
+
+    @Test
+    fun appliesUnavailableMetadataFailureToTheSelectedServer() = runTest {
+        val store = ConnectionStateStore()
+        store.dispatch(ConnectionEvent.StartDiscovery)
+        store.dispatch(ConnectionEvent.SelectServer("court-1"))
+        val client = ServerMetadataClient(
+            HttpClient(MockEngine { error("connection refused") }),
+            Url("http://court.local")
+        )
+
+        client.fetchInto(store)
+
+        assertEquals(
+            ConnectionState.Rejected("court-1", ConnectionFailure.MetadataUnavailable),
+            store.state
+        )
     }
 
     private fun clientReturning(response: String): ServerMetadataClient = ServerMetadataClient(

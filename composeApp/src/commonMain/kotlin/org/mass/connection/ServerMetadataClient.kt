@@ -16,6 +16,8 @@ sealed interface MetadataFetchResult {
     data object Unavailable : MetadataFetchResult
 }
 
+fun metadataEndpoint(address: String, port: Int): Url = Url("http://$address:$port")
+
 class ServerMetadataClient(
     private val httpClient: HttpClient,
     private val endpoint: Url
@@ -30,8 +32,10 @@ class ServerMetadataClient(
 
     suspend fun fetchInto(store: ConnectionStateStore): MetadataFetchResult {
         val result = fetch()
-        if (result is MetadataFetchResult.Success) {
-            store.dispatch(ConnectionEvent.ValidateMetadata(result.metadata))
+        when (result) {
+            is MetadataFetchResult.Success -> store.dispatch(ConnectionEvent.ValidateMetadata(result.metadata))
+            MetadataFetchResult.MalformedResponse,
+            MetadataFetchResult.Unavailable -> store.dispatch(ConnectionEvent.RejectMetadata(ConnectionFailure.MetadataUnavailable))
         }
         return result
     }
