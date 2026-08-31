@@ -136,15 +136,15 @@ audit содержит каждый physical tap один раз.
 
 ### Gate C5
 
-Все шесть дисциплин проходят client/server contract tests; offline Save переживает restart, а online
+Все восемь дисциплин проходят client/server contract tests; offline Save переживает restart, а online
 Send применяется один раз и становится read-only.
 
 ## 8. Недели 9-10: локализация и UX hardening
 
 - Убрать hardcoded строки из screens и debug `println`.
-- Проверить полноту RU/EN resources.
-- Проверить соответствие PDF выбранным языку и дисциплине.
-- Не считать English PDF готовыми, пока они являются копиями RU; English rules and UI are deferred beyond v1.
+- Проверить полноту русских resources.
+- Проверить соответствие PDF выбранной дисциплине; English resources и rules deferred beyond v1.
+- English PDF, rules and UI deferred beyond v1.
 - Проверить landscape на минимальном и максимальном pilot screens.
 - Добавить accessible names для icons/combat buttons.
 - Проверить text scaling, contrast и touch target sizes.
@@ -152,7 +152,7 @@ Send применяется один раз и становится read-only.
 
 ### Gate C6
 
-RU/EN critical flows не содержат смешанных строк; pilot devices не имеют clipped controls; blind
+Русские critical flows не содержат смешанных строк; pilot devices не имеют clipped controls; blind
 semantics audit различает все критические действия.
 
 ## 9. Недели 10-11: release hardening
@@ -172,9 +172,9 @@ APK и TestFlight устанавливаются на всех инвентар�
 
 ## 10. Неделя 12: полевой pilot
 
-- Подключить реальное число судей на нескольких площадках.
+- Подключить 5-7 судей к одному peer через выделенный Wi-Fi роутер площадки.
 - Провести Kerugi и Tanbon с контролируемым mobile disconnect.
-- Провести Hosinsool, Pair, Group и Weapon Freestyle.
+- Провести Hosinsool, Pair, Group, Sword, Pole, Paired Nunchaku и Paired Fans.
 - Сравнить client feedback, server audit и ручной протокол.
 - Собрать anonymized diagnostics и UX observations.
 - Зафиксировать battery/network/device-specific issues.
@@ -193,8 +193,8 @@ Client не потерял и не продублировал подтвержд
 - Combat event применяется server не более одного раза.
 - `Save` локален и доступен offline.
 - `Send` окончателен, подтверждается и блокирует изменение после ACK.
-- Все шесть дисциплин проверены экспертными test vectors.
-- RU/EN critical flows завершены.
+- Все восемь дисциплин проверены экспертными test vectors.
+- Русский critical flow завершён; English localization deferred beyond v1.
 - Accessibility labels присутствуют у критических controls.
 - Release notes явно называют сборку pilot.
 
@@ -207,8 +207,8 @@ Client не потерял и не продублировал подтвержд
 | Outbox реализован слишком поздно                 | Критическое | Ввести до Kerugi vertical slice                                     |
 | Текущие empty handlers выглядят готовыми         | Высокое     | Не считать UI completion функциональной готовностью                 |
 | `Save` сейчас отключена offline                  | Среднее     | Разделить Save/Send semantics и добавить persistence                |
-| Нет iOS minimum version                          | Среднее     | Инвентаризация pilot devices на неделе 1                            |
-| Английские PDF не локализованы                   | Среднее     | Явный blocker `CLI-082`, не маскировать fallback                    |
+| Physical-device compatibility ещё не проверена   | Среднее     | Зафиксированы iOS 18 minimum и smoke test на iOS 26                 |
+| Английские PDF не локализованы                   | Низкое      | English rules явно deferred beyond v1                                |
 | Один разработчик и два приложения                | Высокое     | Shared contract tests, минимальная architecture, вертикальные gates |
 
 ## 13. После pilot
