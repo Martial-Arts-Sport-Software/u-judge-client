@@ -245,7 +245,7 @@ Rejected
 
 ### 9.2. Частично или не реализовано
 
-- Shared HTTP metadata client получает и декодирует `GET /v1/metadata`, затем передаёт compatible metadata в state machine; вызов ещё не связан с выбранной mDNS-площадкой, а TLS/manual fallback, pairing и WebSocket pending;
+- Выбор resolved mDNS-площадки строит endpoint из адреса/порта и вызывает shared HTTP metadata client; compatible metadata переводит lifecycle в `MetadataValidated`, а недоступность metadata даёт typed rejection. TLS/manual fallback, pairing и WebSocket pending;
 - server pairing, protocol version и текущий bout не получаются;
 - кнопки Kerugi/Tanbon имеют пустые `onclick`;
 - `Save` и `Send` имеют пустые `onclick` и сейчас обе выключены offline;
