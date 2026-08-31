@@ -36,8 +36,8 @@
 
 ## Принятые protocol decisions
 
-- [ ] Требования client/server metadata, pairing, TLS, WebSocket, durable ACK, resync и clock synchronization зафиксированы в [PROTOCOL-DECISIONS.md](PROTOCOL-DECISIONS.md); implementation evidence ещё не готово.
-- [ ] Kerugi conflict resolution использует `1000 мс` coincidence window и minimum-score policy на server; client не вычисляет итоговый score.
+- [x] Требования client/server metadata, pairing, TLS, WebSocket, durable ACK, resync и clock synchronization зафиксированы в [PROTOCOL-DECISIONS.md](PROTOCOL-DECISIONS.md); implementation evidence ещё не готово.
+- [x] Kerugi conflict resolution использует `1000 мс` coincidence window и minimum-score policy на server; client не вычисляет итоговый score. Implementation evidence ещё не готово.
 
 ## 2. Неделя 1: baseline и тестовая основа
 
