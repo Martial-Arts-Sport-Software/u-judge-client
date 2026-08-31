@@ -43,7 +43,7 @@
 | CLI-011 | Must      | Partial | Найденные servers дедуплицируются и удаляются при mDNS removed | В списке нет дублей и заведомо недоступных записей                                    |
 | CLI-012 | Must      | Planned | Повторный scan отменяет или переиспользует предыдущую job      | Многократное нажатие Search не создаёт несколько collectors                           |
 | CLI-013 | Must      | Implemented | Судья выбирает площадку по понятному имени                     | UI показывает имя, адрес и статус; resolving площадка недоступна для выбора           |
-| CLI-014 | Must      | Planned | Client проверяет protocol version/capabilities                 | Несовместимый server отклоняется с локализованной причиной                            |
+| CLI-014 | Must      | Partial | Shared metadata validator проверяет protocol version/capabilities; HTTP transport pending | Несовместимый server отклоняется с локализованной причиной                            |
 | CLI-015 | Must      | Planned | Client отправляет pairing request с judge/device identity      | Server видит pending device и фамилию                                                 |
 | CLI-016 | Must      | Planned | UI показывает pending, accepted и rejected                     | Судья не попадает на рабочий экран до accepted                                        |
 | CLI-017 | Must      | Planned | Pairing session восстанавливается при кратком reconnect        | Подтверждённый клиент не требует ручного pairing после каждого packet loss            |
@@ -117,7 +117,7 @@
 | CLI-070 | Must      | Implemented | Connection представлено state machine, а не boolean                  | Невозможны одновременно offline/connected или paired/no-server состояния |
 | CLI-071 | Must      | Planned | Session state отделено от navigation state                              | Возврат назад не завершает серверную сессию неявно                       |
 | CLI-072 | Must      | Planned | Rating draft имеет ID дисциплины, категории и сессии                    | Черновик другой сессии не отправляется случайно                          |
-| CLI-073 | Must      | Planned | Ошибки типизированы и локализованы                                      | UI различает discovery, pairing, transport, validation и protocol errors |
+| CLI-073 | Must      | Partial | Metadata validation имеет типизированные локализуемые ошибки; остальные transport errors pending | UI различает discovery, pairing, transport, validation и protocol errors |
 | CLI-074 | Must      | Planned | Loading/action jobs отменяются по lifecycle                             | Уход с экрана не оставляет лишние scans или sends                        |
 | CLI-075 | Must      | Planned | Значимый state восстанавливается после configuration/process recreation | Android recreation и iOS lifecycle не сбрасывают active flow             |
 
@@ -140,7 +140,7 @@
 | CLI-090 | Must      | Planned | Client не отправляет события до pairing                                   | Anonymous write отклоняется и локально, и server-side     |
 | CLI-091 | Must      | Planned | Competition/session credentials хранятся в platform secure storage        | Секреты отсутствуют в plain preferences/logs              |
 | CLI-092 | Must      | Planned | Логи не содержат полный rating payload и персональные данные по умолчанию | Production pilot log использует IDs и error codes         |
-| CLI-093 | Must      | Planned | Client валидирует endpoint из discovery                                   | Подключение к сервису неверного типа/protocol отклоняется |
+| CLI-093 | Must      | Partial | Protocol/capability validation готова как shared domain boundary; HTTP endpoint/TLS validation pending | Подключение к сервису неверного типа/protocol отклоняется |
 | CLI-094 | Must      | Planned | Локальные черновики удаляются явным действием или после retention policy  | Судья понимает, какие данные остались на устройстве       |
 
 ## 11. Качество и выпуск

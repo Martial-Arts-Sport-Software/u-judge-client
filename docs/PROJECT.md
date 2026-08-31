@@ -245,7 +245,7 @@ Rejected
 
 ### 9.2. Частично или не реализовано
 
-- HTTP metadata handshake, protocol version check, server pairing и WebSocket client отсутствуют; выбор площадки остаётся состоянием `ServerSelected` и не даёт online access;
+- HTTP metadata handshake, server pairing и WebSocket client отсутствуют; shared metadata validator проверяет protocol major/capabilities и переводит выбранную площадку только в `MetadataValidated` или typed rejection, но ещё не получает metadata по сети;
 - server pairing, protocol version и текущий bout не получаются;
 - кнопки Kerugi/Tanbon имеют пустые `onclick`;
 - `Save` и `Send` имеют пустые `onclick` и сейчас обе выключены offline;
