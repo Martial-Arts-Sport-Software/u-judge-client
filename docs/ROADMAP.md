@@ -136,7 +136,7 @@ audit содержит каждый physical tap один раз.
 
 ### Gate C5
 
-Все восемь дисциплин проходят client/server contract tests; offline Save переживает restart, а online
+Все восемь дисциплин PDF 1 и Tanbon проходят client/server contract tests; offline Save переживает restart, а online
 Send применяется один раз и становится read-only.
 
 ## 8. Недели 9-10: локализация и UX hardening
@@ -193,7 +193,7 @@ Client не потерял и не продублировал подтвержд
 - Combat event применяется server не более одного раза.
 - `Save` локален и доступен offline.
 - `Send` окончателен, подтверждается и блокирует изменение после ACK.
-- Все восемь дисциплин проверены экспертными test vectors.
+- Все восемь дисциплин PDF 1 и Tanbon проверены соответствующими test vectors.
 - Русский critical flow завершён; English localization deferred beyond v1.
 - Accessibility labels присутствуют у критических controls.
 - Release notes явно называют сборку pilot.
