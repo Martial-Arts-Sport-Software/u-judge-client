@@ -67,7 +67,7 @@ Shared/Android/iOS targets собираются в CI, формулы текущ
 
 ## 4. Недели 2-3: state и durable outbox
 
-- Заменить `State.isConnectedToServer` connection state machine.
+- [x] Заменить `State.isConnectedToServer` connection state machine (`CLI-070`; переходы покрыты shared unit tests).
 - Отделить navigation, pairing, session и rating draft state.
 - Ввести локальное durable storage для identity, settings, drafts и outbox.
 - Добавить event ID, client sequence, timestamp и retry metadata.

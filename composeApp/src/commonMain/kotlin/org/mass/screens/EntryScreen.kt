@@ -120,11 +120,11 @@ object EntryScreen: Screen {
                     )
 
                     val loginOnClick = remember { {
-                        State.isOffline = false
+                        State.startDiscovery()
                         clickWithTransition(Routes.SERVER_CONNECTION)
                     } }
                     val offlineOnClick = remember { {
-                        State.isOffline = true
+                        State.useOffline()
                         clickWithTransition(Routes.DISCIPLINE_SELECT)
                     } }
 

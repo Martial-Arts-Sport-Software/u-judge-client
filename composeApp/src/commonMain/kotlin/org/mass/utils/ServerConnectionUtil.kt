@@ -4,7 +4,8 @@ import com.appstractive.dnssd.DiscoveryEvent
 import com.appstractive.dnssd.discoverServices
 import com.appstractive.dnssd.key
 import org.mass.State.availableServers
-import org.mass.State.selectedServer
+import org.mass.State.removeServer
+import org.mass.State.startDiscovery
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -15,7 +16,7 @@ object ServerConnectionUtil {
     fun scan(scope: CoroutineScope) {
         scanJob?.cancel()
         availableServers.clear()
-        selectedServer = null
+        startDiscovery()
         scanJob = scope.launch {
             discoverServices("_u-judge._tcp.local.").collect {
                 when (it) {
@@ -25,7 +26,7 @@ object ServerConnectionUtil {
                     }
                     is DiscoveryEvent.Removed -> {
                         availableServers.removed(it.service.key)
-                        if (selectedServer?.key == it.service.key) selectedServer = null
+                        removeServer(it.service.key)
                     }
                     is DiscoveryEvent.Resolved -> {
                         availableServers.resolved(it.service)

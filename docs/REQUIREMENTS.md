@@ -113,7 +113,7 @@
 
 | ID      | Приоритет | Статус  | Требование                                                              | Критерий приёмки                                                         |
 |---------|-----------|---------|-------------------------------------------------------------------------|--------------------------------------------------------------------------|
-| CLI-070 | Must      | Planned | Connection представлено state machine, а не boolean                     | Невозможны одновременно offline/connected или paired/no-server состояния |
+| CLI-070 | Must      | Implemented | Connection представлено state machine, а не boolean                  | Невозможны одновременно offline/connected или paired/no-server состояния |
 | CLI-071 | Must      | Planned | Session state отделено от navigation state                              | Возврат назад не завершает серверную сессию неявно                       |
 | CLI-072 | Must      | Planned | Rating draft имеет ID дисциплины, категории и сессии                    | Черновик другой сессии не отправляется случайно                          |
 | CLI-073 | Must      | Planned | Ошибки типизированы и локализованы                                      | UI различает discovery, pairing, transport, validation и protocol errors |
