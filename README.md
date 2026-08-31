@@ -36,6 +36,16 @@ UI всех шести дисциплин и локальные модели т�
 ./gradlew :androidApp:assembleDebug
 ```
 
+Проверка перед изменением или pull request (JDK 21):
+
+```shell
+./gradlew :composeApp:testAndroidHostTest :androidApp:assembleDebug \
+  :composeApp:compileKotlinIosArm64 :composeApp:compileKotlinIosSimulatorArm64
+```
+
+GitHub Actions запускает эти проверки для каждого push и pull request: Android tests/APK на Ubuntu,
+iOS framework compilation на macOS. Проверка не заменяет smoke test на физических pilot devices.
+
 Запуск Android выполняется из Android Studio. Для iOS откройте `iosApp/iosApp.xcodeproj` в Xcode и запустите схему `iosApp`.
 
 ## Документация
