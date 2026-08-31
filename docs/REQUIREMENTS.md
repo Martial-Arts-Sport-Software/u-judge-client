@@ -42,7 +42,7 @@
 | CLI-010 | Must      | Partial | Клиент обнаруживает `_u-judge._tcp.local.`                     | Server появляется без ручного IP в общей LAN                                          |
 | CLI-011 | Must      | Partial | Найденные servers дедуплицируются и удаляются при mDNS removed | В списке нет дублей и заведомо недоступных записей                                    |
 | CLI-012 | Must      | Planned | Повторный scan отменяет или переиспользует предыдущую job      | Многократное нажатие Search не создаёт несколько collectors                           |
-| CLI-013 | Must      | Planned | Судья выбирает площадку по понятному имени                     | UI не требует читать raw address list                                                 |
+| CLI-013 | Must      | Implemented | Судья выбирает площадку по понятному имени                     | UI показывает имя, адрес и статус; resolving площадка недоступна для выбора           |
 | CLI-014 | Must      | Planned | Client проверяет protocol version/capabilities                 | Несовместимый server отклоняется с локализованной причиной                            |
 | CLI-015 | Must      | Planned | Client отправляет pairing request с judge/device identity      | Server видит pending device и фамилию                                                 |
 | CLI-016 | Must      | Planned | UI показывает pending, accepted и rejected                     | Судья не попадает на рабочий экран до accepted                                        |

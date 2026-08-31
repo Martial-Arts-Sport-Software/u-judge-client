@@ -235,7 +235,7 @@ Rejected
 - unit tests граничных значений и формул `TechniqueCriteria`, `PresentationCriteria` и `TechniqueRating`;
 - информационные PDF и popup;
 - mDNS discovery `_u-judge._tcp.local.` с дедупликацией по service key, удалением unavailable service и единственной отменяемой scan job;
-- локализованный список площадок с понятными именем и адресом.
+- локализованный список площадок с понятными именем, адресом и статусом доступности; площадка в состоянии resolving недоступна для выбора.
 - явная connection state machine: выбор mDNS-площадки не даёт paired/online access.
 
 ### 9.2. Частично или не реализовано
