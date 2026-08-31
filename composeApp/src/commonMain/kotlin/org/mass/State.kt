@@ -10,6 +10,8 @@ import com.appstractive.dnssd.key
 import org.mass.connection.ConnectionEvent
 import org.mass.connection.ConnectionState
 import org.mass.connection.ConnectionStateStore
+import org.mass.connection.PairingIdentityRepository
+import org.mass.connection.createPairingIdentityStorage
 import org.mass.discovery.ServerDiscoveryStore
 import org.mass.entities.Rating
 import org.mass.enums.Categories
@@ -17,6 +19,7 @@ import org.mass.enums.Disciplines
 import org.mass.ui.popup.Popup
 import kotlin.collections.getValue
 import kotlin.collections.setValue
+import kotlin.random.Random
 
 /**
  * Singleton that controls current state of application
@@ -46,9 +49,18 @@ object State {
     val availableServers = ServerDiscoveryStore<DiscoveredService> { it.key }
     var selectedServer: DiscoveredService? by mutableStateOf(null)
     val connection = ConnectionStateStore()
+    lateinit var pairingIdentity: PairingIdentityRepository
     val isOffline: Boolean
         get() = connection.state == ConnectionState.Offline
     var isAnimating by mutableStateOf(false)
+
+    fun initializePairingIdentity(context: Any?) {
+        if (!::pairingIdentity.isInitialized) {
+            pairingIdentity = PairingIdentityRepository(createPairingIdentityStorage(context)) {
+                "device-${Random.nextInt()}"
+            }
+        }
+    }
 
     fun useOffline() {
         selectedServer = null
