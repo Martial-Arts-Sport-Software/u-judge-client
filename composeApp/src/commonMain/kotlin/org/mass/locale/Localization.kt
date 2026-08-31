@@ -20,6 +20,9 @@ object Localization {
             "connection_title" to "Server Connection",
             "connection_search_btn" to "Search for courts",
             "connection_server_not_found" to "No courts found. Start a search to discover servers on this network.",
+            "connection_court_address" to "Address",
+            "connection_court_available" to "Available",
+            "connection_court_resolving" to "Checking address",
 
             "discipline_title" to "Choose discipline",
             "discipline_kerugi" to "Kerugi",
@@ -111,6 +114,9 @@ object Localization {
             "connection_title" to "Подключение к серверу",
             "connection_search_btn" to "Найти площадки",
             "connection_server_not_found" to "Площадки не найдены. Запустите поиск серверов в этой сети.",
+            "connection_court_address" to "Адрес",
+            "connection_court_available" to "Доступна",
+            "connection_court_resolving" to "Проверяем адрес",
 
             "discipline_title" to "Выберите дисциплину",
             "discipline_kerugi" to "Весовые категории",

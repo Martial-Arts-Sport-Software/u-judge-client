@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.appstractive.dnssd.key
+import org.mass.discovery.DiscoveryStatus
 import org.mass.State.availableServers
 import org.mass.State.selectedServer
 import org.mass.State.selectServer
@@ -105,14 +106,22 @@ object ServerConnectionScreen : Screen {
                         modifier = Modifier.fillMaxSize().padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(availableServers.servers, key = { it.key }) { service ->
+                        items(availableServers.servers, key = { it.server.key }) { discoveredServer ->
+                            val service = discoveredServer.server
+                            val isAvailable = discoveredServer.status == DiscoveryStatus.Available
+                            val status = if (isAvailable) {
+                                Localization.getString("connection_court_available")
+                            } else {
+                                Localization.getString("connection_court_resolving")
+                            }
                             ButtonComponent(
                                 modifier = Modifier
                                     .background((if (service == selectedServer) Colors.SECONDARY else Colors.PRIMARY).color),
-                                text = "${service.name} (${service.addresses.joinToString()})",
+                                text = "${service.name}\n${Localization.getString("connection_court_address")}: ${service.addresses.joinToString()}\n$status",
                                 onclick = {
                                     selectServer(service)
-                                }
+                                },
+                                enabled = isAvailable
                             )
                         }
                     }
