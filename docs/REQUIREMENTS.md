@@ -44,7 +44,7 @@
 | CLI-012 | Must      | Planned | Повторный scan отменяет или переиспользует предыдущую job      | Многократное нажатие Search не создаёт несколько collectors                           |
 | CLI-013 | Must      | Implemented | Судья выбирает площадку по понятному имени                     | UI показывает имя, адрес и статус; resolving площадка недоступна для выбора           |
 | CLI-014 | Must      | Partial | Resolved mDNS endpoint проходит shared HTTP metadata validation; TLS/manual fallback pending | Несовместимый server отклоняется с локализованной причиной                            |
-| CLI-015 | Must      | Planned | Client отправляет pairing request с judge/device identity      | Server видит pending device и фамилию                                                 |
+| CLI-015 | Must      | Partial | Shared HTTP client отправляет pairing request с judge/device identity после metadata validation; стабильная identity/UI integration pending | Server видит pending device и фамилию                                                 |
 | CLI-016 | Must      | Planned | UI показывает pending, accepted и rejected                     | Судья не попадает на рабочий экран до accepted                                        |
 | CLI-017 | Must      | Planned | Pairing session восстанавливается при кратком reconnect        | Подтверждённый клиент не требует ручного pairing после каждого packet loss            |
 | CLI-018 | Must      | Planned | Отзыв server немедленно блокирует новые события                | Client показывает disconnected/rejected и сохраняет только допустимые pending records |
@@ -117,7 +117,7 @@
 | CLI-070 | Must      | Implemented | Connection представлено state machine, а не boolean                  | Невозможны одновременно offline/connected или paired/no-server состояния |
 | CLI-071 | Must      | Planned | Session state отделено от navigation state                              | Возврат назад не завершает серверную сессию неявно                       |
 | CLI-072 | Must      | Planned | Rating draft имеет ID дисциплины, категории и сессии                    | Черновик другой сессии не отправляется случайно                          |
-| CLI-073 | Must      | Partial | Metadata validation имеет типизированные локализуемые ошибки; остальные transport errors pending | UI различает discovery, pairing, transport, validation и protocol errors |
+| CLI-073 | Must      | Partial | Metadata validation и pairing request имеют типизированные локализуемые ошибки; остальные transport errors pending | UI различает discovery, pairing, transport, validation и protocol errors |
 | CLI-074 | Must      | Planned | Loading/action jobs отменяются по lifecycle                             | Уход с экрана не оставляет лишние scans или sends                        |
 | CLI-075 | Must      | Planned | Значимый state восстанавливается после configuration/process recreation | Android recreation и iOS lifecycle не сбрасывают active flow             |
 

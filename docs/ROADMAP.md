@@ -61,7 +61,7 @@ Shared/Android/iOS targets собираются в CI, формулы текущ
 - [x] Показывать понятные имя площадки, адрес и статус (`CLI-013`; resolved и resolving состояния покрыты shared unit tests).
 - [ ] Реализовать HTTP metadata/handshake, protocol version/capability check и manual host/IP fallback (resolved mDNS вызывает shared HTTP client и validation domain model; TLS/manual fallback pending).
 - [ ] Реализовать WebSocket connect, heartbeat и typed envelope.
-- [ ] Получать pairing pending/accepted/rejected.
+- [ ] Получать pairing pending/accepted/rejected (shared HTTP request переводит validated server в pending; operator approval/rejection UI pending).
 - [ ] Согласовать clock offset.
 - [ ] Отправить событие, получить ACK, разорвать сеть и повторить тот же ID.
 - [ ] Проверить iOS Local Network permission и mDNS на TestFlight-like build.
