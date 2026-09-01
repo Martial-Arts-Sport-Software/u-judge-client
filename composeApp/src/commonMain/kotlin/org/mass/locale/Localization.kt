@@ -29,6 +29,11 @@ object Localization {
             "connection_error_pairing_response_invalid" to "The server returned an invalid pairing response",
             "connection_error_pairing_unavailable" to "The pairing request could not be sent",
             "connection_pairing_pending" to "Pairing request sent. Wait for the operator to approve this device.",
+            "connection_manual_hint" to "If search did not find a court, enter the server address manually.",
+            "connection_manual_host" to "Host or IP address",
+            "connection_manual_port" to "Port",
+            "connection_manual_connect_btn" to "Connect by address",
+            "connection_error_manual_endpoint" to "Enter a valid host/IP address and port from 1 to 65535",
 
             "discipline_title" to "Choose discipline",
             "discipline_kerugi" to "Kerugi",
@@ -129,6 +134,11 @@ object Localization {
             "connection_error_pairing_response_invalid" to "Сервер вернул некорректный ответ на запрос pairing",
             "connection_error_pairing_unavailable" to "Не удалось отправить запрос pairing",
             "connection_pairing_pending" to "Запрос pairing отправлен. Дождитесь подтверждения устройства оператором.",
+            "connection_manual_hint" to "Если поиск не нашёл площадку, введите адрес сервера вручную.",
+            "connection_manual_host" to "Хост или IP-адрес",
+            "connection_manual_port" to "Порт",
+            "connection_manual_connect_btn" to "Подключиться по адресу",
+            "connection_error_manual_endpoint" to "Введите корректный хост/IP-адрес и порт от 1 до 65535",
 
             "discipline_title" to "Выберите дисциплину",
             "discipline_kerugi" to "Весовые категории",

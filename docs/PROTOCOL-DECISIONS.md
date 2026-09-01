@@ -19,8 +19,8 @@
 - Metadata содержит protocol version, capabilities, desktop peer/court ID, server name, pairing policy и server time.
 - Каждый новый mobile device требует explicit operator approval. После approval client хранит reconnect credential только в
   platform secure storage, до server-side revocation или credential rotation.
-- Все HTTP и WebSocket соединения используют TLS и локальный certificate/trust flow. Client не принимает неизвестный endpoint
-  или certificate как online server.
+- Protocol требует TLS и локальный certificate/trust flow. Текущий client manual/mDNS pre-pilot path использует HTTP metadata
+  validation и не предоставляет TLS trust UX; endpoint не считается online до metadata validation и pairing acceptance.
 
 ## Realtime contract
 
