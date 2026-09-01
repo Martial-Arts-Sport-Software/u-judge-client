@@ -44,6 +44,7 @@ import org.mass.ui.popup.Popup
 @Composable
 @Preview
 fun App() {
+    State.initializePairingIdentity(getContext())
     State.navController = rememberNavController()
     State.density = LocalDensity.current
     MaterialTheme(
