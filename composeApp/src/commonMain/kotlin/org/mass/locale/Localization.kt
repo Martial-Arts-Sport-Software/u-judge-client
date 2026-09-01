@@ -29,6 +29,8 @@ object Localization {
             "connection_error_pairing_response_invalid" to "The server returned an invalid pairing response",
             "connection_error_pairing_unavailable" to "The pairing request could not be sent",
             "connection_pairing_pending" to "Pairing request sent. Wait for the operator to approve this device.",
+            "connection_pairing_accepted" to "Pairing approved. Reconnect is not available yet.",
+            "connection_pairing_rejected" to "Pairing rejected by the operator",
 
             "discipline_title" to "Choose discipline",
             "discipline_kerugi" to "Kerugi",
@@ -129,6 +131,8 @@ object Localization {
             "connection_error_pairing_response_invalid" to "Сервер вернул некорректный ответ на запрос pairing",
             "connection_error_pairing_unavailable" to "Не удалось отправить запрос pairing",
             "connection_pairing_pending" to "Запрос pairing отправлен. Дождитесь подтверждения устройства оператором.",
+            "connection_pairing_accepted" to "Запрос на сопряжение подтверждён. Повторное подключение пока недоступно.",
+            "connection_pairing_rejected" to "Запрос на сопряжение отклонён оператором",
 
             "discipline_title" to "Выберите дисциплину",
             "discipline_kerugi" to "Весовые категории",
