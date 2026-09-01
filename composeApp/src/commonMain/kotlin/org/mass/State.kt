@@ -10,6 +10,7 @@ import com.appstractive.dnssd.key
 import org.mass.connection.ConnectionEvent
 import org.mass.connection.ConnectionState
 import org.mass.connection.ConnectionStateStore
+import org.mass.connection.ManualServerEndpointResult
 import org.mass.connection.PairingIdentityRepository
 import org.mass.connection.createPairingIdentityStorage
 import org.mass.discovery.ServerDiscoveryStore
@@ -75,6 +76,12 @@ object State {
     fun selectServer(server: DiscoveredService) {
         selectedServer = server
         connection.dispatch(ConnectionEvent.SelectServer(server.key))
+    }
+
+    fun selectManualServer(endpoint: ManualServerEndpointResult.Valid) {
+        selectedServer = null
+        connection.dispatch(ConnectionEvent.StartDiscovery)
+        connection.dispatch(ConnectionEvent.SelectServer(endpoint.endpoint.toString()))
     }
 
     fun removeServer(serverKey: String) {

@@ -31,10 +31,11 @@ fun TextInputComponent(
     labelText: String? = null,
     inputValue: String = "",
     onChange: (inputValue: String) -> Unit,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier
 ) {
     Column(
-        Modifier
+        modifier
             .padding(bottom = 10.dp)
             .fillMaxWidth(0.8f)
             .alpha(if (enabled) 1f else 0.5f)

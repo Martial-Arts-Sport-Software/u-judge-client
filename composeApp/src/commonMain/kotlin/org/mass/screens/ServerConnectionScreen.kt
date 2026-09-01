@@ -18,8 +18,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,6 +35,7 @@ import org.mass.State.availableServers
 import org.mass.State.connection
 import org.mass.State.pairingIdentity
 import org.mass.State.selectedServer
+import org.mass.State.selectManualServer
 import org.mass.State.selectServer
 import org.mass.getPlatformName
 import org.mass.connection.ConnectionState
@@ -40,6 +44,8 @@ import org.mass.connection.PairingFlow
 import org.mass.connection.PairingRequest
 import org.mass.connection.createHttpClient
 import org.mass.connection.metadataEndpoint
+import org.mass.connection.manualServerEndpoint
+import org.mass.connection.ManualServerEndpointResult
 import org.mass.connection.ServerMetadataClient
 import org.mass.enums.Colors
 import org.mass.enums.Routes
@@ -47,6 +53,7 @@ import org.mass.locale.Localization
 import org.mass.ui.button.ButtonComponent
 import org.mass.ui.button.ButtonStyles
 import org.mass.ui.button.clickWithTransition
+import org.mass.ui.input.TextInputComponent
 import org.mass.utils.ServerConnectionUtil
 import u_judge_client.composeapp.generated.resources.Res
 import u_judge_client.composeapp.generated.resources.back_icon
@@ -94,12 +101,68 @@ object ServerConnectionScreen : Screen {
 
             Spacer(Modifier.height(20.dp))
 
+            var manualHost by remember { mutableStateOf("") }
+            var manualPort by remember { mutableStateOf("8080") }
+            var manualEndpointError by remember { mutableStateOf(false) }
+
             ButtonComponent(
                 onclick = {
                     ServerConnectionUtil.scan(coroutineScope)
                 },
                 text = Localization.getString("connection_search_btn")
             )
+            Text(
+                text = Localization.getString("connection_manual_hint"),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = 12.dp)
+            )
+            Row(modifier = Modifier.fillMaxWidth(0.8f)) {
+                TextInputComponent(
+                    labelText = Localization.getString("connection_manual_host"),
+                    onChange = { manualHost = it },
+                    modifier = Modifier.weight(3f)
+                )
+                Spacer(Modifier.weight(0.1f))
+                TextInputComponent(
+                    labelText = Localization.getString("connection_manual_port"),
+                    inputValue = manualPort,
+                    onChange = { manualPort = it },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            ButtonComponent(
+                onclick = {
+                    when (val result = manualServerEndpoint(manualHost, manualPort)) {
+                        ManualServerEndpointResult.Invalid -> manualEndpointError = true
+                        is ManualServerEndpointResult.Valid -> {
+                            manualEndpointError = false
+                            selectManualServer(result)
+                            coroutineScope.launch {
+                                createHttpClient().use { httpClient ->
+                                    PairingFlow(
+                                        ServerMetadataClient(httpClient, result.endpoint),
+                                        PairingClient(httpClient, result.endpoint)
+                                    ).connect(
+                                        PairingRequest(
+                                            deviceId = pairingIdentity.deviceId(),
+                                            surname = State.judgeSurname.trim(),
+                                            platform = getPlatformName()
+                                        ),
+                                        connection
+                                    )
+                                }
+                            }
+                        }
+                    }
+                },
+                text = Localization.getString("connection_manual_connect_btn")
+            )
+            if (manualEndpointError) {
+                Text(
+                    text = Localization.getString("connection_error_manual_endpoint"),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
             connectionStatus()?.let { status ->
                 Text(
                     text = status,
