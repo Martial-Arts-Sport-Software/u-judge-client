@@ -242,6 +242,7 @@ Rejected
 - mDNS discovery `_u-judge._tcp.local.` с дедупликацией по service key, удалением unavailable service и единственной отменяемой scan job;
 - локализованный список площадок с понятными именем, адресом и статусом доступности; площадка в состоянии resolving недоступна для выбора.
 - явная connection state machine: выбор mDNS-площадки не даёт paired/online access.
+- shared durable outbox: platform-backed journal сохраняет event ID, client sequence, timestamp, payload, retry metadata и terminal rejection; unit tests покрывают recreation, matching ACK и ordered bounded retry.
 
 ### 9.2. Частично или не реализовано
 
@@ -249,7 +250,7 @@ Rejected
 - server pairing approval, protocol version и текущий bout не получаются;
 - кнопки Kerugi/Tanbon имеют пустые `onclick`;
 - `Save` и `Send` имеют пустые `onclick` и сейчас обе выключены offline;
-- durable outbox, ACK, retry, heartbeat и resync отсутствуют;
+- typed combat/rating events ещё не wired в durable outbox; WebSocket ACK, transport retry, heartbeat и resync отсутствуют;
 - глобальный singleton `State` всё ещё хранит navigation/UI/domain state; connection lifecycle выделен в отдельную state machine;
 - v1 minimum iOS version is 18; iOS 18 and iOS 26 require physical-device smoke coverage.
 - Android 5.1/TZ55 compatibility is deferred to a separate lightweight client track after v1.
