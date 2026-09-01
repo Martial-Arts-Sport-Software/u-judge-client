@@ -94,6 +94,8 @@ actual fun PDFViewer(
 
 actual fun getLocale(): String = Locale.getDefault().language
 
+actual fun getPlatformName(): String = "android"
+
 @Composable
 actual fun getTypography(): Typography {
     val montserratVariable = FontFamily(

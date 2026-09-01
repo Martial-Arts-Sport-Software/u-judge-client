@@ -7,6 +7,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.Url
 import io.ktor.http.appendPathSegments
+import kotlinx.coroutines.CancellationException
 import io.ktor.http.content.TextContent
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
@@ -35,11 +36,11 @@ class PairingClient(
             url.appendPathSegments("v1", "pairing-requests")
             setBody(TextContent(request.toJson(), ContentType.Application.Json))
         }
-        val result = if (response.status.value in 200..299) {
-            decodePending(response.bodyAsText())
-        } else {
-            null
+        if (response.status.value !in 200..299) {
+            store.dispatch(ConnectionEvent.RejectPairing(ConnectionFailure.PairingUnavailable))
+            return PairingResult.Unavailable
         }
+        val result = decodePending(response.bodyAsText())
         if (result == null) {
             store.dispatch(ConnectionEvent.RejectPairing(ConnectionFailure.PairingResponseInvalid))
             PairingResult.Rejected
@@ -47,7 +48,8 @@ class PairingClient(
             store.dispatch(ConnectionEvent.RequestPairing)
             result
         }
-    } catch (_: Exception) {
+    } catch (exception: Exception) {
+        if (exception is CancellationException) throw exception
         store.dispatch(ConnectionEvent.RejectPairing(ConnectionFailure.PairingUnavailable))
         PairingResult.Unavailable
     }

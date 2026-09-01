@@ -73,6 +73,24 @@ class PairingClientTest {
         assertFalse(store.isPaired)
     }
 
+    @Test
+    fun rejectedPairingRequestReportsPairingUnavailable() = runTest {
+        val client = PairingClient(
+            HttpClient(MockEngine {
+                respond("""{"code":"invalid_pairing_request"}""", HttpStatusCode.BadRequest)
+            }),
+            Url("http://court.local")
+        )
+        val store = validatedStore()
+
+        assertEquals(PairingResult.Unavailable, client.request(PairingRequest("device-7", "Ivanov", "ios"), store))
+        assertEquals(
+            ConnectionState.Rejected("court-1", ConnectionFailure.PairingUnavailable),
+            store.state
+        )
+        assertFalse(store.isPaired)
+    }
+
     private fun validatedStore(): ConnectionStateStore = ConnectionStateStore().also { store ->
         store.dispatch(ConnectionEvent.StartDiscovery)
         store.dispatch(ConnectionEvent.SelectServer("court-1"))

@@ -26,14 +26,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.appstractive.dnssd.key
 import kotlinx.coroutines.launch
+import org.mass.State
 import org.mass.discovery.DiscoveryStatus
 import org.mass.State.availableServers
 import org.mass.State.connection
+import org.mass.State.pairingIdentity
 import org.mass.State.selectedServer
 import org.mass.State.selectServer
-import org.mass.connection.ServerMetadataClient
+import org.mass.getPlatformName
+import org.mass.connection.ConnectionState
+import org.mass.connection.PairingClient
+import org.mass.connection.PairingFlow
+import org.mass.connection.PairingRequest
 import org.mass.connection.createHttpClient
 import org.mass.connection.metadataEndpoint
+import org.mass.connection.ServerMetadataClient
 import org.mass.enums.Colors
 import org.mass.enums.Routes
 import org.mass.locale.Localization
@@ -93,6 +100,13 @@ object ServerConnectionScreen : Screen {
                 },
                 text = Localization.getString("connection_search_btn")
             )
+            connectionStatus()?.let { status ->
+                Text(
+                    text = status,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
             Box(
                 Modifier
                     .fillMaxWidth(0.8f)
@@ -129,21 +143,36 @@ object ServerConnectionScreen : Screen {
                                         val address = service.addresses.firstOrNull()
                                         if (address != null) {
                                             createHttpClient().use { httpClient ->
-                                                ServerMetadataClient(
-                                                    httpClient,
-                                                    metadataEndpoint(address, service.port)
-                                                ).fetchInto(connection)
+                                                val endpoint = metadataEndpoint(address, service.port)
+                                                PairingFlow(
+                                                    ServerMetadataClient(httpClient, endpoint),
+                                                    PairingClient(httpClient, endpoint)
+                                                ).connect(
+                                                    PairingRequest(
+                                                        deviceId = pairingIdentity.deviceId(),
+                                                        surname = State.judgeSurname.trim(),
+                                                        platform = getPlatformName()
+                                                    ),
+                                                    connection
+                                                )
                                             }
                                         }
                                     }
                                 },
-                                enabled = isAvailable
+                                enabled = isAvailable && connection.state is ConnectionState.Discovering
                             )
                         }
                     }
                 }
             }
         }
+    }
+
+    @Composable
+    private fun connectionStatus(): String? = when (val state = connection.state) {
+        is ConnectionState.PairingPending -> Localization.getString("connection_pairing_pending")
+        is ConnectionState.Rejected -> Localization.getString(state.failure.localizationKey)
+        else -> null
     }
 
 }
