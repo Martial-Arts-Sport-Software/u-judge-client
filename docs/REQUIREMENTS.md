@@ -43,12 +43,12 @@
 | CLI-011 | Must      | Partial | Найденные servers дедуплицируются и удаляются при mDNS removed | В списке нет дублей и заведомо недоступных записей                                    |
 | CLI-012 | Must      | Planned | Повторный scan отменяет или переиспользует предыдущую job      | Многократное нажатие Search не создаёт несколько collectors                           |
 | CLI-013 | Must      | Implemented | Судья выбирает площадку по понятному имени                     | UI показывает имя, адрес и статус; resolving площадка недоступна для выбора           |
-| CLI-014 | Must      | Partial | Resolved mDNS endpoint проходит shared HTTP metadata validation; TLS/manual fallback pending | Несовместимый server отклоняется с локализованной причиной                            |
+| CLI-014 | Must      | Partial | Resolved mDNS endpoint проходит shared HTTP metadata validation; manual fallback использует ту же validation/pairing chain, TLS trust UX pending | Несовместимый server отклоняется с локализованной причиной                            |
 | CLI-015 | Must      | Partial | Выбор validated mDNS server отправляет pairing request с device identity, нормализованной фамилией судьи и platform; TLS pending | Server видит pending device и фамилию                                                 |
 | CLI-016 | Must      | Partial | UI показывает pending и локальные pairing errors; shared realtime handshake decodes typed accepted/rejected responses, UI status wiring pending | Судья не попадает на рабочий экран до accepted                                        |
 | CLI-017 | Must      | Partial | Shared client accepts a reconnect credential through the realtime handshake; secure persistence and reconnect lifecycle pending | Подтверждённый клиент не требует ручного pairing после каждого packet loss            |
 | CLI-018 | Must      | Planned | Отзыв server немедленно блокирует новые события                | Client показывает disconnected/rejected и сохраняет только допустимые pending records |
-| CLI-019 | Must      | Planned | Client поддерживает manual host/IP fallback после mDNS         | Endpoint проходит metadata, protocol и TLS validation до online state                |
+| CLI-019 | Must      | Partial | Client поддерживает manual host/IP fallback после mDNS: HTTP endpoint проходит metadata, protocol и capability validation и начинает pairing; TLS trust UX pending | Ручной endpoint не даёт online state без metadata validation и pairing acceptance     |
 
 ## 4. Выбор дисциплины и сессии
 
@@ -140,7 +140,7 @@
 | CLI-090 | Must      | Planned | Client не отправляет события до pairing                                   | Anonymous write отклоняется и локально, и server-side     |
 | CLI-091 | Must      | Planned | Competition/session credentials хранятся в platform secure storage        | Секреты отсутствуют в plain preferences/logs              |
 | CLI-092 | Must      | Planned | Логи не содержат полный rating payload и персональные данные по умолчанию | Production pilot log использует IDs и error codes         |
-| CLI-093 | Must      | Partial | Protocol/capability validation готова как shared domain boundary; HTTP endpoint/TLS validation pending | Подключение к сервису неверного типа/protocol отклоняется |
+| CLI-093 | Must      | Partial | Protocol/capability validation готова как shared domain boundary; mDNS и manual HTTP endpoint используют её, TLS trust UX pending | Подключение к сервису неверного типа/protocol отклоняется |
 | CLI-094 | Must      | Planned | Локальные черновики удаляются явным действием или после retention policy  | Судья понимает, какие данные остались на устройстве       |
 
 ## 11. Качество и выпуск
