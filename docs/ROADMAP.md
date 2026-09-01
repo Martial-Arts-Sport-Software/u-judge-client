@@ -59,10 +59,10 @@ Shared/Android/iOS targets собираются в CI, формулы текущ
 
 - [x] Управлять единственной mDNS discovery job и её lifecycle.
 - [x] Показывать понятные имя площадки, адрес и статус (`CLI-013`; resolved и resolving состояния покрыты shared unit tests).
-- [ ] Реализовать HTTP metadata/handshake, protocol version/capability check и manual host/IP fallback (resolved mDNS вызывает shared HTTP client и validation domain model; TLS/manual fallback pending).
+- [ ] Реализовать HTTP metadata/handshake, protocol version/capability check и manual host/IP fallback (resolved mDNS и manual host/IP вызывают shared HTTP client, validation domain model и pairing flow; TLS trust UX pending).
 - [ ] Реализовать WebSocket connect, heartbeat и typed envelope (shared Ktor handshake, typed command envelope и terminal ACK/rejection outbox handling готовы; credential storage, lifecycle wiring, heartbeat and reconnect pending).
-- [ ] Получать pairing pending/accepted/rejected (shared one-shot HTTP reader декодирует typed pending/accepted/rejected, 404 и transport/protocol failures; UI status wiring, polling/push и realtime status pending).
-- [ ] Согласовать clock offset.
+- [ ] Получать pairing pending/accepted/rejected (UI показывает pending и локальные ошибки после shared HTTP request; operator accepted/rejected realtime status pending).
+- [ ] Согласовать clock offset (shared `ClockSyncClient` оценивает offset/round-trip по одному typed exchange и отклоняет invalid/rejected responses; handshake/reconnect wiring pending).
 - [ ] Отправить событие, получить ACK, разорвать сеть и повторить тот же ID (shared command/ACK contract сохраняет stable ID and terminal outcome; disconnect/reconnect proof pending).
 - [ ] Проверить iOS Local Network permission и mDNS на TestFlight-like build.
 

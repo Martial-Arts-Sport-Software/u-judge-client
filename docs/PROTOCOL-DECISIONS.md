@@ -19,8 +19,8 @@
 - Metadata содержит protocol version, capabilities, desktop peer/court ID, server name, pairing policy и server time.
 - Каждый новый mobile device требует explicit operator approval. После approval client хранит reconnect credential только в
   platform secure storage, до server-side revocation или credential rotation.
-- Все HTTP и WebSocket соединения используют TLS и локальный certificate/trust flow. Client не принимает неизвестный endpoint
-  или certificate как online server.
+- Protocol требует TLS и локальный certificate/trust flow. Текущий client manual/mDNS pre-pilot path использует HTTP metadata
+  validation и не предоставляет TLS trust UX; endpoint не считается online до metadata validation и pairing acceptance.
 
 ## Realtime contract
 
@@ -35,7 +35,7 @@
 
 ## Время и Kerugi
 
-- Handshake/reconnect выполняет four-timestamp exchange для оценки server/client clock offset и round-trip time.
+- Shared `ClockSyncClient` отправляет `clock_sync` с ISO-8601 UTC `clientSendTimestamp`, принимает echo с UTC `serverReceiveTimestamp`/`serverSendTimestamp` и вычисляет server/client offset и round-trip по four-timestamp formula. Typed `clock_sync_rejected` возвращает server code; malformed, incomplete или non-matching echo возвращает invalid response. Handshake/reconnect lifecycle wiring остаётся отдельной задачей.
 - Client передаёт timestamp, скорректированный по согласованному offset; server, а не порядок WebSocket delivery, применяет
   coincidence window.
 - Default Kerugi coincidence window равен `1000 мс`.
