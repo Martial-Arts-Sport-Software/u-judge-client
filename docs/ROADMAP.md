@@ -61,7 +61,7 @@ Shared/Android/iOS targets собираются в CI, формулы текущ
 - [x] Показывать понятные имя площадки, адрес и статус (`CLI-013`; resolved и resolving состояния покрыты shared unit tests).
 - [ ] Реализовать HTTP metadata/handshake, protocol version/capability check и manual host/IP fallback (resolved mDNS и manual host/IP вызывают shared HTTP client, validation domain model и pairing flow; TLS trust UX pending).
 - [ ] Реализовать WebSocket connect, heartbeat и typed envelope (shared Ktor handshake, typed command envelope и terminal ACK/rejection outbox handling готовы; credential storage, lifecycle wiring, heartbeat and reconnect pending).
-- [ ] Получать pairing pending/accepted/rejected (UI показывает pending и локальные ошибки после shared HTTP request; operator accepted/rejected realtime status pending).
+- [ ] Получать pairing pending/accepted/rejected (shared HTTP reader декодирует typed status projection; UI polling/push and reconnect credential delivery pending).
 - [ ] Согласовать clock offset (shared `ClockSyncClient` оценивает offset/round-trip по одному typed exchange и отклоняет invalid/rejected responses; handshake/reconnect wiring pending).
 - [ ] Отправить событие, получить ACK, разорвать сеть и повторить тот же ID (shared command/ACK contract сохраняет stable ID and terminal outcome; disconnect/reconnect proof pending).
 - [ ] Проверить iOS Local Network permission и mDNS на TestFlight-like build.
@@ -76,7 +76,7 @@ Shared/Android/iOS targets собираются в CI, формулы текущ
 - [x] Заменить `State.isConnectedToServer` connection state machine (`CLI-070`; переходы покрыты shared unit tests).
 - Отделить navigation, pairing, session и rating draft state.
 - [ ] Ввести локальное durable storage для identity, settings, drafts и outbox (shared outbox journal уже сохраняет pending/rejected records в platform storage; wiring domain events, drafts и settings pending).
-- [ ] Добавить event ID, client sequence, timestamp и retry metadata (shared outbox model и retry metadata готовы; typed transport payload pending).
+- [ ] Добавить event ID, client sequence, timestamp и retry metadata (shared outbox model, retry metadata и typed command envelope готовы; physical action wiring and reconnect pending).
 - [ ] Реализовать bounded exponential backoff и terminal rejection (shared ordered retry и terminal rejection готовы; transport integration pending).
 - Восстанавливать active connection/session после lifecycle events.
 - Локализовать типизированные transport/protocol errors.

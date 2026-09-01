@@ -69,7 +69,7 @@
 | CLI-030 | Must      | Partial | Kerugi имеет `HEAD`/`BODY` для blue/red                 | Каждая кнопка создаёт правильный typed event                           |
 | CLI-031 | Must      | Partial | Tanbon имеет `HEAD`/`BODY` для blue/red и `CROSS`       | Пять кнопок создают правильные typed events                            |
 | CLI-032 | Must      | Partial | Shared outbox сохраняет caller-provided unique event ID; generation in combat controls pending | Два намеренных нажатия различаются, transport retry сохраняет ID       |
-| CLI-033 | Must      | Partial | Shared outbox сохраняет client sequence и timestamp; typed transport send pending | Server может восстановить локальный порядок и clock offset             |
+| CLI-033 | Must      | Partial | Shared outbox and typed command envelope preserve client sequence and timestamp; physical action wiring and reconnect pending | Server может восстановить локальный порядок и clock offset             |
 | CLI-034 | Must      | Planned | Client не вычисляет кворум и итоговый балл              | UI не объявляет score accepted до server ACK/state update; server разрешает конфликт score candidates по минимальной оценке |
 | CLI-035 | Must      | Partial | Realtime command client journals the complete command before socket send; physical tap wiring and app-kill proof pending | App kill до ACK не теряет событие                                      |
 | CLI-036 | Must      | Partial | Shared command transport applies terminal ACK/rejection to outbox; UI feedback pending | Состояние каждого недавнего события понятно судье                      |
