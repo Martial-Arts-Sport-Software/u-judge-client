@@ -108,7 +108,7 @@
 | CLI-065 | Must      | Partial | Shared command ACK removes only its matching durable event; transport reorder test pending | Поздний ACK не удаляет более новое pending event                       |
 | CLI-066 | Must      | Partial | Terminal command rejection is persisted and excluded from retry; UI feedback pending | Outbox отмечает final rejection и показывает действие пользователю     |
 | CLI-067 | Must      | Planned | Logout/смена server не удаляет pending events молча        | Требуется успешная доставка или явное подтверждённое discard с аудитом |
-| CLI-068 | Must      | Planned | Clock offset согласуется при handshake/reconnect           | Four-timestamp exchange оценивает offset/round-trip; combat timestamp не полагается только на device wall clock |
+| CLI-068 | Must      | Partial | Shared `ClockSyncClient` выполняет один typed four-timestamp exchange через authenticated realtime socket; handshake/reconnect wiring pending | Four-timestamp exchange оценивает offset/round-trip; combat timestamp не полагается только на device wall clock |
 
 ## 8. Состояние и навигация
 
