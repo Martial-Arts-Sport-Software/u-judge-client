@@ -44,7 +44,7 @@
 | CLI-012 | Must      | Planned | Повторный scan отменяет или переиспользует предыдущую job      | Многократное нажатие Search не создаёт несколько collectors                           |
 | CLI-013 | Must      | Implemented | Судья выбирает площадку по понятному имени                     | UI показывает имя, адрес и статус; resolving площадка недоступна для выбора           |
 | CLI-014 | Must      | Partial | Resolved mDNS endpoint проходит shared HTTP metadata validation; TLS/manual fallback pending | Несовместимый server отклоняется с локализованной причиной                            |
-| CLI-015 | Must      | Implemented | Выбор validated mDNS server отправляет pairing request с сохранёнными device identity и фамилией судьи | Server видит pending device и фамилию                                                 |
+| CLI-015 | Must      | Partial | Выбор validated mDNS server отправляет pairing request с device identity, нормализованной фамилией судьи и platform; TLS pending | Server видит pending device и фамилию                                                 |
 | CLI-016 | Must      | Partial | UI показывает pending и локальные pairing errors; accepted/rejected от оператора ожидают pairing-status realtime contract | Судья не попадает на рабочий экран до accepted                                        |
 | CLI-017 | Must      | Planned | Pairing session восстанавливается при кратком reconnect        | Подтверждённый клиент не требует ручного pairing после каждого packet loss            |
 | CLI-018 | Must      | Planned | Отзыв server немедленно блокирует новые события                | Client показывает disconnected/rejected и сохраняет только допустимые pending records |

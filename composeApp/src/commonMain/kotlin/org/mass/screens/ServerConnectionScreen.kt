@@ -150,7 +150,7 @@ object ServerConnectionScreen : Screen {
                                                 ).connect(
                                                     PairingRequest(
                                                         deviceId = pairingIdentity.deviceId(),
-                                                        surname = State.judgeSurname,
+                                                        surname = State.judgeSurname.trim(),
                                                         platform = getPlatformName()
                                                     ),
                                                     connection
@@ -159,7 +159,7 @@ object ServerConnectionScreen : Screen {
                                         }
                                     }
                                 },
-                                enabled = isAvailable
+                                enabled = isAvailable && connection.state is ConnectionState.Discovering
                             )
                         }
                     }
