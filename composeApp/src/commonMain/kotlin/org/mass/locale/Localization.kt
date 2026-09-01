@@ -26,6 +26,9 @@ object Localization {
             "connection_error_protocol_version" to "The server uses an unsupported protocol version",
             "connection_error_missing_capabilities" to "The server does not support required features",
             "connection_error_metadata_unavailable" to "The server metadata is unavailable",
+            "connection_error_pairing_response_invalid" to "The server returned an invalid pairing response",
+            "connection_error_pairing_unavailable" to "The pairing request could not be sent",
+            "connection_pairing_pending" to "Pairing request sent. Wait for the operator to approve this device.",
 
             "discipline_title" to "Choose discipline",
             "discipline_kerugi" to "Kerugi",
@@ -123,6 +126,9 @@ object Localization {
             "connection_error_protocol_version" to "Сервер использует неподдерживаемую версию протокола",
             "connection_error_missing_capabilities" to "Сервер не поддерживает обязательные возможности",
             "connection_error_metadata_unavailable" to "Метаданные сервера недоступны",
+            "connection_error_pairing_response_invalid" to "Сервер вернул некорректный ответ на запрос pairing",
+            "connection_error_pairing_unavailable" to "Не удалось отправить запрос pairing",
+            "connection_pairing_pending" to "Запрос pairing отправлен. Дождитесь подтверждения устройства оператором.",
 
             "discipline_title" to "Выберите дисциплину",
             "discipline_kerugi" to "Весовые категории",

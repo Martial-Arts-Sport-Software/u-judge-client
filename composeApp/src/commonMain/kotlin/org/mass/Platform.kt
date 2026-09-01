@@ -11,6 +11,8 @@ expect fun vibrate(context: Any?)
 
 expect fun getLocale(): String
 
+expect fun getPlatformName(): String
+
 @Composable
 expect fun getTypography(): Typography
 

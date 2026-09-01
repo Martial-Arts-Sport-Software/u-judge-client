@@ -43,6 +43,8 @@ import platform.UIKit.UIView
 
 actual fun getLocale(): String = NSLocale.currentLocale.languageCode
 
+actual fun getPlatformName(): String = "ios"
+
 @Composable
 actual fun getContext(): Any? {
     return null
