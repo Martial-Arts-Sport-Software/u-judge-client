@@ -61,6 +61,18 @@ sealed interface ConnectionFailure {
     data object PairingUnavailable : ConnectionFailure {
         override val localizationKey = "connection_error_pairing_unavailable"
     }
+
+    data class RealtimeHandshakeRejected(val code: String) : ConnectionFailure {
+        override val localizationKey = "connection_error_realtime_handshake_rejected"
+    }
+
+    data object RealtimeResponseInvalid : ConnectionFailure {
+        override val localizationKey = "connection_error_realtime_response_invalid"
+    }
+
+    data object RealtimeUnavailable : ConnectionFailure {
+        override val localizationKey = "connection_error_realtime_unavailable"
+    }
 }
 
 sealed interface ConnectionEvent {
@@ -71,6 +83,7 @@ sealed interface ConnectionEvent {
     data class RejectMetadata(val failure: ConnectionFailure) : ConnectionEvent
     data object RequestPairing : ConnectionEvent
     data class RejectPairing(val failure: ConnectionFailure) : ConnectionEvent
+    data class RejectRealtime(val failure: ConnectionFailure) : ConnectionEvent
     data class AcceptPairing(val deviceId: String) : ConnectionEvent
 }
 
@@ -106,6 +119,10 @@ class ConnectionStateStore(
             }
             is ConnectionEvent.RejectPairing -> when (val currentState = state) {
                 is ConnectionState.MetadataValidated -> ConnectionState.Rejected(currentState.serverKey, event.failure)
+                else -> state
+            }
+            is ConnectionEvent.RejectRealtime -> when (val currentState = state) {
+                is ConnectionState.PairingPending -> ConnectionState.Rejected(currentState.serverKey, event.failure)
                 else -> state
             }
             is ConnectionEvent.AcceptPairing -> when (state) {

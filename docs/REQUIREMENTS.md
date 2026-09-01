@@ -31,7 +31,7 @@
 | CLI-002 | Must      | Partial | Судья вводит фамилию до выбора режима                     | Пустое/пробельное значение не позволяет продолжить                                 |
 | CLI-003 | Must      | Partial | Клиент поддерживает online и offline                      | Выбранный режим явно виден и не меняется из-за навигации                           |
 | CLI-004 | Must      | Partial | Offline разрешает только технические дисциплины           | Kerugi/Tanbon заблокированы с объяснением причины                                  |
-| CLI-005 | Must      | Planned | Online-функции доступны только после handshake и pairing  | Простого выбора mDNS service недостаточно для connected state                      |
+| CLI-005 | Must      | Partial | Shared realtime handshake переводит pairing-pending state в connected только после typed server acceptance; credential storage and UI wiring pending | Простого выбора mDNS service недостаточно для connected state                      |
 | CLI-006 | Should    | Planned | Post-v1 интерфейс переключается между RU/EN               | Все строки текущего flow локализованы; v1 Pilot требует русский интерфейс          |
 | CLI-007 | Should    | Planned | Фамилия, язык и локальные черновики переживают перезапуск | После restart значения восстановлены из локального persistence                     |
 
@@ -45,8 +45,8 @@
 | CLI-013 | Must      | Implemented | Судья выбирает площадку по понятному имени                     | UI показывает имя, адрес и статус; resolving площадка недоступна для выбора           |
 | CLI-014 | Must      | Partial | Resolved mDNS endpoint проходит shared HTTP metadata validation; TLS/manual fallback pending | Несовместимый server отклоняется с локализованной причиной                            |
 | CLI-015 | Must      | Partial | Выбор validated mDNS server отправляет pairing request с device identity, нормализованной фамилией судьи и platform; TLS pending | Server видит pending device и фамилию                                                 |
-| CLI-016 | Must      | Partial | UI показывает pending и локальные pairing errors; accepted/rejected от оператора ожидают pairing-status realtime contract | Судья не попадает на рабочий экран до accepted                                        |
-| CLI-017 | Must      | Planned | Pairing session восстанавливается при кратком reconnect        | Подтверждённый клиент не требует ручного pairing после каждого packet loss            |
+| CLI-016 | Must      | Partial | UI показывает pending и локальные pairing errors; shared realtime handshake decodes typed accepted/rejected responses, UI status wiring pending | Судья не попадает на рабочий экран до accepted                                        |
+| CLI-017 | Must      | Partial | Shared client accepts a reconnect credential through the realtime handshake; secure persistence and reconnect lifecycle pending | Подтверждённый клиент не требует ручного pairing после каждого packet loss            |
 | CLI-018 | Must      | Planned | Отзыв server немедленно блокирует новые события                | Client показывает disconnected/rejected и сохраняет только допустимые pending records |
 | CLI-019 | Must      | Planned | Client поддерживает manual host/IP fallback после mDNS         | Endpoint проходит metadata, protocol и TLS validation до online state                |
 
@@ -117,7 +117,7 @@
 | CLI-070 | Must      | Implemented | Connection представлено state machine, а не boolean                  | Невозможны одновременно offline/connected или paired/no-server состояния |
 | CLI-071 | Must      | Planned | Session state отделено от navigation state                              | Возврат назад не завершает серверную сессию неявно                       |
 | CLI-072 | Must      | Planned | Rating draft имеет ID дисциплины, категории и сессии                    | Черновик другой сессии не отправляется случайно                          |
-| CLI-073 | Must      | Partial | Metadata validation и pairing request имеют типизированные локализуемые ошибки и UI feedback; остальные transport errors pending | UI различает discovery, pairing, transport, validation и protocol errors |
+| CLI-073 | Must      | Partial | Metadata validation, pairing request и realtime handshake имеют типизированные локализуемые errors; UI transport feedback and remaining protocol errors pending | UI различает discovery, pairing, transport, validation и protocol errors |
 | CLI-074 | Must      | Planned | Loading/action jobs отменяются по lifecycle                             | Уход с экрана не оставляет лишние scans или sends                        |
 | CLI-075 | Must      | Planned | Значимый state восстанавливается после configuration/process recreation | Android recreation и iOS lifecycle не сбрасывают active flow             |
 
