@@ -246,7 +246,7 @@ Rejected
 
 ### 9.2. Частично или не реализовано
 
-- Выбор resolved mDNS-площадки строит endpoint из адреса/порта, проверяет metadata и отправляет `POST /v1/pairing-requests` с device identity, нормализованной фамилией судьи и platform. Shared Ktor client выполняет versioned `/v1/realtime` handshake и принимает typed accepted/rejected response до перехода в `ConnectedIdle`; secure credential storage, UI/lifecycle wiring, pairing-status push и TLS/manual fallback pending;
+- Выбор resolved mDNS-площадки строит endpoint из адреса/порта, проверяет metadata и отправляет `POST /v1/pairing-requests` с device identity, нормализованной фамилией судьи и platform. Shared Ktor client однократно читает `GET /v1/pairing-status/{requestId}` и декодирует typed pending/accepted/rejected status, а также выполняет versioned `/v1/realtime` handshake и принимает typed accepted/rejected response до перехода в `ConnectedIdle`; secure credential storage, UI/lifecycle wiring, pairing-status polling/push и TLS/manual fallback pending;
 - server pairing approval, protocol version и текущий bout не получаются;
 - кнопки Kerugi/Tanbon имеют пустые `onclick`;
 - `Save` и `Send` имеют пустые `onclick` и сейчас обе выключены offline;
