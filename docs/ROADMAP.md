@@ -75,9 +75,9 @@ Shared/Android/iOS targets собираются в CI, формулы текущ
 
 - [x] Заменить `State.isConnectedToServer` connection state machine (`CLI-070`; переходы покрыты shared unit tests).
 - Отделить navigation, pairing, session и rating draft state.
-- Ввести локальное durable storage для identity, settings, drafts и outbox.
-- Добавить event ID, client sequence, timestamp и retry metadata.
-- Реализовать bounded exponential backoff и terminal rejection.
+- [ ] Ввести локальное durable storage для identity, settings, drafts и outbox (shared outbox journal уже сохраняет pending/rejected records в platform storage; wiring domain events, drafts и settings pending).
+- [ ] Добавить event ID, client sequence, timestamp и retry metadata (shared outbox model и retry metadata готовы; typed transport payload pending).
+- [ ] Реализовать bounded exponential backoff и terminal rejection (shared ordered retry и terminal rejection готовы; transport integration pending).
 - Восстанавливать active connection/session после lifecycle events.
 - Локализовать типизированные transport/protocol errors.
 

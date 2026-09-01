@@ -68,10 +68,10 @@
 |---------|-----------|---------|---------------------------------------------------------|------------------------------------------------------------------------|
 | CLI-030 | Must      | Partial | Kerugi имеет `HEAD`/`BODY` для blue/red                 | Каждая кнопка создаёт правильный typed event                           |
 | CLI-031 | Must      | Partial | Tanbon имеет `HEAD`/`BODY` для blue/red и `CROSS`       | Пять кнопок создают правильные typed events                            |
-| CLI-032 | Must      | Planned | Каждое физическое нажатие получает уникальный event ID  | Два намеренных нажатия различаются, transport retry сохраняет ID       |
-| CLI-033 | Must      | Planned | Client отправляет client sequence и timestamp           | Server может восстановить локальный порядок и clock offset             |
+| CLI-032 | Must      | Partial | Shared outbox сохраняет caller-provided unique event ID; generation in combat controls pending | Два намеренных нажатия различаются, transport retry сохраняет ID       |
+| CLI-033 | Must      | Partial | Shared outbox сохраняет client sequence и timestamp; typed transport send pending | Server может восстановить локальный порядок и clock offset             |
 | CLI-034 | Must      | Planned | Client не вычисляет кворум и итоговый балл              | UI не объявляет score accepted до server ACK/state update; server разрешает конфликт score candidates по минимальной оценке |
-| CLI-035 | Must      | Planned | Нажатие немедленно попадает в durable outbox            | App kill до ACK не теряет событие                                      |
+| CLI-035 | Must      | Partial | Durable shared outbox готов; wiring physical tap before transport pending | App kill до ACK не теряет событие                                      |
 | CLI-036 | Must      | Planned | Client отображает pending/accepted/rejected             | Состояние каждого недавнего события понятно судье                      |
 | CLI-037 | Must      | Planned | Warning/attention отправляется отдельно от scoring      | Server получает judge, device, session и timestamp; счёт не меняется   |
 | CLI-038 | Must      | Planned | Offline Kerugi/Tanbon не генерирует официальные события | Боевые кнопки недоступны без server session                            |
@@ -100,13 +100,13 @@
 
 | ID      | Приоритет | Статус  | Требование                                                 | Критерий приёмки                                                       |
 |---------|-----------|---------|------------------------------------------------------------|------------------------------------------------------------------------|
-| CLI-060 | Must      | Planned | Outbox хранится в локальном durable storage                | Process death не очищает неподтверждённые events                       |
-| CLI-061 | Must      | Planned | Retry использует тот же event ID                           | Server применяет событие не более одного раза                          |
-| CLI-062 | Must      | Planned | Retry применяет bounded exponential backoff                | Client не создаёт request storm при недоступном server                 |
+| CLI-060 | Must      | Partial | Shared JSON journal сохраняется в Android SharedPreferences/iOS NSUserDefaults; event wiring and app-kill integration proof pending | Process death не очищает неподтверждённые events                       |
+| CLI-061 | Must      | Partial | Outbox retry хранит исходный event ID; transport/server evidence pending | Server применяет событие не более одного раза                          |
+| CLI-062 | Must      | Partial | Shared outbox uses ordered bounded exponential backoff; transport fault injection pending | Client не создаёт request storm при недоступном server                 |
 | CLI-063 | Must      | Planned | WebSocket heartbeat обнаруживает разрыв                    | UI переходит в reconnecting в ограниченное protocol timeout время      |
 | CLI-064 | Must      | Planned | После reconnect client отправляет cursor и получает resync | Session state сходится до разрешения новых действий                    |
-| CLI-065 | Must      | Planned | Event ordering сохраняется для одного client               | Поздний ACK не удаляет более новое pending event                       |
-| CLI-066 | Must      | Planned | Rejected terminal event не повторяется бесконечно          | Outbox отмечает final rejection и показывает действие пользователю     |
+| CLI-065 | Must      | Partial | Shared outbox releases only the earliest pending client sequence and ACK removes only matching ID; transport reorder test pending | Поздний ACK не удаляет более новое pending event                       |
+| CLI-066 | Must      | Partial | Terminal rejection is persisted and excluded from retry; UI feedback pending | Outbox отмечает final rejection и показывает действие пользователю     |
 | CLI-067 | Must      | Planned | Logout/смена server не удаляет pending events молча        | Требуется успешная доставка или явное подтверждённое discard с аудитом |
 | CLI-068 | Must      | Planned | Clock offset согласуется при handshake/reconnect           | Four-timestamp exchange оценивает offset/round-trip; combat timestamp не полагается только на device wall clock |
 
