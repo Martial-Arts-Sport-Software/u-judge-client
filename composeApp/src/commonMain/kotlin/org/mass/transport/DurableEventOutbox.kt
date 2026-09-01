@@ -21,6 +21,8 @@ data class OutboxEvent(
     val eventId: String,
     val clientSequence: Long,
     val clientTimestampMillis: Long,
+    val clientTimestamp: String = "",
+    val sessionId: String = "",
     val payload: String
 )
 
@@ -115,6 +117,8 @@ class DurableEventOutbox(
                     put("eventId", record.event.eventId)
                     put("clientSequence", record.event.clientSequence)
                     put("clientTimestampMillis", record.event.clientTimestampMillis)
+                    put("clientTimestamp", record.event.clientTimestamp)
+                    put("sessionId", record.event.sessionId)
                     put("payload", record.event.payload)
                     when (record) {
                         is Record.Pending -> {
@@ -139,6 +143,8 @@ class DurableEventOutbox(
                 eventId = record["eventId"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null,
                 clientSequence = record["clientSequence"]?.jsonPrimitive?.contentOrNull?.toLongOrNull() ?: return@mapNotNull null,
                 clientTimestampMillis = record["clientTimestampMillis"]?.jsonPrimitive?.contentOrNull?.toLongOrNull() ?: return@mapNotNull null,
+                clientTimestamp = record["clientTimestamp"]?.jsonPrimitive?.contentOrNull.orEmpty(),
+                sessionId = record["sessionId"]?.jsonPrimitive?.contentOrNull.orEmpty(),
                 payload = record["payload"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null
             )
             when (record["status"]?.jsonPrimitive?.contentOrNull) {
