@@ -245,8 +245,8 @@ Rejected
 
 ### 9.2. Частично или не реализовано
 
-- Выбор resolved mDNS-площадки строит endpoint из адреса/порта и вызывает shared HTTP metadata client; compatible metadata переводит lifecycle в `MetadataValidated`, а недоступность metadata даёт typed rejection. TLS/manual fallback, pairing и WebSocket pending;
-- server pairing, protocol version и текущий bout не получаются;
+- Выбор resolved mDNS-площадки строит endpoint из адреса/порта и вызывает shared HTTP metadata client; compatible metadata переводит lifecycle в `MetadataValidated`, а недоступность metadata даёт typed rejection. Shared pairing client отправляет `POST /v1/pairing-requests` и переводит только validated server в `PairingPending`; UI вызов, стабильная device identity, operator approval и TLS/manual fallback pending;
+- server pairing approval, protocol version и текущий bout не получаются;
 - кнопки Kerugi/Tanbon имеют пустые `onclick`;
 - `Save` и `Send` имеют пустые `onclick` и сейчас обе выключены offline;
 - durable outbox, ACK, retry, heartbeat и resync отсутствуют;

@@ -153,6 +153,35 @@ class ConnectionStateStoreTest {
     }
 
     @Test
+    fun pairingFailureRejectsOnlyMetadataValidatedServer() {
+        val store = ConnectionStateStore()
+
+        store.dispatch(ConnectionEvent.StartDiscovery)
+        store.dispatch(ConnectionEvent.SelectServer("court-1"))
+        store.dispatch(
+            ConnectionEvent.ValidateMetadata(
+                ServerMetadata(
+                    protocolMajor = 1,
+                    protocolMinor = 0,
+                    capabilities = emptySet(),
+                    peerId = "peer-1",
+                    courtId = "court-1",
+                    serverName = "Court 1",
+                    pairingPolicy = "operatorApproval",
+                    serverTimeMillis = 1_000
+                )
+            )
+        )
+        store.dispatch(ConnectionEvent.RejectPairing(ConnectionFailure.PairingResponseInvalid))
+
+        assertEquals(
+            ConnectionState.Rejected("court-1", ConnectionFailure.PairingResponseInvalid),
+            store.state
+        )
+        assertFalse(store.isPaired)
+    }
+
+    @Test
     fun invalidTransitionsLeaveConnectionStateUnchanged() {
         val store = ConnectionStateStore()
 
