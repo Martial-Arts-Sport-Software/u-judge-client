@@ -13,7 +13,7 @@
 
 ## Текущее состояние
 
-UI всех шести дисциплин и локальные модели технической оценки уже существуют. mDNS находит `_u-judge._tcp.local.`; повторный поиск отменяет предыдущий scan, а removed services исчезают из списка. Shared HTTP metadata/pairing, WebSocket handshake с authenticated four-timestamp clock sync и typed command/terminal ACK outbox реализованы без UI wiring. Secure reconnect credential storage, lifecycle, heartbeat, reconnect/resync и отправка оценок ещё не реализованы. Боевые кнопки и `Save`/`Send` пока содержат пустые обработчики.
+UI всех шести дисциплин и локальные модели технической оценки уже существуют. mDNS находит `_u-judge._tcp.local.`; повторный поиск отменяет предыдущий scan, а removed services исчезают из списка. Shared HTTP metadata/pairing, WebSocket handshake с authenticated four-timestamp clock sync и typed command/terminal ACK outbox реализованы без UI wiring. Reconnect credential хранится в Android Keystore-backed storage и iOS Keychain; lifecycle, heartbeat, reconnect/resync и отправка оценок ещё не реализованы. Боевые кнопки и `Save`/`Send` пока содержат пустые обработчики.
 
 Подробное разделение текущего и целевого состояния находится в [описании проекта](docs/PROJECT.md).
 
