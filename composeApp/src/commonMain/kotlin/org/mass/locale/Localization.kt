@@ -34,6 +34,8 @@ object Localization {
             "connection_manual_port" to "Port",
             "connection_manual_connect_btn" to "Connect by address",
             "connection_error_manual_endpoint" to "Enter a valid host/IP address and port from 1 to 65535",
+            "connection_error_clock_sync_rejected" to "The server rejected clock synchronization",
+            "connection_error_clock_sync_response_invalid" to "The server returned an invalid clock synchronization response",
 
             "discipline_title" to "Choose discipline",
             "discipline_kerugi" to "Kerugi",
@@ -139,6 +141,8 @@ object Localization {
             "connection_manual_port" to "Порт",
             "connection_manual_connect_btn" to "Подключиться по адресу",
             "connection_error_manual_endpoint" to "Введите корректный хост/IP-адрес и порт от 1 до 65535",
+            "connection_error_clock_sync_rejected" to "Сервер отклонил синхронизацию времени",
+            "connection_error_clock_sync_response_invalid" to "Сервер вернул некорректный ответ синхронизации времени",
 
             "discipline_title" to "Выберите дисциплину",
             "discipline_kerugi" to "Весовые категории",
