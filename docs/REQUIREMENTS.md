@@ -31,7 +31,7 @@
 | CLI-002 | Must      | Partial | Судья вводит фамилию до выбора режима                     | Пустое/пробельное значение не позволяет продолжить                                 |
 | CLI-003 | Must      | Partial | Клиент поддерживает online и offline                      | Выбранный режим явно виден и не меняется из-за навигации                           |
 | CLI-004 | Must      | Partial | Offline разрешает только технические дисциплины           | Kerugi/Tanbon заблокированы с объяснением причины                                  |
-| CLI-005 | Must      | Partial | Shared realtime handshake переводит pairing-pending state в connected только после typed server acceptance; credential storage and UI wiring pending | Простого выбора mDNS service недостаточно для connected state                      |
+| CLI-005 | Must      | Partial | Shared realtime handshake переводит pairing-pending state в connected только после typed server acceptance и authenticated clock sync; credential storage and UI wiring pending | Простого выбора mDNS service недостаточно для connected state                      |
 | CLI-006 | Should    | Planned | Post-v1 интерфейс переключается между RU/EN               | Все строки текущего flow локализованы; v1 Pilot требует русский интерфейс          |
 | CLI-007 | Should    | Planned | Фамилия, язык и локальные черновики переживают перезапуск | После restart значения восстановлены из локального persistence                     |
 
@@ -108,7 +108,7 @@
 | CLI-065 | Must      | Partial | Shared command ACK removes only its matching durable event; transport reorder test pending | Поздний ACK не удаляет более новое pending event                       |
 | CLI-066 | Must      | Partial | Terminal command rejection is persisted and excluded from retry; UI feedback pending | Outbox отмечает final rejection и показывает действие пользователю     |
 | CLI-067 | Must      | Planned | Logout/смена server не удаляет pending events молча        | Требуется успешная доставка или явное подтверждённое discard с аудитом |
-| CLI-068 | Must      | Partial | Shared `ClockSyncClient` выполняет один typed four-timestamp exchange через authenticated realtime socket; handshake/reconnect wiring pending | Four-timestamp exchange оценивает offset/round-trip; combat timestamp не полагается только на device wall clock |
+| CLI-068 | Must      | Partial | Shared `ClockSyncClient` выполняет один typed four-timestamp exchange через authenticated realtime socket во время initial handshake; reconnect wiring pending | Four-timestamp exchange оценивает offset/round-trip; combat timestamp не полагается только на device wall clock |
 
 ## 8. Состояние и навигация
 

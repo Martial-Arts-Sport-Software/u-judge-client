@@ -16,6 +16,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
+import kotlin.time.Clock
 
 interface RealtimeSocket {
     suspend fun send(payload: String)
@@ -43,6 +44,8 @@ data class RealtimeHandshakeRequest(
 sealed interface RealtimeHandshakeResult {
     data class Accepted(val socket: RealtimeSocket) : RealtimeHandshakeResult
     data class Rejected(val code: String) : RealtimeHandshakeResult
+    data class ClockSyncRejected(val code: String) : RealtimeHandshakeResult
+    data object ClockSyncInvalidResponse : RealtimeHandshakeResult
     data object InvalidResponse : RealtimeHandshakeResult
     data object Unavailable : RealtimeHandshakeResult
 }
@@ -51,34 +54,76 @@ sealed interface RealtimeHandshakeResult {
 class RealtimeClient(
     private val endpoint: Url,
     private val socketOpener: RealtimeSocketOpener,
-    private val protocolVersion: String = "1.0"
+    private val protocolVersion: String = "1.0",
+    private val clockSyncClient: ClockSyncClient = ClockSyncClient {
+        Clock.System.now().toEpochMilliseconds()
+    }
 ) {
     suspend fun connect(
         request: RealtimeHandshakeRequest,
         store: ConnectionStateStore
-    ): RealtimeHandshakeResult = try {
-        val socket = socketOpener.open(endpoint.realtimeUrl())
-        socket.send(request.toJson())
-        when (val response = decodeResponse(socket.receive())) {
-            HandshakeResponse.Accepted -> {
-                store.dispatch(ConnectionEvent.AcceptPairing(request.deviceId))
-                RealtimeHandshakeResult.Accepted(socket)
+    ): RealtimeHandshakeResult {
+        var socket: RealtimeSocket? = null
+        return try {
+            val openedSocket = socketOpener.open(endpoint.realtimeUrl())
+            socket = openedSocket
+            openedSocket.send(request.toJson())
+            when (val response = decodeResponse(openedSocket.receive())) {
+                HandshakeResponse.Accepted -> {
+                    when (val clockSyncResult = clockSyncClient.synchronize(openedSocket)) {
+                        is ClockSyncResult.Synchronized -> {
+                            store.dispatch(
+                                ConnectionEvent.AcceptPairing(
+                                    deviceId = request.deviceId,
+                                    clockOffsetMillis = clockSyncResult.offsetMillis
+                                )
+                            )
+                            RealtimeHandshakeResult.Accepted(openedSocket)
+                        }
+                        is ClockSyncResult.Rejected -> {
+                            openedSocket.close()
+                            store.dispatch(
+                                ConnectionEvent.RejectRealtime(
+                                    ConnectionFailure.ClockSyncRejected(clockSyncResult.code)
+                                )
+                            )
+                            RealtimeHandshakeResult.ClockSyncRejected(clockSyncResult.code)
+                        }
+                        ClockSyncResult.InvalidResponse -> {
+                            openedSocket.close()
+                            store.dispatch(ConnectionEvent.RejectRealtime(ConnectionFailure.ClockSyncResponseInvalid))
+                            RealtimeHandshakeResult.ClockSyncInvalidResponse
+                        }
+                    }
+                }
+                is HandshakeResponse.Rejected -> {
+                    openedSocket.close()
+                    store.dispatch(ConnectionEvent.RejectRealtime(ConnectionFailure.RealtimeHandshakeRejected(response.code)))
+                    RealtimeHandshakeResult.Rejected(response.code)
+                }
+                HandshakeResponse.Invalid -> {
+                    openedSocket.close()
+                    store.dispatch(ConnectionEvent.RejectRealtime(ConnectionFailure.RealtimeResponseInvalid))
+                    RealtimeHandshakeResult.InvalidResponse
+                }
             }
-            is HandshakeResponse.Rejected -> {
-                socket.close()
-                store.dispatch(ConnectionEvent.RejectRealtime(ConnectionFailure.RealtimeHandshakeRejected(response.code)))
-                RealtimeHandshakeResult.Rejected(response.code)
+        } catch (exception: Exception) {
+            if (exception is CancellationException) {
+                try {
+                    socket?.close()
+                } catch (_: Exception) {
+                    // Cancellation must not be replaced by a close failure.
+                }
+                throw exception
             }
-            HandshakeResponse.Invalid -> {
-                socket.close()
-                store.dispatch(ConnectionEvent.RejectRealtime(ConnectionFailure.RealtimeResponseInvalid))
-                RealtimeHandshakeResult.InvalidResponse
+            try {
+                socket?.close()
+            } catch (_: Exception) {
+                // The original transport failure is more useful than a close failure.
             }
+            store.dispatch(ConnectionEvent.RejectRealtime(ConnectionFailure.RealtimeUnavailable))
+            RealtimeHandshakeResult.Unavailable
         }
-    } catch (exception: Exception) {
-        if (exception is CancellationException) throw exception
-        store.dispatch(ConnectionEvent.RejectRealtime(ConnectionFailure.RealtimeUnavailable))
-        RealtimeHandshakeResult.Unavailable
     }
 
     private fun RealtimeHandshakeRequest.toJson(): String = buildJsonObject {

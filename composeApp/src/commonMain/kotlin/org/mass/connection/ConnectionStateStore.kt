@@ -14,7 +14,10 @@ sealed interface ConnectionState {
         val metadata: ServerMetadata
     ) : ConnectionState
     data class PairingPending(val serverKey: String) : ConnectionState
-    data class ConnectedIdle(val deviceId: String) : ConnectionState
+    data class ConnectedIdle(
+        val deviceId: String,
+        val clockOffsetMillis: Long = 0
+    ) : ConnectionState
     data class Rejected(
         val serverKey: String,
         val failure: ConnectionFailure
@@ -73,6 +76,14 @@ sealed interface ConnectionFailure {
     data object RealtimeUnavailable : ConnectionFailure {
         override val localizationKey = "connection_error_realtime_unavailable"
     }
+
+    data class ClockSyncRejected(val code: String) : ConnectionFailure {
+        override val localizationKey = "connection_error_clock_sync_rejected"
+    }
+
+    data object ClockSyncResponseInvalid : ConnectionFailure {
+        override val localizationKey = "connection_error_clock_sync_response_invalid"
+    }
 }
 
 sealed interface ConnectionEvent {
@@ -84,7 +95,10 @@ sealed interface ConnectionEvent {
     data object RequestPairing : ConnectionEvent
     data class RejectPairing(val failure: ConnectionFailure) : ConnectionEvent
     data class RejectRealtime(val failure: ConnectionFailure) : ConnectionEvent
-    data class AcceptPairing(val deviceId: String) : ConnectionEvent
+    data class AcceptPairing(
+        val deviceId: String,
+        val clockOffsetMillis: Long = 0
+    ) : ConnectionEvent
 }
 
 class ConnectionStateStore(
@@ -126,7 +140,10 @@ class ConnectionStateStore(
                 else -> state
             }
             is ConnectionEvent.AcceptPairing -> when (state) {
-                is ConnectionState.PairingPending -> ConnectionState.ConnectedIdle(event.deviceId)
+                is ConnectionState.PairingPending -> ConnectionState.ConnectedIdle(
+                    deviceId = event.deviceId,
+                    clockOffsetMillis = event.clockOffsetMillis
+                )
                 else -> state
             }
         }

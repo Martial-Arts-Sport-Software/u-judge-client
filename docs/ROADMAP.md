@@ -61,8 +61,8 @@ Shared/Android/iOS targets собираются в CI, формулы текущ
 - [x] Показывать понятные имя площадки, адрес и статус (`CLI-013`; resolved и resolving состояния покрыты shared unit tests).
 - [ ] Реализовать HTTP metadata/handshake, protocol version/capability check и manual host/IP fallback (resolved mDNS и manual host/IP вызывают shared HTTP client, validation domain model и pairing flow; TLS trust UX pending).
 - [ ] Реализовать WebSocket connect, heartbeat и typed envelope (shared Ktor handshake, typed command envelope и terminal ACK/rejection outbox handling готовы; credential storage, lifecycle wiring, heartbeat and reconnect pending).
-- [ ] Получать pairing pending/accepted/rejected (shared HTTP reader декодирует typed status projection; UI polling/push and reconnect credential delivery pending).
-- [ ] Согласовать clock offset (shared `ClockSyncClient` оценивает offset/round-trip по одному typed exchange и отклоняет invalid/rejected responses; handshake/reconnect wiring pending).
+- [ ] Получать pairing pending/accepted/rejected (UI показывает pending и локальные ошибки после shared HTTP request; operator accepted/rejected realtime status pending).
+- [ ] Согласовать clock offset (authenticated realtime handshake выполняет shared typed four-timestamp exchange, сохраняет offset/round-trip и отклоняет invalid/rejected responses; reconnect wiring pending).
 - [ ] Отправить событие, получить ACK, разорвать сеть и повторить тот же ID (shared command/ACK contract сохраняет stable ID and terminal outcome; disconnect/reconnect proof pending).
 - [ ] Проверить iOS Local Network permission и mDNS на TestFlight-like build.
 
