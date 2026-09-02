@@ -250,7 +250,7 @@ Rejected
 - server pairing approval, protocol version и текущий bout не получаются;
 - кнопки Kerugi/Tanbon имеют пустые `onclick`;
 - `Save` и `Send` имеют пустые `onclick` и сейчас обе выключены offline;
-- typed combat/rating events ещё не wired в durable outbox; WebSocket ACK, transport retry, heartbeat и resync отсутствуют;
+- typed combat/rating events ещё не wired in UI to the durable outbox; shared WebSocket command ACK/rejection handling exists, while transport retry lifecycle, heartbeat and resync remain pending;
 - глобальный singleton `State` всё ещё хранит navigation/UI/domain state; connection lifecycle выделен в отдельную state machine;
 - v1 minimum iOS version is 18; iOS 18 and iOS 26 require physical-device smoke coverage.
 - Android 5.1/TZ55 compatibility is deferred to a separate lightweight client track after v1.
