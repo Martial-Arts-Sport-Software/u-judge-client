@@ -4,7 +4,7 @@
 
 ## Ограничения
 
-- mDNS discovery доступен: повторный поиск отменяет предыдущий scan, а удалённые сервисы исчезают из списка. Для fallback после поиска доступен manual host/IP: endpoint проходит HTTP metadata, protocol/capability validation и pairing request, но не получает online state без pairing acceptance и authenticated clock sync. TLS trust UX, secure credential storage и realtime lifecycle ещё не реализованы.
+- mDNS discovery доступен: повторный поиск отменяет предыдущий scan, а удалённые сервисы исчезают из списка. Для fallback после поиска доступен manual host/IP: endpoint проходит HTTP metadata, protocol/capability validation и pairing request, но не получает online state без pairing acceptance и authenticated clock sync. Reconnect credential хранится в Android Keystore-backed storage и iOS Keychain; TLS trust UX и realtime lifecycle ещё не реализованы.
 - Kerugi и Tanbon не отправляют официальные события: кнопки пока не имеют обработчиков.
 - `Save` и `Send` технических оценок пока не реализованы.
 - Shared durable outbox and terminal WebSocket command ACK/rejection handling готовы; UI event wiring, retry lifecycle, reconnect and session resync ещё не реализованы.
