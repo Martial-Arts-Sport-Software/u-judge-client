@@ -18,6 +18,11 @@ sealed interface ConnectionState {
         val deviceId: String,
         val clockOffsetMillis: Long = 0
     ) : ConnectionState
+    data class Reconnecting(
+        val deviceId: String,
+        val clockOffsetMillis: Long,
+        val failure: ConnectionFailure
+    ) : ConnectionState
     data class Rejected(
         val serverKey: String,
         val failure: ConnectionFailure
@@ -96,6 +101,18 @@ sealed interface ConnectionFailure {
     data object ClockSyncResponseInvalid : ConnectionFailure {
         override val localizationKey = "connection_error_clock_sync_response_invalid"
     }
+
+    data class HeartbeatRejected(val code: String) : ConnectionFailure {
+        override val localizationKey = "connection_error_heartbeat_rejected"
+    }
+
+    data object HeartbeatResponseInvalid : ConnectionFailure {
+        override val localizationKey = "connection_error_heartbeat_response_invalid"
+    }
+
+    data object HeartbeatUnavailable : ConnectionFailure {
+        override val localizationKey = "connection_error_heartbeat_unavailable"
+    }
 }
 
 sealed interface ConnectionEvent {
@@ -107,6 +124,7 @@ sealed interface ConnectionEvent {
     data object RequestPairing : ConnectionEvent
     data class RejectPairing(val failure: ConnectionFailure) : ConnectionEvent
     data class RejectRealtime(val failure: ConnectionFailure) : ConnectionEvent
+    data class HeartbeatFailed(val failure: ConnectionFailure) : ConnectionEvent
     data class AcceptPairing(
         val deviceId: String,
         val clockOffsetMillis: Long = 0
@@ -149,6 +167,14 @@ class ConnectionStateStore(
             }
             is ConnectionEvent.RejectRealtime -> when (val currentState = state) {
                 is ConnectionState.PairingPending -> ConnectionState.Rejected(currentState.serverKey, event.failure)
+                else -> state
+            }
+            is ConnectionEvent.HeartbeatFailed -> when (val currentState = state) {
+                is ConnectionState.ConnectedIdle -> ConnectionState.Reconnecting(
+                    deviceId = currentState.deviceId,
+                    clockOffsetMillis = currentState.clockOffsetMillis,
+                    failure = event.failure
+                )
                 else -> state
             }
             is ConnectionEvent.AcceptPairing -> when (state) {

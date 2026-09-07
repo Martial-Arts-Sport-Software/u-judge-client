@@ -40,6 +40,9 @@ object Localization {
             "connection_error_manual_endpoint" to "Enter a valid host/IP address and port from 1 to 65535",
             "connection_error_clock_sync_rejected" to "The server rejected clock synchronization",
             "connection_error_clock_sync_response_invalid" to "The server returned an invalid clock synchronization response",
+            "connection_error_heartbeat_rejected" to "The server rejected the connection heartbeat",
+            "connection_error_heartbeat_response_invalid" to "The server returned an invalid heartbeat response",
+            "connection_error_heartbeat_unavailable" to "The server did not acknowledge the connection heartbeat",
 
             "discipline_title" to "Choose discipline",
             "discipline_kerugi" to "Kerugi",
@@ -157,6 +160,9 @@ object Localization {
             "connection_error_manual_endpoint" to "Введите корректный хост/IP-адрес и порт от 1 до 65535",
             "connection_error_clock_sync_rejected" to "Сервер отклонил синхронизацию времени",
             "connection_error_clock_sync_response_invalid" to "Сервер вернул некорректный ответ синхронизации времени",
+            "connection_error_heartbeat_rejected" to "Сервер отклонил проверку соединения",
+            "connection_error_heartbeat_response_invalid" to "Сервер вернул некорректный ответ проверки соединения",
+            "connection_error_heartbeat_unavailable" to "Сервер не подтвердил проверку соединения",
 
             "discipline_title" to "Выберите дисциплину",
             "discipline_kerugi" to "Весовые категории",
