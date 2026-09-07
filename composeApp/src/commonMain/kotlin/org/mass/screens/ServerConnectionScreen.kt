@@ -40,6 +40,7 @@ import org.mass.State.selectManualServer
 import org.mass.State.selectServer
 import org.mass.getPlatformName
 import org.mass.connection.ConnectionState
+import org.mass.connection.ConnectionStatusPresentation
 import org.mass.connection.PairingClient
 import org.mass.connection.PairingFlow
 import org.mass.connection.PairingRequest
@@ -49,6 +50,7 @@ import org.mass.connection.PairingStatusFlow
 import org.mass.connection.PairingStatusPolling
 import org.mass.connection.PairingStatusResult
 import org.mass.connection.createHttpClient
+import org.mass.connection.connectionStatusPresentation
 import org.mass.connection.metadataEndpoint
 import org.mass.connection.manualServerEndpoint
 import org.mass.connection.ManualServerEndpointResult
@@ -181,10 +183,16 @@ object ServerConnectionScreen : Screen {
             }
             connectionStatus(pairingStatus)?.let { status ->
                 Text(
-                    text = status,
+                    text = Localization.getString(status.statusKey),
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
+                status.reasonKey?.let { reasonKey ->
+                    Text(
+                        text = Localization.getString(reasonKey),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             }
             Box(
                 Modifier
@@ -261,12 +269,12 @@ object ServerConnectionScreen : Screen {
     }
 
     @Composable
-    private fun connectionStatus(pairingStatus: PairingStatusResult?): String? = when (pairingStatus) {
-        is PairingStatusResult.Accepted -> Localization.getString("connection_pairing_accepted")
+    private fun connectionStatus(pairingStatus: PairingStatusResult?): ConnectionStatusPresentation? = when (pairingStatus) {
+        is PairingStatusResult.Accepted -> ConnectionStatusPresentation("connection_pairing_accepted")
         else -> when (val state = connection.state) {
-        is ConnectionState.PairingPending -> Localization.getString("connection_pairing_pending")
-        is ConnectionState.Rejected -> Localization.getString(state.failure.localizationKey)
-        else -> null
+        is ConnectionState.PairingPending -> ConnectionStatusPresentation("connection_pairing_pending")
+        is ConnectionState.Rejected -> ConnectionStatusPresentation(state.failure.localizationKey)
+        else -> connectionStatusPresentation(state)
         }
     }
 
