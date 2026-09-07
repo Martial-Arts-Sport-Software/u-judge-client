@@ -19,7 +19,11 @@ class HeartbeatLifecycle(
     private var heartbeatJob: Job? = null
     private var activeSocket: RealtimeSocket? = null
 
-    suspend fun start(socket: RealtimeSocket, store: ConnectionStateStore) {
+    suspend fun start(
+        socket: RealtimeSocket,
+        store: ConnectionStateStore,
+        onFailure: suspend () -> Unit = {}
+    ) {
         if (store.state !is ConnectionState.ConnectedIdle) return
         stop()
         activeSocket = socket
@@ -28,22 +32,22 @@ class HeartbeatLifecycle(
                 val result = try {
                     withTimeout(heartbeatTimeoutMillis) { heartbeatClient.send(socket) }
                 } catch (_: TimeoutCancellationException) {
-                    end(socket, store, ConnectionFailure.HeartbeatUnavailable)
+                    end(socket, store, ConnectionFailure.HeartbeatUnavailable, onFailure)
                     return@launch
                 } catch (exception: CancellationException) {
                     throw exception
                 } catch (exception: Exception) {
-                    end(socket, store, ConnectionFailure.HeartbeatUnavailable)
+                    end(socket, store, ConnectionFailure.HeartbeatUnavailable, onFailure)
                     return@launch
                 }
                 when (result) {
                     HeartbeatResult.Acknowledged -> delay(heartbeatIntervalMillis)
                     is HeartbeatResult.Rejected -> {
-                        end(socket, store, ConnectionFailure.HeartbeatRejected(result.code))
+                        end(socket, store, ConnectionFailure.HeartbeatRejected(result.code), onFailure)
                         return@launch
                     }
                     HeartbeatResult.InvalidResponse -> {
-                        end(socket, store, ConnectionFailure.HeartbeatResponseInvalid)
+                        end(socket, store, ConnectionFailure.HeartbeatResponseInvalid, onFailure)
                         return@launch
                     }
                 }
@@ -62,13 +66,15 @@ class HeartbeatLifecycle(
     private suspend fun end(
         socket: RealtimeSocket,
         store: ConnectionStateStore,
-        failure: ConnectionFailure
+        failure: ConnectionFailure,
+        onFailure: suspend () -> Unit
     ) {
         store.dispatch(ConnectionEvent.HeartbeatFailed(failure))
         if (activeSocket === socket) {
             activeSocket = null
         }
         socket.close()
+        onFailure()
     }
 
     private companion object {

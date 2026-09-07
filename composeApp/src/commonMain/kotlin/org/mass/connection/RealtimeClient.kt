@@ -82,28 +82,24 @@ class RealtimeClient(
                         }
                         is ClockSyncResult.Rejected -> {
                             openedSocket.close()
-                            store.dispatch(
-                                ConnectionEvent.RejectRealtime(
-                                    ConnectionFailure.ClockSyncRejected(clockSyncResult.code)
-                                )
-                            )
+                            store.rejectRealtime(ConnectionFailure.ClockSyncRejected(clockSyncResult.code))
                             RealtimeHandshakeResult.ClockSyncRejected(clockSyncResult.code)
                         }
                         ClockSyncResult.InvalidResponse -> {
                             openedSocket.close()
-                            store.dispatch(ConnectionEvent.RejectRealtime(ConnectionFailure.ClockSyncResponseInvalid))
+                            store.rejectRealtime(ConnectionFailure.ClockSyncResponseInvalid)
                             RealtimeHandshakeResult.ClockSyncInvalidResponse
                         }
                     }
                 }
                 is HandshakeResponse.Rejected -> {
                     openedSocket.close()
-                    store.dispatch(ConnectionEvent.RejectRealtime(ConnectionFailure.RealtimeHandshakeRejected(response.code)))
+                    store.rejectRealtime(ConnectionFailure.RealtimeHandshakeRejected(response.code))
                     RealtimeHandshakeResult.Rejected(response.code)
                 }
                 HandshakeResponse.Invalid -> {
                     openedSocket.close()
-                    store.dispatch(ConnectionEvent.RejectRealtime(ConnectionFailure.RealtimeResponseInvalid))
+                    store.rejectRealtime(ConnectionFailure.RealtimeResponseInvalid)
                     RealtimeHandshakeResult.InvalidResponse
                 }
             }
@@ -121,9 +117,19 @@ class RealtimeClient(
             } catch (_: Exception) {
                 // The original transport failure is more useful than a close failure.
             }
-            store.dispatch(ConnectionEvent.RejectRealtime(ConnectionFailure.RealtimeUnavailable))
+            store.rejectRealtime(ConnectionFailure.RealtimeUnavailable)
             RealtimeHandshakeResult.Unavailable
         }
+    }
+
+    private fun ConnectionStateStore.rejectRealtime(failure: ConnectionFailure) {
+        dispatch(
+            if (state is ConnectionState.Reconnecting) {
+                ConnectionEvent.ReconnectFailed(failure)
+            } else {
+                ConnectionEvent.RejectRealtime(failure)
+            }
+        )
     }
 
     private fun RealtimeHandshakeRequest.toJson(): String = buildJsonObject {
