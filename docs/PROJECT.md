@@ -246,11 +246,11 @@ Rejected
 
 ### 9.2. Частично или не реализовано
 
-- Выбор resolved mDNS-площадки строит endpoint из адреса/порта, проверяет metadata и отправляет `POST /v1/pairing-requests` с device identity, нормализованной фамилией судьи и platform. Shared Ktor client выполняет versioned `/v1/realtime` handshake, принимает typed accepted/rejected response и authenticated clock sync до перехода в `ConnectedIdle`; reconnect credential storage использует Android Keystore-backed storage и iOS Keychain, а shared heartbeat lifecycle переводит connection в typed reconnecting state после timeout/rejection/invalid response. Экран подключения показывает локализованные reconnecting status и reason; authenticated UI lifecycle wiring, pairing-status push и TLS/manual fallback pending;
+- Выбор resolved mDNS-площадки строит endpoint из адреса/порта, проверяет metadata и отправляет `POST /v1/pairing-requests` с device identity, нормализованной фамилией судьи и platform. Shared Ktor client выполняет versioned `/v1/realtime` handshake, принимает typed accepted/rejected response и authenticated clock sync до перехода в `ConnectedIdle`; reconnect credential storage использует Android Keystore-backed storage и iOS Keychain, а shared reconnect lifecycle после heartbeat failure повторно выполняет authenticated handshake и clock sync. Экран подключения показывает локализованные reconnecting status и reason; credential issuance, initial authenticated UI lifecycle wiring, pairing-status push и TLS/manual fallback pending;
 - server pairing approval, protocol version и текущий bout не получаются;
 - кнопки Kerugi/Tanbon имеют пустые `onclick`;
 - `Save` и `Send` имеют пустые `onclick` и сейчас обе выключены offline;
-- typed combat/rating events ещё не wired in UI to the durable outbox; shared WebSocket command ACK/rejection handling and typed heartbeat lifecycle exist, while transport retry lifecycle, reconnect and resync remain pending;
+- typed combat/rating events ещё не wired in UI to the durable outbox; shared WebSocket command ACK/rejection handling, heartbeat и reconnect lifecycle exist, while transport retry lifecycle and resync remain pending;
 - глобальный singleton `State` всё ещё хранит navigation/UI/domain state; connection lifecycle выделен в отдельную state machine;
 - v1 minimum iOS version is 18; iOS 18 and iOS 26 require physical-device smoke coverage.
 - Android 5.1/TZ55 compatibility is deferred to a separate lightweight client track after v1.
