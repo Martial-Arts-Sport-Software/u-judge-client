@@ -60,7 +60,7 @@ Shared/Android/iOS targets собираются в CI, формулы текущ
 - [x] Управлять единственной mDNS discovery job и её lifecycle (`CLI-012`; shared rescan/cancellation tests).
 - [x] Показывать понятные имя площадки, адрес и статус (`CLI-013`; resolved и resolving состояния покрыты shared unit tests).
 - [ ] Реализовать HTTP metadata/handshake, protocol version/capability check и manual host/IP fallback (resolved mDNS и manual host/IP вызывают shared HTTP client, validation domain model и pairing flow; TLS trust UX pending).
-- [ ] Реализовать WebSocket connect, heartbeat и typed envelope (shared Ktor handshake, credential storage, typed command envelope, terminal ACK/rejection outbox handling и typed heartbeat exchange готовы; lifecycle wiring, heartbeat scheduling and reconnect pending).
+- [ ] Реализовать WebSocket connect, heartbeat и typed envelope (shared Ktor handshake, credential storage, typed command envelope, terminal ACK/rejection outbox handling и typed heartbeat lifecycle готовы; UI lifecycle wiring, reconnect и resync pending).
 - [x] Получать pairing pending/accepted/rejected через public HTTP status polling с локальным UI без online access (`CLI-016`; shared contract tests). Realtime status wiring and reconnect remain pending.
 - [ ] Согласовать clock offset (authenticated realtime handshake выполняет shared typed four-timestamp exchange, сохраняет offset/round-trip и отклоняет invalid/rejected responses; reconnect wiring pending).
 - [ ] Отправить событие, получить ACK, разорвать сеть и повторить тот же ID (shared command/ACK contract сохраняет stable ID and terminal outcome; disconnect/reconnect proof pending).
