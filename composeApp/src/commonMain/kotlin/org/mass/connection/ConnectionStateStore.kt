@@ -124,6 +124,7 @@ sealed interface ConnectionEvent {
     data object RequestPairing : ConnectionEvent
     data class RejectPairing(val failure: ConnectionFailure) : ConnectionEvent
     data class RejectRealtime(val failure: ConnectionFailure) : ConnectionEvent
+    data class ReconnectFailed(val failure: ConnectionFailure) : ConnectionEvent
     data class HeartbeatFailed(val failure: ConnectionFailure) : ConnectionEvent
     data class AcceptPairing(
         val deviceId: String,
@@ -169,6 +170,10 @@ class ConnectionStateStore(
                 is ConnectionState.PairingPending -> ConnectionState.Rejected(currentState.serverKey, event.failure)
                 else -> state
             }
+            is ConnectionEvent.ReconnectFailed -> when (val currentState = state) {
+                is ConnectionState.Reconnecting -> currentState.copy(failure = event.failure)
+                else -> state
+            }
             is ConnectionEvent.HeartbeatFailed -> when (val currentState = state) {
                 is ConnectionState.ConnectedIdle -> ConnectionState.Reconnecting(
                     deviceId = currentState.deviceId,
@@ -179,6 +184,10 @@ class ConnectionStateStore(
             }
             is ConnectionEvent.AcceptPairing -> when (state) {
                 is ConnectionState.PairingPending -> ConnectionState.ConnectedIdle(
+                    deviceId = event.deviceId,
+                    clockOffsetMillis = event.clockOffsetMillis
+                )
+                is ConnectionState.Reconnecting -> ConnectionState.ConnectedIdle(
                     deviceId = event.deviceId,
                     clockOffsetMillis = event.clockOffsetMillis
                 )
