@@ -103,7 +103,7 @@
 | CLI-060 | Must      | Partial | Shared JSON journal сохраняется в Android SharedPreferences/iOS NSUserDefaults; event wiring and app-kill integration proof pending | Process death не очищает неподтверждённые events                       |
 | CLI-061 | Must      | Partial | Realtime command retry reuses the durable event ID; reconnect/server integration evidence pending | Server применяет событие не более одного раза                          |
 | CLI-062 | Must      | Partial | Shared outbox uses ordered bounded exponential backoff; command-boundary drop/reorder fault-injection tests ready, transport integration pending | Client не создаёт request storm при недоступном server                 |
-| CLI-063 | Must      | Partial | Shared typed heartbeat lifecycle schedules exchange only from `ConnectedIdle`, closes the socket and enters typed reconnecting state after timeout/rejection/invalid response; UI lifecycle wiring and reconnect remain pending | UI переходит в reconnecting в ограниченное protocol timeout время      |
+| CLI-063 | Must      | Partial | Shared typed heartbeat lifecycle schedules exchange only from `ConnectedIdle`, closes the socket and enters typed reconnecting state after timeout/rejection/invalid response; connection UI renders localized reconnecting status and typed reason, while authenticated lifecycle wiring and reconnect remain pending | UI переходит в reconnecting в ограниченное protocol timeout время      |
 | CLI-064 | Must      | Planned | После reconnect client отправляет cursor и получает resync | Session state сходится до разрешения новых действий                    |
 | CLI-065 | Must      | Partial | Shared command ACK removes only its matching durable event; command-boundary reorder test ready, transport runtime integration pending | Поздний ACK не удаляет более новое pending event                       |
 | CLI-066 | Must      | Partial | Terminal command rejection is persisted and excluded from retry; UI feedback pending | Outbox отмечает final rejection и показывает действие пользователю     |
@@ -117,7 +117,7 @@
 | CLI-070 | Must      | Implemented | Connection представлено state machine, а не boolean                  | Невозможны одновременно offline/connected или paired/no-server состояния |
 | CLI-071 | Must      | Planned | Session state отделено от navigation state                              | Возврат назад не завершает серверную сессию неявно                       |
 | CLI-072 | Must      | Planned | Rating draft имеет ID дисциплины, категории и сессии                    | Черновик другой сессии не отправляется случайно                          |
-| CLI-073 | Must      | Partial | Metadata validation, pairing request и realtime handshake имеют типизированные локализуемые errors; UI transport feedback and remaining protocol errors pending | UI различает discovery, pairing, transport, validation и protocol errors |
+| CLI-073 | Must      | Partial | Metadata validation, pairing request и realtime handshake имеют типизированные локализуемые errors; connection UI also renders typed heartbeat reconnect reasons, while remaining transport feedback and protocol errors remain pending | UI различает discovery, pairing, transport, validation и protocol errors |
 | CLI-074 | Must      | Planned | Loading/action jobs отменяются по lifecycle                             | Уход с экрана не оставляет лишние scans или sends                        |
 | CLI-075 | Must      | Planned | Значимый state восстанавливается после configuration/process recreation | Android recreation и iOS lifecycle не сбрасывают active flow             |
 
@@ -129,7 +129,7 @@
 | CLI-081 | Must      | Partial | Информационный popup открывает правила текущей дисциплины/языка | Ресурс существует и соответствует выбранной дисциплине                               |
 | CLI-082 | Could     | Planned | Английские PDF действительно англоязычные                       | Post-v1 контент проверен владельцем продукта и не является копией RU                 |
 | CLI-083 | Must      | Planned | Combat controls имеют semantic labels                           | Accessibility tree сообщает participant и event type                                 |
-| CLI-084 | Must      | Planned | Статус не кодируется только цветом                              | Pending/accepted/rejected имеют текст/иконку/форму                                   |
+| CLI-084 | Must      | Partial | Pending/accepted/rejected и reconnecting connection status имеют текстовые localized labels; non-color treatment for remaining status surfaces pending | Pending/accepted/rejected имеют текст/иконку/форму                                   |
 | CLI-085 | Must      | Planned | Все критические элементы доступны при pilot screen sizes        | Physical-device smoke test не обнаруживает clipping/недоступных кнопок               |
 | CLI-086 | Should    | Planned | Dynamic font не скрывает критические действия                   | Поддерживаемый accessibility scale проходит layout test                              |
 
