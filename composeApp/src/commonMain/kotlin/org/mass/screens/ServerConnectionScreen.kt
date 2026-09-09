@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,6 +30,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.appstractive.dnssd.key
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.mass.State
 import org.mass.discovery.DiscoveryStatus
@@ -39,8 +42,12 @@ import org.mass.State.selectedServer
 import org.mass.State.selectManualServer
 import org.mass.State.selectServer
 import org.mass.getPlatformName
+import org.mass.getContext
 import org.mass.connection.ConnectionState
 import org.mass.connection.ConnectionStatusPresentation
+import org.mass.connection.HeartbeatLifecycle
+import org.mass.connection.InitialRealtimeLifecycle
+import org.mass.connection.KtorRealtimeSocketOpener
 import org.mass.connection.PairingClient
 import org.mass.connection.PairingFlow
 import org.mass.connection.PairingRequest
@@ -49,6 +56,10 @@ import org.mass.connection.PairingStatusClient
 import org.mass.connection.PairingStatusFlow
 import org.mass.connection.PairingStatusPolling
 import org.mass.connection.PairingStatusResult
+import org.mass.connection.RealtimeClient
+import org.mass.connection.RealtimeReconnectLifecycle
+import org.mass.connection.ReconnectCredentialRepository
+import org.mass.connection.createReconnectCredentialStorage
 import org.mass.connection.createHttpClient
 import org.mass.connection.connectionStatusPresentation
 import org.mass.connection.metadataEndpoint
@@ -75,6 +86,7 @@ object ServerConnectionScreen : Screen {
         } }
 
         val coroutineScope = rememberCoroutineScope()
+        val context = getContext()
 
         Column(
             modifier = Modifier
@@ -110,6 +122,15 @@ object ServerConnectionScreen : Screen {
             var manualEndpointError by remember { mutableStateOf(false) }
             var pairingStatus by remember { mutableStateOf<PairingStatusResult?>(null) }
             var pairingJob by remember { mutableStateOf<Job?>(null) }
+            var realtimeLifecycle by remember { mutableStateOf<InitialRealtimeLifecycle?>(null) }
+
+            LaunchedEffect(Unit) {
+                try {
+                    awaitCancellation()
+                } finally {
+                    realtimeLifecycle?.stop()
+                }
+            }
 
             DisposableEffect(Unit) {
                 onDispose {
@@ -155,6 +176,8 @@ object ServerConnectionScreen : Screen {
                             pairingJob?.cancel()
                             pairingStatus = null
                             pairingJob = coroutineScope.launch {
+                                realtimeLifecycle?.stop()
+                                realtimeLifecycle = null
                                 createHttpClient().use { httpClient ->
                                     val pairingResult = PairingFlow(
                                         ServerMetadataClient(httpClient, result.endpoint),
@@ -168,6 +191,12 @@ object ServerConnectionScreen : Screen {
                                         connection
                                     )
                                     pairingStatus = pairingResult.pollStatus(httpClient, result.endpoint)
+                                    startRealtimeAfterPairingAcceptance(
+                                        pairingStatus,
+                                        result.endpoint,
+                                        coroutineScope,
+                                        context
+                                    ) { lifecycle -> realtimeLifecycle = lifecycle }
                                 }
                             }
                         }
@@ -229,6 +258,8 @@ object ServerConnectionScreen : Screen {
                                     pairingJob?.cancel()
                                     pairingStatus = null
                                     pairingJob = coroutineScope.launch {
+                                        realtimeLifecycle?.stop()
+                                        realtimeLifecycle = null
                                         val address = service.addresses.firstOrNull()
                                         if (address != null) {
                                             createHttpClient().use { httpClient ->
@@ -245,6 +276,12 @@ object ServerConnectionScreen : Screen {
                                                     connection
                                                 )
                                                 pairingStatus = pairingResult.pollStatus(httpClient, endpoint)
+                                                startRealtimeAfterPairingAcceptance(
+                                                    pairingStatus,
+                                                    endpoint,
+                                                    coroutineScope,
+                                                    context
+                                                ) { lifecycle -> realtimeLifecycle = lifecycle }
                                             }
                                         }
                                     }
@@ -268,13 +305,45 @@ object ServerConnectionScreen : Screen {
         else -> null
     }
 
+    private suspend fun startRealtimeAfterPairingAcceptance(
+        pairingStatus: PairingStatusResult?,
+        endpoint: io.ktor.http.Url,
+        scope: CoroutineScope,
+        context: Any?,
+        setLifecycle: (InitialRealtimeLifecycle) -> Unit
+    ) {
+        val accepted = pairingStatus as? PairingStatusResult.Accepted ?: return
+        val credentialRepository = ReconnectCredentialRepository(
+            createReconnectCredentialStorage(context)
+        )
+        val realtimeHttpClient = createHttpClient()
+        val realtimeClient = RealtimeClient(
+            endpoint = endpoint,
+            socketOpener = KtorRealtimeSocketOpener(realtimeHttpClient)
+        )
+        val lifecycle = InitialRealtimeLifecycle(
+            reconnectCredentialRepository = credentialRepository,
+            realtimeClient = realtimeClient,
+            reconnectLifecycle = RealtimeReconnectLifecycle(
+                reconnectCredentialRepository = credentialRepository,
+                realtimeClient = realtimeClient,
+                heartbeatLifecycle = HeartbeatLifecycle(scope)
+            ),
+            closeTransport = realtimeHttpClient::close
+        )
+        setLifecycle(lifecycle)
+        lifecycle.start(accepted.deviceId, connection)
+    }
+
     @Composable
-    private fun connectionStatus(pairingStatus: PairingStatusResult?): ConnectionStatusPresentation? = when (pairingStatus) {
-        is PairingStatusResult.Accepted -> ConnectionStatusPresentation("connection_pairing_accepted")
-        else -> when (val state = connection.state) {
-        is ConnectionState.PairingPending -> ConnectionStatusPresentation("connection_pairing_pending")
+    private fun connectionStatus(pairingStatus: PairingStatusResult?): ConnectionStatusPresentation? = when (val state = connection.state) {
         is ConnectionState.Rejected -> ConnectionStatusPresentation(state.failure.localizationKey)
-        else -> connectionStatusPresentation(state)
+        else -> when (pairingStatus) {
+            is PairingStatusResult.Accepted -> ConnectionStatusPresentation("connection_pairing_accepted")
+            else -> when (state) {
+                is ConnectionState.PairingPending -> ConnectionStatusPresentation("connection_pairing_pending")
+                else -> connectionStatusPresentation(state)
+            }
         }
     }
 
