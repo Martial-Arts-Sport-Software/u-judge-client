@@ -97,6 +97,54 @@ class InitialRealtimeLifecycleTest {
         assertTrue(transportClosed)
     }
 
+    @Test
+    fun replaysDurableCommandsBeforeStartingHeartbeat() = runTest {
+        val socket = RespondingSocket(
+            """{"type":"handshake_accepted"}""",
+            """{"type":"clock_sync_response","clientSendTimestamp":"1970-01-01T00:00:01Z","serverReceiveTimestamp":"1970-01-01T00:00:01.100Z","serverSendTimestamp":"1970-01-01T00:00:01.120Z"}""",
+            """{"type":"heartbeat_ack"}"""
+        )
+        var replayed = false
+        val lifecycle = InitialRealtimeLifecycle(
+            reconnectCredentialRepository = credentialRepository("credential-1"),
+            realtimeClient = RealtimeClient(
+                endpoint = Url("http://court.local"),
+                socketOpener = RealtimeSocketOpener { socket },
+                clockSyncClient = ClockSyncClient { if (replayed) 1_100 else 1_000 }
+            ),
+            reconnectLifecycle = RealtimeReconnectLifecycle(
+                reconnectCredentialRepository = credentialRepository("credential-1"),
+                realtimeClient = RealtimeClient(
+                    endpoint = Url("http://court.local"),
+                    socketOpener = RealtimeSocketOpener { error("reconnect must not start") }
+                ),
+                heartbeatLifecycle = HeartbeatLifecycle(
+                    scope = backgroundScope,
+                    heartbeatIntervalMillis = Long.MAX_VALUE,
+                    heartbeatTimeoutMillis = 20
+                ),
+                outboxReplay = RealtimeOutboxReplay {
+                    assertEquals(
+                        listOf(
+                            "{\"type\":\"handshake\",\"protocolVersion\":\"1.0\",\"reconnectCredential\":\"credential-1\"}",
+                            "{\"type\":\"clock_sync\",\"clientSendTimestamp\":\"1970-01-01T00:00:01Z\"}"
+                        ),
+                        socket.sentPayloads
+                    )
+                    replayed = true
+                    true
+                }
+            )
+        )
+
+        lifecycle.start("device-1", pairingPendingStore())
+        runCurrent()
+
+        assertTrue(replayed)
+        assertEquals("{\"type\":\"heartbeat\"}", socket.sentPayloads.last())
+        lifecycle.stop()
+    }
+
     private fun pairingPendingStore(): ConnectionStateStore = ConnectionStateStore().also { store ->
         store.dispatch(ConnectionEvent.StartDiscovery)
         store.dispatch(ConnectionEvent.SelectServer("court-1"))
