@@ -19,6 +19,7 @@ class RealtimeReconnectLifecycleTest {
             """{"type":"heartbeat_ack"}"""
         )
         val clockSyncTimes = mutableListOf(1_000L, 1_100L)
+        val replayedSockets = mutableListOf<RealtimeSocket>()
         val reconnectClient = RealtimeClient(
             endpoint = Url("http://court.local"),
             socketOpener = RealtimeSocketOpener { reconnectedSocket },
@@ -31,7 +32,11 @@ class RealtimeReconnectLifecycleTest {
                 scope = backgroundScope,
                 heartbeatIntervalMillis = Long.MAX_VALUE,
                 heartbeatTimeoutMillis = 20
-            )
+            ),
+            outboxReplay = RealtimeOutboxReplay { socket ->
+                replayedSockets += socket
+                true
+            }
         )
         val store = connectedStore()
 
@@ -43,6 +48,7 @@ class RealtimeReconnectLifecycleTest {
             store.state
         )
         assertEquals(1, failedSocket.closeCount)
+        assertEquals(listOf<RealtimeSocket>(failedSocket, reconnectedSocket), replayedSockets)
         assertEquals(
             listOf(
                 "{\"type\":\"handshake\",\"protocolVersion\":\"1.0\",\"reconnectCredential\":\"credential-1\"}",
@@ -89,6 +95,34 @@ class RealtimeReconnectLifecycleTest {
         )
         assertFalse(store.isPaired)
         assertEquals(0, openCount)
+    }
+
+    @Test
+    fun invalidReplayClosesTheSocketAndRetriesTheAuthenticatedConnection() = runTest {
+        val initialSocket = RespondingSocket()
+        val retriedSocket = RespondingSocket("""{"type":"handshake_rejected","code":"credential_revoked"}""")
+        val lifecycle = RealtimeReconnectLifecycle(
+            reconnectCredentialRepository = credentialRepository("credential-1"),
+            realtimeClient = RealtimeClient(
+                endpoint = Url("http://court.local"),
+                socketOpener = RealtimeSocketOpener { retriedSocket }
+            ),
+            heartbeatLifecycle = HeartbeatLifecycle(backgroundScope),
+            outboxReplay = RealtimeOutboxReplay { false }
+        )
+        val store = connectedStore()
+
+        lifecycle.start(initialSocket, store)
+
+        assertEquals(1, initialSocket.closeCount)
+        assertEquals(
+            ConnectionState.Reconnecting(
+                deviceId = "device-1",
+                clockOffsetMillis = 20,
+                failure = ConnectionFailure.RealtimeHandshakeRejected("credential_revoked")
+            ),
+            store.state
+        )
     }
 
     @Test

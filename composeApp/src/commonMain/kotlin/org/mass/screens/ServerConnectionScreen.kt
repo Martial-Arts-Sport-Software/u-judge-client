@@ -45,6 +45,7 @@ import org.mass.getPlatformName
 import org.mass.getContext
 import org.mass.connection.ConnectionState
 import org.mass.connection.ConnectionStatusPresentation
+import org.mass.connection.DueRealtimeOutboxReplay
 import org.mass.connection.HeartbeatLifecycle
 import org.mass.connection.InitialRealtimeLifecycle
 import org.mass.connection.KtorRealtimeSocketOpener
@@ -66,6 +67,8 @@ import org.mass.connection.metadataEndpoint
 import org.mass.connection.manualServerEndpoint
 import org.mass.connection.ManualServerEndpointResult
 import org.mass.connection.ServerMetadataClient
+import org.mass.transport.DurableEventOutbox
+import org.mass.transport.createEventOutboxStorage
 import org.mass.enums.Colors
 import org.mass.enums.Routes
 import org.mass.locale.Localization
@@ -316,6 +319,9 @@ object ServerConnectionScreen : Screen {
         val credentialRepository = ReconnectCredentialRepository(
             createReconnectCredentialStorage(context)
         )
+        val outboxReplay = DueRealtimeOutboxReplay(
+            DurableEventOutbox(createEventOutboxStorage(context))
+        )
         val realtimeHttpClient = createHttpClient()
         val realtimeClient = RealtimeClient(
             endpoint = endpoint,
@@ -327,7 +333,8 @@ object ServerConnectionScreen : Screen {
             reconnectLifecycle = RealtimeReconnectLifecycle(
                 reconnectCredentialRepository = credentialRepository,
                 realtimeClient = realtimeClient,
-                heartbeatLifecycle = HeartbeatLifecycle(scope)
+                heartbeatLifecycle = HeartbeatLifecycle(scope),
+                outboxReplay = outboxReplay
             ),
             closeTransport = realtimeHttpClient::close
         )
