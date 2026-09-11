@@ -31,7 +31,7 @@
 | CLI-002 | Must      | Partial | Судья вводит фамилию до выбора режима                     | Пустое/пробельное значение не позволяет продолжить                                 |
 | CLI-003 | Must      | Partial | Клиент поддерживает online и offline                      | Выбранный режим явно виден и не меняется из-за навигации                           |
 | CLI-004 | Must      | Implemented | Offline разрешает только технические дисциплины; Kerugi/Tanbon disabled с локализованной причиной | Kerugi/Tanbon заблокированы с объяснением причины                                  |
-| CLI-005 | Must      | Partial | Shared realtime handshake переводит pairing-pending state в connected только после typed server acceptance и authenticated clock sync; credential storage and UI wiring pending | Простого выбора mDNS service недостаточно для connected state                      |
+| CLI-005 | Must      | Partial | Shared realtime handshake переводит pairing-pending state в connected только после typed server acceptance и authenticated clock sync; UI запускает lifecycle после HTTP pairing acceptance со stored credential, credential issuance pending | Простого выбора mDNS service недостаточно для connected state                      |
 | CLI-006 | Should    | Planned | Post-v1 интерфейс переключается между RU/EN               | Все строки текущего flow локализованы; v1 Pilot требует русский интерфейс          |
 | CLI-007 | Should    | Planned | Фамилия, язык и локальные черновики переживают перезапуск | После restart значения восстановлены из локального persistence                     |
 
@@ -46,7 +46,7 @@
 | CLI-014 | Must      | Partial | Resolved mDNS endpoint проходит shared HTTP metadata validation; manual fallback использует ту же validation/pairing chain, TLS trust UX pending | Несовместимый server отклоняется с локализованной причиной                            |
 | CLI-015 | Must      | Partial | Выбор validated mDNS server отправляет pairing request с device identity, нормализованной фамилией судьи и platform; TLS pending | Server видит pending device и фамилию                                                 |
 | CLI-016 | Must      | Implemented | UI polls typed public HTTP pairing status after a pending request, renders pending/accepted/rejected and terminal local errors, and cancels the poll with the connection screen or replacement attempt; realtime push remains pending | Судья не попадает на рабочий экран до authenticated realtime acceptance and clock sync |
-| CLI-017 | Must      | Partial | Shared reconnect lifecycle reuses the securely stored credential after heartbeat failure and repeats authenticated realtime handshake; credential issuance and initial UI lifecycle wiring pending | Подтверждённый клиент не требует ручного pairing после каждого packet loss            |
+| CLI-017 | Must      | Partial | Shared reconnect lifecycle reuses the securely stored credential after heartbeat failure and repeats authenticated realtime handshake; initial UI lifecycle wiring готово, credential issuance pending | Подтверждённый клиент не требует ручного pairing после каждого packet loss            |
 | CLI-018 | Must      | Planned | Отзыв server немедленно блокирует новые события                | Client показывает disconnected/rejected и сохраняет только допустимые pending records |
 | CLI-019 | Must      | Partial | Client поддерживает manual host/IP fallback после mDNS: HTTP endpoint проходит metadata, protocol и capability validation и начинает pairing; TLS trust UX pending | Ручной endpoint не даёт online state без metadata validation и pairing acceptance     |
 
@@ -103,12 +103,12 @@
 | CLI-060 | Must      | Partial | Shared JSON journal сохраняется в Android SharedPreferences/iOS NSUserDefaults; event wiring and app-kill integration proof pending | Process death не очищает неподтверждённые events                       |
 | CLI-061 | Must      | Partial | Realtime command retry reuses the durable event ID; reconnect/server integration evidence pending | Server применяет событие не более одного раза                          |
 | CLI-062 | Must      | Partial | Shared outbox uses ordered bounded exponential backoff; command-boundary drop/reorder fault-injection tests ready, transport integration pending | Client не создаёт request storm при недоступном server                 |
-| CLI-063 | Must      | Partial | Shared typed heartbeat lifecycle schedules exchange only from `ConnectedIdle`, closes the socket and enters typed reconnecting state after timeout/rejection/invalid response; shared transport reconnect reopens the authenticated socket, while initial UI lifecycle wiring and resync remain pending | UI переходит в reconnecting в ограниченное protocol timeout время      |
+| CLI-063 | Must      | Partial | Shared typed heartbeat lifecycle schedules exchange only from `ConnectedIdle`, closes the socket and enters typed reconnecting state after timeout/rejection/invalid response; shared transport reconnect reopens the authenticated socket; UI owns lifecycle after pairing acceptance and cancels it with the connection screen, resync pending | UI переходит в reconnecting в ограниченное protocol timeout время      |
 | CLI-064 | Must      | Planned | После reconnect client отправляет cursor и получает resync | Session state сходится до разрешения новых действий                    |
 | CLI-065 | Must      | Partial | Shared command ACK removes only its matching durable event; command-boundary reorder test ready, transport runtime integration pending | Поздний ACK не удаляет более новое pending event                       |
 | CLI-066 | Must      | Partial | Terminal command rejection is persisted and excluded from retry; UI feedback pending | Outbox отмечает final rejection и показывает действие пользователю     |
 | CLI-067 | Must      | Planned | Logout/смена server не удаляет pending events молча        | Требуется успешная доставка или явное подтверждённое discard с аудитом |
-| CLI-068 | Must      | Partial | Shared `ClockSyncClient` выполняет typed four-timestamp exchange через authenticated realtime socket во время initial handshake и reconnect; initial UI lifecycle wiring pending | Four-timestamp exchange оценивает offset/round-trip; combat timestamp не полагается только на device wall clock |
+| CLI-068 | Must      | Partial | Shared `ClockSyncClient` выполняет typed four-timestamp exchange через authenticated realtime socket во время initial handshake и reconnect; UI lifecycle wiring готово, credential issuance pending | Four-timestamp exchange оценивает offset/round-trip; combat timestamp не полагается только на device wall clock |
 
 ## 8. Состояние и навигация
 
@@ -118,7 +118,7 @@
 | CLI-071 | Must      | Planned | Session state отделено от navigation state                              | Возврат назад не завершает серверную сессию неявно                       |
 | CLI-072 | Must      | Planned | Rating draft имеет ID дисциплины, категории и сессии                    | Черновик другой сессии не отправляется случайно                          |
 | CLI-073 | Must      | Partial | Metadata validation, pairing request и realtime handshake имеют типизированные локализуемые errors; reconnect preserves typed handshake/clock-sync failures, while remaining transport feedback and protocol errors remain pending | UI различает discovery, pairing, transport, validation и protocol errors |
-| CLI-074 | Must      | Partial | Discovery/pairing jobs and the shared realtime reconnect lifecycle cancel on their owning lifecycle; app-level lifecycle wiring for sessions/sends pending | Уход с экрана не оставляет лишние scans, reconnects или sends            |
+| CLI-074 | Must      | Partial | Discovery/pairing jobs and the shared realtime reconnect lifecycle cancel on their owning lifecycle; connection screen owns and cancels authenticated realtime lifecycle, app-level lifecycle wiring for sessions/sends pending | Уход с экрана не оставляет лишние scans, reconnects или sends            |
 | CLI-075 | Must      | Planned | Значимый state восстанавливается после configuration/process recreation | Android recreation и iOS lifecycle не сбрасывают active flow             |
 
 ## 9. Локализация, правила и доступность
