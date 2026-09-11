@@ -60,7 +60,7 @@ Shared/Android/iOS targets собираются в CI, формулы текущ
 - [x] Управлять единственной mDNS discovery job и её lifecycle (`CLI-012`; shared rescan/cancellation tests).
 - [x] Показывать понятные имя площадки, адрес и статус (`CLI-013`; resolved и resolving состояния покрыты shared unit tests).
 - [ ] Реализовать HTTP metadata/handshake, protocol version/capability check и manual host/IP fallback (resolved mDNS и manual host/IP вызывают shared HTTP client, validation domain model и pairing flow; TLS trust UX pending).
-- [ ] Реализовать WebSocket connect, heartbeat и typed envelope (shared Ktor handshake, credential storage, typed command envelope, terminal ACK/rejection outbox handling и typed heartbeat lifecycle готовы; после HTTP pairing acceptance UI запускает authenticated handshake, clock sync и heartbeat с stored credential и останавливает lifecycle при уходе с connection screen; credential issuance, transport retry и resync pending).
+- [ ] Реализовать WebSocket connect, heartbeat и typed envelope (shared Ktor handshake, credential storage, typed command envelope, terminal ACK/rejection outbox handling и typed heartbeat lifecycle готовы; authenticated lifecycle replays due durable commands in client sequence before heartbeat after initial connection and reconnect; после HTTP pairing acceptance UI запускает lifecycle со stored credential и останавливает его при уходе с connection screen; credential issuance, physical action wiring и resync pending).
 - [x] Получать pairing pending/accepted/rejected через public HTTP status polling с локальным UI без online access (`CLI-016`; shared contract tests). После accepted UI запускает authenticated realtime lifecycle со stored credential; pairing credential issuance, realtime status push и resync remain pending.
 - [ ] Согласовать clock offset (authenticated realtime handshake и transport reconnect выполняют shared typed four-timestamp exchange, сохраняют offset/round-trip и отклоняют invalid/rejected responses; initial UI lifecycle wiring готово, credential issuance и resync pending).
 - [ ] Отправить событие, получить ACK, разорвать сеть и повторить тот же ID (shared command/ACK contract сохраняет stable ID and terminal outcome; disconnect/reconnect proof pending).
@@ -76,8 +76,8 @@ Shared/Android/iOS targets собираются в CI, формулы текущ
 - [x] Заменить `State.isConnectedToServer` connection state machine (`CLI-070`; переходы покрыты shared unit tests).
 - Отделить navigation, pairing, session и rating draft state.
 - [ ] Ввести локальное durable storage для identity, settings, drafts и outbox (shared outbox journal уже сохраняет pending/rejected records в platform storage; wiring domain events, drafts и settings pending).
-- [ ] Добавить event ID, client sequence, timestamp и retry metadata (shared outbox model, retry metadata и typed command envelope готовы; physical action wiring and reconnect pending).
-- [ ] Реализовать bounded exponential backoff и terminal rejection (shared ordered retry, terminal rejection и drop/reorder fault-injection tests готовы; transport integration pending).
+- [ ] Добавить event ID, client sequence, timestamp и retry metadata (shared outbox model, retry metadata и typed command envelope готовы; authenticated lifecycle replays due events in order after initial connection and reconnect; physical action wiring pending).
+- [ ] Реализовать bounded exponential backoff и terminal rejection (shared ordered retry, terminal rejection и drop/reorder fault-injection tests готовы; authenticated lifecycle replays only due events and stops on an invalid terminal response; physical action wiring and resync pending).
 - Восстанавливать active connection/session после lifecycle events.
 - Локализовать типизированные transport/protocol errors.
 
