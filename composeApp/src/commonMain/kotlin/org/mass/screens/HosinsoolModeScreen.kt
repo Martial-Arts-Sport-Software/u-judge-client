@@ -68,7 +68,7 @@ object HosinsoolModeScreen : TechniqueScreen {
             && State.currentCategory != null
             && State.currentDiscipline != null
         ) {
-            State.currentRating = TechniqueRating(
+            State.currentRating = State.ratingDrafts.load(State.currentDiscipline!!, State.currentCategory!!) ?: TechniqueRating(
                 State.currentDiscipline.toString().lowercase(),
                 techniqueCriteria = if (State.currentCategory == Categories.JUNIORS)
                     TechniqueCriteria.Junior(0.1f, 0.1f, 0.1f, 0.1f)
@@ -346,9 +346,14 @@ object HosinsoolModeScreen : TechniqueScreen {
                                                     ) {
                                                         ButtonComponent(
                                                             modifier = Modifier.weight(1f),
-                                                            text = Localization.getString("hosinsool-result-save-btn"),
-                                                            onclick = {},
-                                                            enabled = !State.isOffline
+                                                             text = Localization.getString("hosinsool-result-save-btn"),
+                                                            onclick = {
+                                                                State.ratingDrafts.save(
+                                                                    State.currentDiscipline!!,
+                                                                    State.currentCategory!!,
+                                                                    rating
+                                                                )
+                                                            }
                                                         )
                                                         Spacer(Modifier.width(15.dp))
                                                         ButtonComponent(
@@ -356,7 +361,7 @@ object HosinsoolModeScreen : TechniqueScreen {
                                                             style = ButtonStyles.Secondary,
                                                             text = Localization.getString("hosinsool-result-send-btn"),
                                                             onclick = {},
-                                                            enabled = !State.isOffline
+                                                            enabled = false
                                                         )
                                                     }
                                                 }

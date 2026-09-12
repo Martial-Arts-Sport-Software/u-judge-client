@@ -45,6 +45,7 @@ import org.mass.ui.popup.Popup
 @Preview
 fun App() {
     State.initializePairingIdentity(getContext())
+    State.initializeRatingDrafts(getContext())
     State.navController = rememberNavController()
     State.density = LocalDensity.current
     MaterialTheme(
