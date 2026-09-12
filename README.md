@@ -8,12 +8,12 @@
 
 - русский и английский интерфейс;
 - поиск площадок в локальной сети через mDNS;
-- offline-калькулятор технических дисциплин;
+- offline-калькулятор технических дисциплин с локальным сохранением черновика;
 - Kerugi, Tanbon, Hosinsool, Pair Freestyle, Group Freestyle и Weapon Freestyle;
 
 ## Текущее состояние
 
-UI всех шести дисциплин и локальные модели технической оценки уже существуют. mDNS находит `_u-judge._tcp.local.`; повторный поиск отменяет предыдущий scan, а removed services исчезают из списка. Shared HTTP metadata/pairing, WebSocket handshake с authenticated four-timestamp clock sync, typed heartbeat lifecycle и typed command/terminal ACK outbox реализованы. При authenticated initial connection и reconnect lifecycle воспроизводит due durable commands в исходном порядке до heartbeat, сохраняя event ID; UI ещё не создаёт боевые события. Reconnect credential хранится в Android Keystore-backed storage и iOS Keychain, но его безопасная выдача server остаётся blocker для полного pairing flow. `Save`/`Send` пока содержат пустые обработчики.
+UI всех шести дисциплин и локальные модели технической оценки уже существуют. mDNS находит `_u-judge._tcp.local.`; повторный поиск отменяет предыдущий scan, а removed services исчезают из списка. Shared HTTP metadata/pairing, WebSocket handshake с authenticated four-timestamp clock sync, typed heartbeat lifecycle и typed command/terminal ACK outbox реализованы. При authenticated initial connection и reconnect lifecycle воспроизводит due durable commands в исходном порядке до heartbeat, сохраняя event ID; UI ещё не создаёт боевые события. Reconnect credential хранится в Android Keystore-backed storage и iOS Keychain, но его безопасная выдача server остаётся blocker для полного pairing flow. `Save` локально сохраняет и восстанавливает черновик поддерживаемых технических экранов без network request; `Send` пока недоступна.
 
 Подробное разделение текущего и целевого состояния находится в [описании проекта](docs/PROJECT.md).
 
