@@ -101,7 +101,7 @@ object DisciplineSelectScreen: Screen {
                         val second = if (i + 1 < disciplines.size)
                             disciplines[i + 1] else null
                         val firstOnclick = {
-                            State.currentDiscipline = first
+                            State.selectDiscipline(first)
                             if (first !in arrayOf(
                                     Disciplines.HOSINSOOL, Disciplines.FREESTYLE_PAIR)
                             ) {
@@ -131,7 +131,7 @@ object DisciplineSelectScreen: Screen {
                             )
                             if (second != null) {
                                 val secondOnclick = {
-                                    State.currentDiscipline = second
+                                    State.selectDiscipline(second)
                                     if (second !in arrayOf(
                                             Disciplines.HOSINSOOL, Disciplines.FREESTYLE_PAIR)
                                     ) {

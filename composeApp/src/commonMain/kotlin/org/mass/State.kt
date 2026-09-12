@@ -19,6 +19,7 @@ import org.mass.enums.Categories
 import org.mass.enums.Disciplines
 import org.mass.rating.RatingDraftRepository
 import org.mass.rating.createRatingDraftStorage
+import org.mass.session.SessionStateStore
 import org.mass.ui.popup.Popup
 import kotlin.collections.getValue
 import kotlin.collections.setValue
@@ -52,6 +53,7 @@ object State {
     val availableServers = ServerDiscoveryStore<DiscoveredService> { it.key }
     var selectedServer: DiscoveredService? by mutableStateOf(null)
     val connection = ConnectionStateStore()
+    val session = SessionStateStore()
     lateinit var pairingIdentity: PairingIdentityRepository
     lateinit var ratingDrafts: RatingDraftRepository
     val isOffline: Boolean
@@ -98,5 +100,10 @@ object State {
             selectedServer = null
             connection.dispatch(ConnectionEvent.StartDiscovery)
         }
+    }
+
+    /** Local navigation selection never changes the server-owned session. */
+    fun selectDiscipline(discipline: Disciplines) {
+        currentDiscipline = discipline
     }
 }

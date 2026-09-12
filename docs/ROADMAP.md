@@ -74,7 +74,7 @@ Shared/Android/iOS targets собираются в CI, формулы текущ
 ## 4. Недели 2-3: state и durable outbox
 
 - [x] Заменить `State.isConnectedToServer` connection state machine (`CLI-070`; переходы покрыты shared unit tests).
-- Отделить navigation, pairing, session и rating draft state.
+- [x] Отделить session state от navigation state (`CLI-071`; shared lifecycle/isolation tests); отдельный UI state pairing и rating draft остаётся pending.
 - [ ] Ввести локальное durable storage для identity, settings, drafts и outbox (shared outbox journal уже сохраняет pending/rejected records в platform storage; wiring domain events, drafts и settings pending).
 - [ ] Добавить event ID, client sequence, timestamp и retry metadata (shared outbox model, retry metadata и typed command envelope готовы; authenticated lifecycle replays due events in order after initial connection and reconnect; physical action wiring pending).
 - [ ] Реализовать bounded exponential backoff и terminal rejection (shared ordered retry, terminal rejection и drop/reorder fault-injection tests готовы; authenticated lifecycle replays only due events and stops on an invalid terminal response; physical action wiring and resync pending).
