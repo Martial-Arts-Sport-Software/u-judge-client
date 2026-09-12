@@ -17,6 +17,8 @@ import org.mass.discovery.ServerDiscoveryStore
 import org.mass.entities.Rating
 import org.mass.enums.Categories
 import org.mass.enums.Disciplines
+import org.mass.rating.RatingDraftRepository
+import org.mass.rating.createRatingDraftStorage
 import org.mass.ui.popup.Popup
 import kotlin.collections.getValue
 import kotlin.collections.setValue
@@ -51,6 +53,7 @@ object State {
     var selectedServer: DiscoveredService? by mutableStateOf(null)
     val connection = ConnectionStateStore()
     lateinit var pairingIdentity: PairingIdentityRepository
+    lateinit var ratingDrafts: RatingDraftRepository
     val isOffline: Boolean
         get() = connection.state == ConnectionState.Offline
     var isAnimating by mutableStateOf(false)
@@ -60,6 +63,12 @@ object State {
             pairingIdentity = PairingIdentityRepository(createPairingIdentityStorage(context)) {
                 "device-${Random.nextInt()}"
             }
+        }
+    }
+
+    fun initializeRatingDrafts(context: Any?) {
+        if (!::ratingDrafts.isInitialized) {
+            ratingDrafts = RatingDraftRepository(createRatingDraftStorage(context))
         }
     }
 

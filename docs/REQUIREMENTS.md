@@ -87,8 +87,8 @@
 | CLI-043 | Must      | Partial | Group/Weapon содержит 6 технических критериев                      | Все значения входят в payload                                            |
 | CLI-044 | Must      | Partial | Презентация содержит 4 критерия                                    | Все значения входят в payload                                            |
 | CLI-045 | Must      | Partial | Client показывает technique, presentation, extra points и total    | Total округлён до `0.1` и не меньше нуля                                 |
-| CLI-046 | Must      | Planned | `Save` сохраняет локальный черновик                                | Черновик переживает navigation/restart и не вызывает network request     |
-| CLI-047 | Must      | Planned | `Save` доступна offline                                            | Технический калькулятор выполняет своё автономное назначение             |
+| CLI-046 | Must      | Partial | `Save` сохраняет локальный черновик поддерживаемых технических экранов по discipline/category и восстанавливает его после restart; session binding и remaining disciplines pending | Черновик переживает navigation/restart и не вызывает network request     |
+| CLI-047 | Must      | Implemented | `Save` доступна offline для поддерживаемых технических экранов и не вызывает network request | Технический калькулятор выполняет своё автономное назначение             |
 | CLI-048 | Must      | Planned | `Send` доступна только для активной online-сессии                  | Offline/неподтверждённый client не может отправить оценку                |
 | CLI-049 | Must      | Planned | `Send` требует подтверждения                                       | Диалог сообщает, что после отправки оценка неизменяема                   |
 | CLI-050 | Must      | Planned | Payload содержит исходные критерии, extra points и локальный total | Server может независимо проверить расчёт                                 |
