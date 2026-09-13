@@ -30,16 +30,16 @@ sealed class PresentationCriteria {
         harmony: Float = 0.1f
     ): PresentationCriteria() {
         init {
-            require(realism in 0.1f..1.0f)
-            require(power in 0.1f..1.0f)
-            require(balance in 0.1f..1.0f)
-            require(harmony in 0.1f..1.0f)
+            requireCriterionScore(realism)
+            requireCriterionScore(power)
+            requireCriterionScore(balance)
+            requireCriterionScore(harmony)
         }
 
-        var realism by mutableStateOf(realism)
-        var power by mutableStateOf(power)
-        var balance by mutableStateOf(balance)
-        var harmony by mutableStateOf(harmony)
+        var realism by criterionScoreState(realism)
+        var power by criterionScoreState(power)
+        var balance by criterionScoreState(balance)
+        var harmony by criterionScoreState(harmony)
 
         override fun toString(): String {
             return "realism: $realism,\n" +
@@ -67,16 +67,16 @@ sealed class PresentationCriteria {
         choreography: Float = 0.1f
     ): PresentationCriteria() {
         init {
-            require(creativity in 0.1f..1f)
-            require(power in 0.1f..1f)
-            require(balance in 0.1f..1f)
-            require(choreography in 0.1f..1f)
+            requireCriterionScore(creativity)
+            requireCriterionScore(power)
+            requireCriterionScore(balance)
+            requireCriterionScore(choreography)
         }
 
-        var creativity by mutableStateOf(creativity)
-        var power by mutableStateOf(power)
-        var balance by mutableStateOf(balance)
-        var choreography by mutableStateOf(choreography)
+        var creativity by criterionScoreState(creativity)
+        var power by criterionScoreState(power)
+        var balance by criterionScoreState(balance)
+        var choreography by criterionScoreState(choreography)
 
         override fun toString(): String {
             return "creativity: $creativity,\n" +

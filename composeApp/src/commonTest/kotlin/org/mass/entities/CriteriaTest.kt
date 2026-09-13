@@ -33,6 +33,33 @@ class CriteriaTest {
     }
 
     @Test
+    fun techniqueCriteriaEnforceTenthsAfterConstruction() {
+        val junior = TechniqueCriteria.Junior()
+        junior.wristHold = 0.7f
+        assertEquals(0.7f, junior.wristHold)
+        listOf(0f, 0.15f, 1.1f, Float.NaN, Float.POSITIVE_INFINITY).forEach { score ->
+            assertFailsWith<IllegalArgumentException> { junior.wristHold = score }
+        }
+        assertFailsWith<IllegalArgumentException> { TechniqueCriteria.Adult().knifeLock = 0f }
+        assertFailsWith<IllegalArgumentException> { TechniqueCriteria.Group().acrobatics = 0.15f }
+        assertFailsWith<IllegalArgumentException> { TechniqueCriteria.Weapon().movement = Float.NEGATIVE_INFINITY }
+    }
+
+    @Test
+    fun validCriterionMutationRecalculatesRatingTotal() {
+        val technique = TechniqueCriteria.Junior()
+        val rating = TechniqueRating(
+            "rating",
+            technique,
+            PresentationCriteria.Hosinsool()
+        )
+
+        technique.wristHold = 1f
+
+        assertEquals(1.7f, rating.totalScore)
+    }
+
+    @Test
     fun presentationCriteriaTotalsIncludeEveryCriterion() {
         assertEquals(1.0f, PresentationCriteria.Hosinsool(0.1f, 0.2f, 0.3f, 0.4f).getTotalScore())
         assertEquals(1.0f, PresentationCriteria.FreestylePair(0.1f, 0.2f, 0.3f, 0.4f).getTotalScore())
@@ -48,5 +75,18 @@ class CriteriaTest {
         assertFailsWith<IllegalArgumentException> { PresentationCriteria.FreestylePair(creativity = 1.1f) }
         assertFailsWith<IllegalArgumentException> { PresentationCriteria.FreestyleGroup(balance = 0f) }
         assertFailsWith<IllegalArgumentException> { PresentationCriteria.FreestyleWeapon(choreography = 1.1f) }
+    }
+
+    @Test
+    fun presentationCriteriaEnforceTenthsAfterConstruction() {
+        val hosinsool = PresentationCriteria.Hosinsool()
+        hosinsool.realism = 1f
+        assertEquals(1f, hosinsool.realism)
+        listOf(0f, 0.15f, 1.1f, Float.NaN, Float.POSITIVE_INFINITY).forEach { score ->
+            assertFailsWith<IllegalArgumentException> { hosinsool.realism = score }
+        }
+        assertFailsWith<IllegalArgumentException> { PresentationCriteria.FreestylePair().power = 0f }
+        assertFailsWith<IllegalArgumentException> { PresentationCriteria.FreestyleGroup().balance = 0.15f }
+        assertFailsWith<IllegalArgumentException> { PresentationCriteria.FreestyleWeapon().choreography = Float.NEGATIVE_INFINITY }
     }
 }
