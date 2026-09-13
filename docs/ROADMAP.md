@@ -126,7 +126,7 @@ audit содержит каждый physical tap один раз.
 ### Технические дисциплины
 
 - Проверить наборы критериев по нормативным test vectors.
-- [x] Реализовать локальный `Save` и восстановление черновика для поддерживаемых технических экранов (`CLI-046`; shared persistence tests).
+- [x] Реализовать локальный `Save` и восстановление независимого черновика для Hosinsool, Pair, Group, Sword, Pole, Paired Nunchaku и Paired Fans (`CLI-046`; shared persistence tests).
 - [x] Разрешить `Save` в offline (`CLI-047`; действие не создаёт network request).
 - Реализовать confirmation и final `Send`.
 - Передавать исходные критерии, extra points и calculated total.
