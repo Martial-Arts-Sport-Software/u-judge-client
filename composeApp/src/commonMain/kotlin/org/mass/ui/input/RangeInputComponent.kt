@@ -74,6 +74,9 @@ enum class Modes {
     DEFAULT
 }
 
+internal fun rangeInputStepValues(showSlider: Boolean, steps: Int): List<Int> =
+    if (showSlider) (1..steps).toList() else (0..steps).toList()
+
 /**
  * Renders range input for criterion rating
  * @param currentValue initial value on render
@@ -107,28 +110,29 @@ fun RangeInputComponent(
             }
         }
     }
-    val stepBoxSize by remember(trackSize) {
-        derivedStateOf { (trackSize.width - trackSize.height) / steps + 1 }
+    val stepValues = remember(showSlider, steps) { rangeInputStepValues(showSlider, steps) }
+    val stepBoxSize by remember(trackSize, stepValues) {
+        derivedStateOf { (trackSize.width - trackSize.height) / stepValues.lastIndex + 1 }
     }
     val edgeBoxSize by remember(stepBoxSize) {
         derivedStateOf { (stepBoxSize + trackSize.height) / 2 }
     }
     val coroutineScope = rememberCoroutineScope()
-    val stepPositions by remember(edgeBoxSize, stepBoxSize, steps, trackSize) {
+    val stepPositions by remember(edgeBoxSize, stepBoxSize, stepValues, trackSize) {
         derivedStateOf {
-            List(steps + 1) { i ->
-                when (i) {
+            stepValues.mapIndexed { index, value ->
+                value.toFloat() to when (index) {
                     0 -> 0f
-                    steps -> (trackSize.width - trackSize.height).toFloat()
-                    else -> (edgeBoxSize + (i - 1) * stepBoxSize + (stepBoxSize - trackSize.height) / 2).toFloat()
+                    stepValues.lastIndex -> (trackSize.width - trackSize.height).toFloat()
+                    else -> (edgeBoxSize + (index - 1) * stepBoxSize + (stepBoxSize - trackSize.height) / 2).toFloat()
                 }
             }
         }
     }
     val anchors = remember(stepPositions) {
         DraggableAnchors {
-            stepPositions.forEachIndexed { index, value ->
-                index.toFloat() at value
+            stepPositions.forEach { (value, position) ->
+                value at position
             }
         }
     }
@@ -143,7 +147,7 @@ fun RangeInputComponent(
 
     LaunchedEffect(anchors) { state.updateAnchors(anchors) }
     LaunchedEffect(currentValue) {
-        if (state.currentValue != currentValue && !state.isAnimationRunning) {
+        if (state.currentValue != currentValue * 10 && !state.isAnimationRunning) {
             state.animateTo(currentValue * 10)
         }
     }
@@ -230,9 +234,9 @@ fun RangeInputComponent(
                         .onSizeChanged { trackSize = it },
                     verticalAlignment = Alignment.Bottom,
                 ){
-                    for (i in 0..steps) {
+                    stepValues.forEachIndexed { index, i ->
                         val boxWidth = with(State.density!!) {
-                            if (i == 0 || i == steps) edgeBoxSize.toDp() else stepBoxSize.toDp()
+                            if (index == 0 || index == stepValues.lastIndex) edgeBoxSize.toDp() else stepBoxSize.toDp()
                         }
                         val stepModifier = Modifier
                             .clickable(

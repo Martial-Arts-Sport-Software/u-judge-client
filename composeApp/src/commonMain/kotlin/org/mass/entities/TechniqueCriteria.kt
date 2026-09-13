@@ -3,7 +3,30 @@ package org.mass.entities
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import kotlin.math.abs
 import kotlin.math.round
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
+
+internal fun requireCriterionScore(value: Float) {
+    require(
+        value.isFinite() && value in 0.1f..1f &&
+            abs(value * 10 - round(value * 10)) < 0.001f
+    )
+}
+
+internal fun criterionScoreState(initialValue: Float): ReadWriteProperty<Any?, Float> {
+    requireCriterionScore(initialValue)
+    var score by mutableStateOf(initialValue)
+    return object : ReadWriteProperty<Any?, Float> {
+        override fun getValue(thisRef: Any?, property: KProperty<*>): Float = score
+
+        override fun setValue(thisRef: Any?, property: KProperty<*>, value: Float) {
+            requireCriterionScore(value)
+            score = value
+        }
+    }
+}
 
 /**
  * rating's score for presentation, has:
@@ -31,16 +54,16 @@ sealed class TechniqueCriteria {
         legKick: Float = 0.1f,
     ): TechniqueCriteria() {
         init {
-            require(wristHold in 0.1f..1f)
-            require(clothesHold in 0.1f..1f)
-            require(fistPunch in 0.1f..1f)
-            require(legKick in 0.1f..1f)
+            requireCriterionScore(wristHold)
+            requireCriterionScore(clothesHold)
+            requireCriterionScore(fistPunch)
+            requireCriterionScore(legKick)
         }
         
-        var wristHold by mutableStateOf(wristHold)
-        var clothesHold by mutableStateOf(clothesHold)
-        var fistPunch by mutableStateOf(fistPunch)
-        var legKick by mutableStateOf(legKick)
+        var wristHold by criterionScoreState(wristHold)
+        var clothesHold by criterionScoreState(clothesHold)
+        var fistPunch by criterionScoreState(fistPunch)
+        var legKick by criterionScoreState(legKick)
 
         override fun toString(): String {
             return "wristHold: $wristHold,\n" +
@@ -77,12 +100,12 @@ sealed class TechniqueCriteria {
         legKick
     ){
         init {
-            require(knifeLock in 0.1f..1f)
-            require(weaponLock in 0.1f..1f)
+            requireCriterionScore(knifeLock)
+            requireCriterionScore(weaponLock)
         }
         
-        var knifeLock by mutableStateOf(knifeLock)
-        var weaponLock by mutableStateOf(weaponLock)
+        var knifeLock by criterionScoreState(knifeLock)
+        var weaponLock by criterionScoreState(weaponLock)
 
         override fun toString(): String {
             return super.toString() +
@@ -114,20 +137,20 @@ sealed class TechniqueCriteria {
         acrobatics: Float = 0.1f
     ): TechniqueCriteria() {
         init {
-            require(offenseDefense in 0.1f..1f)
-            require(itemsBreaking in 0.1f..1f)
-            require(legKicks in 0.1f..1f)
-            require(weaponSkills in 0.1f..1f)
-            require(dynamicMovement in 0.1f..1f)
-            require(acrobatics in 0.1f..1f)
+            requireCriterionScore(offenseDefense)
+            requireCriterionScore(itemsBreaking)
+            requireCriterionScore(legKicks)
+            requireCriterionScore(weaponSkills)
+            requireCriterionScore(dynamicMovement)
+            requireCriterionScore(acrobatics)
         }
         
-        var offenseDefense by mutableStateOf(offenseDefense)
-        var itemsBreaking by mutableStateOf(itemsBreaking)
-        var legKicks by mutableStateOf(legKicks)
-        var weaponSkills by mutableStateOf(weaponSkills)
-        var dynamicMovement by mutableStateOf(dynamicMovement)
-        var acrobatics by mutableStateOf(acrobatics)
+        var offenseDefense by criterionScoreState(offenseDefense)
+        var itemsBreaking by criterionScoreState(itemsBreaking)
+        var legKicks by criterionScoreState(legKicks)
+        var weaponSkills by criterionScoreState(weaponSkills)
+        var dynamicMovement by criterionScoreState(dynamicMovement)
+        var acrobatics by criterionScoreState(acrobatics)
 
         override fun toString(): String {
             return "offenseDefense: $offenseDefense,\n" +
@@ -165,20 +188,20 @@ sealed class TechniqueCriteria {
         acrobatics: Float = 0.1f
     ): TechniqueCriteria() {
         init {
-            require(weaponTechniques in 0.1f..1f)
-            require(jumpKicks in 0.1f..1f)
-            require(rotateKicks in 0.1f..1f)
-            require(weaponManipulation in 0.1f..1f)
-            require(movement in 0.1f..1f)
-            require(acrobatics in 0.1f..1f)
+            requireCriterionScore(weaponTechniques)
+            requireCriterionScore(jumpKicks)
+            requireCriterionScore(rotateKicks)
+            requireCriterionScore(weaponManipulation)
+            requireCriterionScore(movement)
+            requireCriterionScore(acrobatics)
         }
         
-        var weaponTechniques by mutableStateOf(weaponTechniques)
-        var jumpKicks by mutableStateOf(jumpKicks)
-        var rotateKicks by mutableStateOf(rotateKicks)
-        var weaponManipulation by mutableStateOf(weaponManipulation)
-        var movement by mutableStateOf(movement)
-        var acrobatics by mutableStateOf(acrobatics)
+        var weaponTechniques by criterionScoreState(weaponTechniques)
+        var jumpKicks by criterionScoreState(jumpKicks)
+        var rotateKicks by criterionScoreState(rotateKicks)
+        var weaponManipulation by criterionScoreState(weaponManipulation)
+        var movement by criterionScoreState(movement)
+        var acrobatics by criterionScoreState(acrobatics)
 
         override fun toString(): String {
             return "weaponTechniques: $weaponTechniques,\n" +
