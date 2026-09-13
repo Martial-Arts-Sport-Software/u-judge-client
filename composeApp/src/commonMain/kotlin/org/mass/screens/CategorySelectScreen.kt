@@ -98,12 +98,7 @@ object CategorySelectScreen : Screen {
                             categories[i + 1] else null
                         val firstOnclick = {
                             State.currentCategory = first
-                            clickWithTransition(
-                                Routes.valueOf(
-                                    "${State.currentDiscipline!!
-                                        .value.split("_")[1].uppercase()}_MODE"
-                                )
-                            )
+                            clickWithTransition(State.currentDiscipline!!.route)
                         }
                         Column(
                             Modifier.weight(1f),
@@ -121,12 +116,7 @@ object CategorySelectScreen : Screen {
                             if (second != null) {
                                 val secondOnclick = {
                                     State.currentCategory = second
-                                    clickWithTransition(
-                                        Routes.valueOf(
-                                            "${State.currentDiscipline!!
-                                                .value.split("_")[1].uppercase()}_MODE"
-                                        )
-                                    )
+                                    clickWithTransition(State.currentDiscipline!!.route)
                                 }
                                 Spacer(Modifier.weight(0.2f))
                                 ButtonComponent(

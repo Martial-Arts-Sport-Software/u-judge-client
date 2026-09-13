@@ -95,27 +95,20 @@ object DisciplineSelectScreen: Screen {
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    val disciplines = Disciplines.entries
+                    val disciplines = Disciplines.entries.filter(Disciplines::isSelectable)
+                    val selectDiscipline: (Disciplines) -> Unit = { discipline ->
+                        State.selectDiscipline(discipline)
+                        if (discipline.requiresCategory) {
+                            clickWithTransition(Routes.CATEGORY_SELECT)
+                        } else {
+                            State.currentCategory = Categories.ADULTS
+                            clickWithTransition(discipline.route)
+                        }
+                    }
                     for (i in disciplines.indices step 2) {
                         val first = disciplines[i]
                         val second = if (i + 1 < disciplines.size)
                             disciplines[i + 1] else null
-                        val firstOnclick = {
-                            State.selectDiscipline(first)
-                            if (first !in arrayOf(
-                                    Disciplines.HOSINSOOL, Disciplines.FREESTYLE_PAIR)
-                            ) {
-                                State.currentCategory = Categories.ADULTS
-                                clickWithTransition(
-                                    Routes.valueOf(
-                                        "${State.currentDiscipline!!
-                                            .value.split("_")[1].uppercase()}_MODE"
-                                    )
-                                )
-                            } else clickWithTransition(
-                                Routes.CATEGORY_SELECT
-                            )
-                        }
                         Row(
                             Modifier.weight(1f),
                             verticalAlignment = Alignment.CenterVertically
@@ -123,34 +116,18 @@ object DisciplineSelectScreen: Screen {
                             ButtonComponent(
                                 text = Localization.getString(first.value)
                                     .uppercase(),
-                                onclick = firstOnclick,
+                                onclick = { selectDiscipline(first) },
                                 enabled = isDisciplineAvailable(first, State.isOffline),
                                 modifier = Modifier
                                     .weight(1f)
                                     .fillMaxHeight(0.8f)
                             )
                             if (second != null) {
-                                val secondOnclick = {
-                                    State.selectDiscipline(second)
-                                    if (second !in arrayOf(
-                                            Disciplines.HOSINSOOL, Disciplines.FREESTYLE_PAIR)
-                                    ) {
-                                        State.currentCategory = Categories.ADULTS
-                                        clickWithTransition(
-                                            Routes.valueOf(
-                                                "${State.currentDiscipline!!
-                                                    .value.split("_")[1].uppercase()}_MODE"
-                                            )
-                                        )
-                                    } else clickWithTransition(
-                                        Routes.CATEGORY_SELECT
-                                    )
-                                }
                                 Spacer(Modifier.weight(0.1f))
                                 ButtonComponent(
                                     text = Localization.getString(second.value)
                                         .uppercase(),
-                                    onclick = secondOnclick,
+                                    onclick = { selectDiscipline(second) },
                                     enabled = isDisciplineAvailable(second, State.isOffline),
                                     modifier = Modifier
                                         .weight(1f)

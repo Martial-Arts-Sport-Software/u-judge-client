@@ -53,6 +53,31 @@ class RatingDraftRepositoryTest {
     }
 
     @Test
+    fun restoresIndependentDraftsForEveryWeaponDiscipline() {
+        val storage = MemoryStorage()
+        val repository = RatingDraftRepository(storage)
+        val disciplines = listOf(
+            Disciplines.FREESTYLE_SWORD,
+            Disciplines.FREESTYLE_POLE,
+            Disciplines.FREESTYLE_NUNCHAKU,
+            Disciplines.FREESTYLE_FANS
+        )
+
+        disciplines.forEachIndexed { index, discipline ->
+            assertTrue(repository.save(discipline, Categories.ADULTS, weaponRating(0.1f * (index + 1))))
+        }
+
+        val restored = RatingDraftRepository(storage)
+        disciplines.forEachIndexed { index, discipline ->
+            val rating = requireNotNull(restored.load(discipline, Categories.ADULTS))
+            val technique = rating.techniqueCriteria as TechniqueCriteria.Weapon
+            assertEquals(0.1f * (index + 1), technique.weaponTechniques)
+            assertEquals(0.8f, (rating.presentationCriteria as PresentationCriteria.FreestyleWeapon).choreography)
+        }
+        assertNull(restored.load(Disciplines.FREESTYLE_SWORD, Categories.JUNIORS))
+    }
+
+    @Test
     fun ignoresMalformedOrInvalidPersistedDrafts() {
         val storage = MemoryStorage(
             """[{"discipline":"HOSINSOOL","category":"JUNIORS","technique":[0.2,0.3,0.4,0.5],"presentation":[0.6,0.7,0.8,0.9],"extraPoints":0,"totalScore":99}]"""
@@ -61,6 +86,21 @@ class RatingDraftRepositoryTest {
         assertNull(RatingDraftRepository(storage).load(Disciplines.HOSINSOOL, Categories.JUNIORS))
         assertFalse(storage.value.isNullOrBlank())
     }
+
+    @Test
+    fun rejectsWeaponDraftWithTheWrongCriteriaShape() {
+        val storage = MemoryStorage(
+            """[{"discipline":"FREESTYLE_SWORD","category":"ADULTS","technique":[0.2,0.3,0.4,0.5],"presentation":[0.6,0.7,0.8,0.9],"extraPoints":0,"totalScore":2.4}]"""
+        )
+
+        assertNull(RatingDraftRepository(storage).load(Disciplines.FREESTYLE_SWORD, Categories.ADULTS))
+    }
+
+    private fun weaponRating(firstCriterion: Float): TechniqueRating = TechniqueRating(
+        "weapon",
+        TechniqueCriteria.Weapon(firstCriterion, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f),
+        PresentationCriteria.FreestyleWeapon(0.5f, 0.6f, 0.7f, 0.8f)
+    )
 
     private class MemoryStorage(var value: String? = null) : RatingDraftStorage {
         override fun load(): String? = value

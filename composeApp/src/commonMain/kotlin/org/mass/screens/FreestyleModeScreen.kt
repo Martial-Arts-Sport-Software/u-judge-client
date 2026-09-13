@@ -73,7 +73,10 @@ object FreestyleModeScreen : TechniqueScreen {
                 State.currentDiscipline.toString().lowercase(),
                 techniqueCriteria = when(State.currentDiscipline) {
                     Disciplines.FREESTYLE_GROUP -> TechniqueCriteria.Group()
-                    Disciplines.FREESTYLE_WEAPON -> TechniqueCriteria.Weapon()
+                    Disciplines.FREESTYLE_SWORD,
+                    Disciplines.FREESTYLE_POLE,
+                    Disciplines.FREESTYLE_NUNCHAKU,
+                    Disciplines.FREESTYLE_FANS -> TechniqueCriteria.Weapon()
                     else -> {
                         if (State.currentCategory == Categories.JUNIORS)
                             TechniqueCriteria.Junior()
@@ -83,7 +86,10 @@ object FreestyleModeScreen : TechniqueScreen {
                 presentationCriteria = when(State.currentDiscipline) {
                     Disciplines.FREESTYLE_PAIR -> PresentationCriteria.FreestylePair()
                     Disciplines.FREESTYLE_GROUP -> PresentationCriteria.FreestyleGroup()
-                    Disciplines.FREESTYLE_WEAPON -> PresentationCriteria.FreestyleWeapon()
+                    Disciplines.FREESTYLE_SWORD,
+                    Disciplines.FREESTYLE_POLE,
+                    Disciplines.FREESTYLE_NUNCHAKU,
+                    Disciplines.FREESTYLE_FANS -> PresentationCriteria.FreestyleWeapon()
                     else -> PresentationCriteria.Hosinsool()
                 }
             )
@@ -189,9 +195,9 @@ object FreestyleModeScreen : TechniqueScreen {
                                                         currentValue = 0f,
                                                         onValueChange = {},
                                                         showSlider = false,
-                                                        mode = if (State.currentDiscipline == Disciplines.FREESTYLE_WEAPON)
+                                                        mode = if (State.currentDiscipline?.usesWeaponCriteria == true)
                                                             Modes.TEXT_LEFT else Modes.DEFAULT,
-                                                        icon = if (State.currentDiscipline == Disciplines.FREESTYLE_WEAPON)
+                                                        icon = if (State.currentDiscipline?.usesWeaponCriteria == true)
                                                             null else Res.drawable.cross_icon
                                                     )
                                                     Column(
@@ -266,7 +272,10 @@ object FreestyleModeScreen : TechniqueScreen {
                                                                     text = Localization.getString("freestyle-group-technique-criterion-6")
                                                                 )
                                                             }
-                                                            Disciplines.FREESTYLE_WEAPON -> {
+                                                            Disciplines.FREESTYLE_SWORD,
+                                                            Disciplines.FREESTYLE_POLE,
+                                                            Disciplines.FREESTYLE_NUNCHAKU,
+                                                            Disciplines.FREESTYLE_FANS -> {
                                                                 RangeInputComponent(
                                                                     currentValue = (rating.techniqueCriteria
                                                                             as TechniqueCriteria.Weapon).weaponTechniques,
@@ -411,7 +420,10 @@ object FreestyleModeScreen : TechniqueScreen {
                                                                         .getString("freestyle-group-presentation-criteria-4")
                                                                 )
                                                             }
-                                                            Disciplines.FREESTYLE_WEAPON -> {
+                                                            Disciplines.FREESTYLE_SWORD,
+                                                            Disciplines.FREESTYLE_POLE,
+                                                            Disciplines.FREESTYLE_NUNCHAKU,
+                                                            Disciplines.FREESTYLE_FANS -> {
                                                                 RangeInputComponent(
                                                                     currentValue = (rating.presentationCriteria as
                                                                             PresentationCriteria.FreestyleWeapon).creativity,
