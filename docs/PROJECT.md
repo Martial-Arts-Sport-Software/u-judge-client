@@ -232,11 +232,11 @@ Rejected
 
 - общая Compose UI-кодовая база для Android/iOS;
 - стартовый экран, фамилия, выбор online/offline и русский язык;
-- навигация по восьми дисциплинам;
+- навигация по восьми дисциплинам PDF 1 и Tanbon;
 - выбор Juniors/Adults для Hosinsool и Pair Freestyle;
 - UI Kerugi и Tanbon;
 - экраны критериев, презентации и результата технических дисциплин;
-- локальные модели критериев и расчёт индивидуальной суммы;
+- локальные модели критериев и расчёт индивидуальной суммы для Hosinsool, Pair, Group, Sword, Pole, Paired Nunchaku и Paired Fans;
 - unit tests граничных значений и формул `TechniqueCriteria`, `PresentationCriteria` и `TechniqueRating`;
 - информационные PDF и popup;
 - mDNS discovery `_u-judge._tcp.local.` с дедупликацией по service key, удалением unavailable service и единственной отменяемой scan job;
@@ -250,7 +250,7 @@ Rejected
 - Выбор resolved mDNS-площадки строит endpoint из адреса/порта, проверяет metadata и отправляет `POST /v1/pairing-requests` с device identity, нормализованной фамилией судьи и platform. Shared Ktor client выполняет versioned `/v1/realtime` handshake, принимает typed accepted/rejected response и authenticated clock sync до перехода в `ConnectedIdle`; reconnect credential storage использует Android Keystore-backed storage и iOS Keychain, а shared reconnect lifecycle после heartbeat failure повторно выполняет authenticated handshake и clock sync. После HTTP pairing acceptance connection screen запускает этот lifecycle со stored credential и останавливает его при уходе с экрана; credential issuance, pairing-status push и TLS/manual fallback pending;
 - server pairing approval, protocol version и текущий bout не получаются;
 - кнопки Kerugi/Tanbon имеют пустые `onclick`;
-- `Save` локально сохраняет criteria, extra points и total для поддерживаемых технических экранов и восстанавливает draft после restart; `Send` остаётся недоступна без active online session и final rating transport;
+- `Save` локально сохраняет criteria, extra points и total в независимый черновик для каждого из семи технических экранов и восстанавливает draft после restart; `Send` остаётся недоступна без active online session и final rating transport;
 - typed combat/rating events ещё не wired in UI to the durable outbox; authenticated initial/reconnect lifecycle replays due durable commands in client sequence before heartbeat and persists terminal ACK/rejection, while physical action wiring, server integration proof and resync remain pending;
 - глобальный singleton `State` всё ещё хранит navigation/UI/domain state; connection lifecycle и server-owned session lifecycle выделены в отдельные state stores;
 - v1 minimum iOS version is 18; iOS 18 and iOS 26 require physical-device smoke coverage.

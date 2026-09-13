@@ -107,6 +107,10 @@ class RatingDraftRepository(private val storage: RatingDraftStorage) {
                     PresentationCriteria.FreestyleGroup(presentation[0], presentation[1], presentation[2], presentation[3]),
                     extraPoints
                 )
+                Disciplines.FREESTYLE_SWORD,
+                Disciplines.FREESTYLE_POLE,
+                Disciplines.FREESTYLE_NUNCHAKU,
+                Disciplines.FREESTYLE_FANS,
                 Disciplines.FREESTYLE_WEAPON -> TechniqueRating(
                     discipline.name,
                     TechniqueCriteria.Weapon(technique[0], technique[1], technique[2], technique[3], technique[4], technique[5]),
@@ -129,7 +133,12 @@ class RatingDraftRepository(private val storage: RatingDraftStorage) {
         private fun hasValidShape(): Boolean {
             val expectedTechniqueCount = when (discipline) {
                 Disciplines.HOSINSOOL, Disciplines.FREESTYLE_PAIR -> if (category == Categories.JUNIORS) 4 else 6
-                Disciplines.FREESTYLE_GROUP, Disciplines.FREESTYLE_WEAPON -> 6
+                Disciplines.FREESTYLE_GROUP,
+                Disciplines.FREESTYLE_SWORD,
+                Disciplines.FREESTYLE_POLE,
+                Disciplines.FREESTYLE_NUNCHAKU,
+                Disciplines.FREESTYLE_FANS,
+                Disciplines.FREESTYLE_WEAPON -> 6
                 Disciplines.KERUGI, Disciplines.TANBON -> return false
             }
             return technique.size == expectedTechniqueCount && presentation.size == 4 &&

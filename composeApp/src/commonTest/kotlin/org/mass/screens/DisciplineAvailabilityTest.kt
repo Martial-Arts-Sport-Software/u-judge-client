@@ -1,21 +1,44 @@
 package org.mass.screens
 
-import org.mass.enums.Disciplines
 import kotlin.test.Test
-import kotlin.test.assertFalse
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import org.mass.enums.Disciplines
+import org.mass.enums.Routes
 
 class DisciplineAvailabilityTest {
     @Test
-    fun offlineModeBlocksCombatDisciplinesOnly() {
-        assertFalse(isDisciplineAvailable(Disciplines.KERUGI, isOffline = true))
-        assertFalse(isDisciplineAvailable(Disciplines.TANBON, isOffline = true))
-        assertTrue(isDisciplineAvailable(Disciplines.HOSINSOOL, isOffline = true))
+    fun offlineAllowsEveryTechnicalDisciplineAndBlocksCombatDisciplines() {
+        val availableOffline = Disciplines.entries.filter { isDisciplineAvailable(it, isOffline = true) }.toSet()
+
+        assertEquals(
+            setOf(
+                Disciplines.HOSINSOOL,
+                Disciplines.FREESTYLE_PAIR,
+                Disciplines.FREESTYLE_GROUP,
+                Disciplines.FREESTYLE_SWORD,
+                Disciplines.FREESTYLE_POLE,
+                Disciplines.FREESTYLE_NUNCHAKU,
+                Disciplines.FREESTYLE_FANS
+            ),
+            availableOffline
+        )
     }
 
     @Test
-    fun onlineModeKeepsCombatDisciplinesAvailable() {
-        assertTrue(isDisciplineAvailable(Disciplines.KERUGI, isOffline = false))
-        assertTrue(isDisciplineAvailable(Disciplines.TANBON, isOffline = false))
+    fun everyDisciplineUsesAnExplicitRouteInsteadOfParsingItsResourceKey() {
+        assertEquals(Routes.FREESTYLE_MODE, Disciplines.FREESTYLE_SWORD.route)
+        assertEquals(Routes.FREESTYLE_MODE, Disciplines.FREESTYLE_POLE.route)
+        assertEquals(Routes.FREESTYLE_MODE, Disciplines.FREESTYLE_NUNCHAKU.route)
+        assertEquals(Routes.FREESTYLE_MODE, Disciplines.FREESTYLE_FANS.route)
+        assertTrue(Disciplines.entries.all { it.route.path.isNotBlank() })
+    }
+
+    @Test
+    fun onlineAllowsEverySelectableDiscipline() {
+        assertEquals(
+            Disciplines.entries.filter(Disciplines::isSelectable).toSet(),
+            Disciplines.entries.filter { isDisciplineAvailable(it, isOffline = false) }.toSet()
+        )
     }
 }
