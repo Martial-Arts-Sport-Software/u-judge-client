@@ -72,7 +72,7 @@
 | CLI-033 | Must      | Partial | Shared outbox and typed command envelope preserve client sequence and timestamp; Kerugi controls persist monotonic sequence and clock-adjusted timestamp, Tanbon/reconnect pending | Server может восстановить локальный порядок и clock offset             |
 | CLI-034 | Must      | Planned | Client не вычисляет кворум и итоговый балл              | UI не объявляет score accepted до server ACK/state update; server разрешает конфликт score candidates по минимальной оценке |
 | CLI-035 | Must      | Partial | Realtime command client journals the complete command before socket send; Kerugi taps now create durable commands, socket dispatch and app-kill proof pending | App kill до ACK не теряет событие                                      |
-| CLI-036 | Must      | Partial | Shared command transport applies terminal ACK/rejection to outbox; Kerugi shows local pending feedback, terminal outcome UI pending | Состояние каждого недавнего события понятно судье                      |
+| CLI-036 | Must      | Partial | Shared command transport applies terminal ACK/rejection to outbox; Kerugi shows localized pending/accepted/rejected feedback for its latest matching event, while direct socket dispatch remains pending | Состояние каждого недавнего события понятно судье                      |
 | CLI-037 | Must      | Planned | Warning/attention отправляется отдельно от scoring      | Server получает judge, device, session и timestamp; счёт не меняется   |
 | CLI-038 | Must      | Partial | Offline исключает выбор Kerugi/Tanbon; Kerugi controls are gated to an authenticated running matching session, Tanbon pending | Боевые кнопки недоступны без server session                            |
 | CLI-039 | Should    | Planned | У кнопок есть настраиваемый haptic feedback             | Feedback на tap не выдаётся за ACK; accessibility settings учитываются |
@@ -106,7 +106,7 @@
 | CLI-063 | Must      | Partial | Shared typed heartbeat lifecycle schedules exchange only from `ConnectedIdle`, closes the socket and enters typed reconnecting state after timeout/rejection/invalid response; shared transport reconnect reopens the authenticated socket; UI owns lifecycle after pairing acceptance and cancels it with the connection screen, resync pending | UI переходит в reconnecting в ограниченное protocol timeout время      |
 | CLI-064 | Must      | Planned | После reconnect client отправляет cursor и получает resync | Session state сходится до разрешения новых действий                    |
 | CLI-065 | Must      | Partial | Shared command ACK removes only its matching durable event; authenticated replay stops before a later command on a mismatched/invalid response, physical action wiring pending | Поздний ACK не удаляет более новое pending event                       |
-| CLI-066 | Must      | Partial | Terminal command rejection is persisted and excluded from retry; UI feedback pending | Outbox отмечает final rejection и показывает действие пользователю     |
+| CLI-066 | Must      | Partial | Terminal command rejection is persisted and excluded from retry; Kerugi renders localized feedback for its latest matching rejection, while other UI surfaces remain pending | Outbox отмечает final rejection и показывает действие пользователю     |
 | CLI-067 | Must      | Planned | Logout/смена server не удаляет pending events молча        | Требуется успешная доставка или явное подтверждённое discard с аудитом |
 | CLI-068 | Must      | Partial | Shared `ClockSyncClient` выполняет typed four-timestamp exchange через authenticated realtime socket во время initial handshake и reconnect; UI lifecycle wiring готово, credential issuance pending | Four-timestamp exchange оценивает offset/round-trip; combat timestamp не полагается только на device wall clock |
 
@@ -129,7 +129,7 @@
 | CLI-081 | Must      | Partial | Информационный popup открывает правила текущей дисциплины/языка | Ресурс существует и соответствует выбранной дисциплине                               |
 | CLI-082 | Could     | Planned | Английские PDF действительно англоязычные                       | Post-v1 контент проверен владельцем продукта и не является копией RU                 |
 | CLI-083 | Must      | Planned | Combat controls имеют semantic labels                           | Accessibility tree сообщает participant и event type                                 |
-| CLI-084 | Must      | Partial | Pending/accepted/rejected и reconnecting connection status имеют текстовые localized labels; non-color treatment for remaining status surfaces pending | Pending/accepted/rejected имеют текст/иконку/форму                                   |
+| CLI-084 | Must      | Partial | Pending/accepted/rejected Kerugi feedback and reconnecting connection status have textual localized labels; non-color treatment for remaining status surfaces pending | Pending/accepted/rejected имеют текст/иконку/форму                                   |
 | CLI-085 | Must      | Planned | Все критические элементы доступны при pilot screen sizes        | Physical-device smoke test не обнаруживает clipping/недоступных кнопок               |
 | CLI-086 | Should    | Planned | Dynamic font не скрывает критические действия                   | Поддерживаемый accessibility scale проходит layout test                              |
 
