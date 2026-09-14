@@ -42,6 +42,7 @@ fun CombatButtonComponent(
     icon: DrawableResource,
     semanticLabel: String,
     onclick: () -> Unit,
+    enabled: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     OutlinedButton(
@@ -70,6 +71,7 @@ fun CombatButtonComponent(
         colors = ButtonDefaults.buttonColors(
             containerColor = color.color
         ),
+        enabled = enabled,
         onClick = { onclick() },
     ) {
         Image(

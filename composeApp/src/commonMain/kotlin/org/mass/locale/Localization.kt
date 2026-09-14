@@ -62,6 +62,8 @@ object Localization {
             "combat_blue_body" to "Blue participant: body",
             "combat_red_body" to "Red participant: body",
             "combat_cross" to "Neutral cross",
+            "combat_event_pending" to "Event queued. Waiting for server confirmation.",
+            "combat_event_unavailable" to "Scoring is available only during a running Kerugi server session.",
 
             "category_title" to "Choose category",
             "category_juniors" to "Younger juniors / cadets",
@@ -187,6 +189,8 @@ object Localization {
             "combat_blue_body" to "Синий участник: корпус",
             "combat_red_body" to "Красный участник: корпус",
             "combat_cross" to "Нейтральный крест",
+            "combat_event_pending" to "Событие поставлено в очередь. Ожидаем подтверждения сервера.",
+            "combat_event_unavailable" to "Оценка доступна только во время активной серверной сессии Kerugi.",
 
             "category_title" to "Выберите категорию",
             "category_juniors" to "Младшие юноши / Кадеты",

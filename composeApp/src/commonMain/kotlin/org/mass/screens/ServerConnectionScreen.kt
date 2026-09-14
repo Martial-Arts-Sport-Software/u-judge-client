@@ -67,8 +67,6 @@ import org.mass.connection.metadataEndpoint
 import org.mass.connection.manualServerEndpoint
 import org.mass.connection.ManualServerEndpointResult
 import org.mass.connection.ServerMetadataClient
-import org.mass.transport.DurableEventOutbox
-import org.mass.transport.createEventOutboxStorage
 import org.mass.enums.Colors
 import org.mass.enums.Routes
 import org.mass.locale.Localization
@@ -320,7 +318,7 @@ object ServerConnectionScreen : Screen {
             createReconnectCredentialStorage(context)
         )
         val outboxReplay = DueRealtimeOutboxReplay(
-            DurableEventOutbox(createEventOutboxStorage(context))
+            State.eventOutbox
         )
         val realtimeHttpClient = createHttpClient()
         val realtimeClient = RealtimeClient(
