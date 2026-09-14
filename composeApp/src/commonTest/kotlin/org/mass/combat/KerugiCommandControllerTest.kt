@@ -2,6 +2,7 @@ package org.mass.combat
 
 import org.mass.connection.ConnectionEvent
 import org.mass.connection.ConnectionStateStore
+import org.mass.connection.RealtimeCommandResult
 import org.mass.enums.Disciplines
 import org.mass.session.SessionPhase
 import org.mass.session.SessionSnapshot
@@ -96,6 +97,27 @@ class KerugiCommandControllerTest {
         ).submit(KerugiParticipant.RED, KerugiTarget.HEAD)
 
         assertEquals(1, assertIs<KerugiCommandOutcome.Pending>(second).event.clientSequence)
+    }
+
+    @Test
+    fun matchingTerminalResultReplacesPendingFeedbackButUnrelatedResultDoesNot() {
+        val controller = KerugiCommandController(
+            connectedStore(clockOffsetMillis = 0),
+            runningKerugiSession(),
+            DurableEventOutbox(FakeStorage()),
+            nowMillis = { 1_000 },
+            eventId = { "event-1" }
+        )
+        controller.submit(KerugiParticipant.BLUE, KerugiTarget.HEAD)
+
+        controller.recordTerminalOutcome(RealtimeCommandResult.Accepted("another-event"))
+        assertIs<KerugiCommandOutcome.Pending>(controller.latestOutcome)
+
+        controller.recordTerminalOutcome(RealtimeCommandResult.Rejected("event-1", "invalid_session"))
+        assertEquals(
+            KerugiCommandOutcome.Rejected("event-1", "invalid_session"),
+            controller.latestOutcome
+        )
     }
 
     private fun connectedStore(clockOffsetMillis: Long) = ConnectionStateStore().apply {

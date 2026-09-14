@@ -7,6 +7,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.mass.connection.ConnectionState
 import org.mass.connection.ConnectionStateStore
+import org.mass.connection.RealtimeCommandResult
 import org.mass.enums.Disciplines
 import org.mass.session.SessionState
 import org.mass.session.SessionStateStore
@@ -23,6 +24,8 @@ enum class KerugiTarget { HEAD, BODY }
 
 sealed interface KerugiCommandOutcome {
     data class Pending(val event: OutboxEvent) : KerugiCommandOutcome
+    data class Accepted(val eventId: String) : KerugiCommandOutcome
+    data class Rejected(val eventId: String, val code: String) : KerugiCommandOutcome
     data object Unavailable : KerugiCommandOutcome
 }
 
@@ -59,6 +62,24 @@ class KerugiCommandController(
             }.toString()
         )
         return KerugiCommandOutcome.Pending(event).also { latestOutcome = it }
+    }
+
+    /** Updates feedback only for the latest physical Kerugi action, never for an unrelated replay. */
+    fun recordTerminalOutcome(result: RealtimeCommandResult) {
+        val pending = latestOutcome as? KerugiCommandOutcome.Pending ?: return
+        latestOutcome = when (result) {
+            is RealtimeCommandResult.Accepted -> {
+                if (result.eventId == pending.event.eventId) KerugiCommandOutcome.Accepted(result.eventId) else pending
+            }
+            is RealtimeCommandResult.Rejected -> {
+                if (result.eventId == pending.event.eventId) {
+                    KerugiCommandOutcome.Rejected(result.eventId, result.code)
+                } else {
+                    pending
+                }
+            }
+            RealtimeCommandResult.InvalidResponse -> pending
+        }
     }
 
     private fun activeSession() = (session.state as? SessionState.Running)?.snapshot

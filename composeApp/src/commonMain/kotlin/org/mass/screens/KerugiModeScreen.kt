@@ -163,9 +163,15 @@ object KerugiModeScreen : Screen {
                                         .weight(1f)
                                 )
                             }
+                            val latestOutcome = commands.latestOutcome
                             Text(
-                                text = when (commands.latestOutcome) {
+                                text = when (latestOutcome) {
                                     is KerugiCommandOutcome.Pending -> Localization.getString("combat_event_pending")
+                                    is KerugiCommandOutcome.Accepted -> Localization.getString("combat_event_accepted")
+                                    is KerugiCommandOutcome.Rejected -> Localization.getString(
+                                        "combat_event_rejected_${latestOutcome.code}"
+                                    ).takeUnless { it.startsWith("combat_event_rejected_") }
+                                        ?: Localization.getString("combat_event_rejected")
                                     KerugiCommandOutcome.Unavailable -> Localization.getString("combat_event_unavailable")
                                     null -> Localization.getString("combat_event_unavailable")
                                 },
