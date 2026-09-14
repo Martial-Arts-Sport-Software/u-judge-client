@@ -88,7 +88,7 @@ outbox только после terminal ACK.
 
 ## 5. Недели 4-5: Kerugi vertical slice
 
-- Подключить четыре текущие combat buttons к typed events (offline entry в Kerugi/Tanbon заблокирован, `CLI-004`; online session gating pending).
+- [x] Подключить четыре Kerugi combat buttons к durable typed events только для authenticated `running` Kerugi session (`CLI-030`, `CLI-032`, `CLI-033`, `CLI-035`, `CLI-038`; shared controller tests). Local tap сохраняет unique ID, client sequence, clock-adjusted timestamp и session ID с pending feedback; socket dispatch, terminal outcome UI и Tanbon pending.
 - Получать current bout, blue/red labels и session state от server.
 - Блокировать ввод вне `running`.
 - Показывать pending/accepted/rejected feedback без ложного подтверждения.

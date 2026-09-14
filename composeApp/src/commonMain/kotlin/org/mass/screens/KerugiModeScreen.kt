@@ -24,6 +24,9 @@ import u_judge_client.composeapp.generated.resources.Res
 import u_judge_client.composeapp.generated.resources.kerugi_chestplate
 import u_judge_client.composeapp.generated.resources.kerugi_helmet
 import org.mass.State
+import org.mass.combat.KerugiCommandOutcome
+import org.mass.combat.KerugiParticipant
+import org.mass.combat.KerugiTarget
 import org.mass.enums.Colors
 import org.mass.locale.Localization
 import org.mass.ui.button.CombatButtonComponent
@@ -101,6 +104,7 @@ object KerugiModeScreen : Screen {
                         }
                     }
                     else -> {
+                        val commands = State.kerugiCommands
                         Column(
                             Modifier
                                 .fillMaxHeight(0.95f)
@@ -115,7 +119,8 @@ object KerugiModeScreen : Screen {
                                     color = Colors.BLUE,
                                     icon = Res.drawable.kerugi_helmet,
                                     semanticLabel = Localization.getString("combat_blue_head"),
-                                    onclick = {},
+                                    onclick = { commands.submit(KerugiParticipant.BLUE, KerugiTarget.HEAD) },
+                                    enabled = commands.isAvailable,
                                     modifier = Modifier
                                         .weight(1f)
                                 )
@@ -125,7 +130,8 @@ object KerugiModeScreen : Screen {
                                     color = Colors.RED,
                                     icon = Res.drawable.kerugi_helmet,
                                     semanticLabel = Localization.getString("combat_red_head"),
-                                    onclick = {},
+                                    onclick = { commands.submit(KerugiParticipant.RED, KerugiTarget.HEAD) },
+                                    enabled = commands.isAvailable,
                                     modifier = Modifier
                                         .weight(1f)
                                 )
@@ -140,7 +146,8 @@ object KerugiModeScreen : Screen {
                                     color = Colors.BLUE,
                                     icon = Res.drawable.kerugi_chestplate,
                                     semanticLabel = Localization.getString("combat_blue_body"),
-                                    onclick = {},
+                                    onclick = { commands.submit(KerugiParticipant.BLUE, KerugiTarget.BODY) },
+                                    enabled = commands.isAvailable,
                                     modifier = Modifier
                                         .weight(1f)
                                 )
@@ -150,11 +157,22 @@ object KerugiModeScreen : Screen {
                                     color = Colors.RED,
                                     icon = Res.drawable.kerugi_chestplate,
                                     semanticLabel = Localization.getString("combat_red_body"),
-                                    onclick = {},
+                                    onclick = { commands.submit(KerugiParticipant.RED, KerugiTarget.BODY) },
+                                    enabled = commands.isAvailable,
                                     modifier = Modifier
                                         .weight(1f)
                                 )
                             }
+                            Text(
+                                text = when (commands.latestOutcome) {
+                                    is KerugiCommandOutcome.Pending -> Localization.getString("combat_event_pending")
+                                    KerugiCommandOutcome.Unavailable -> Localization.getString("combat_event_unavailable")
+                                    null -> Localization.getString("combat_event_unavailable")
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                            )
                         }
                     }
                 }

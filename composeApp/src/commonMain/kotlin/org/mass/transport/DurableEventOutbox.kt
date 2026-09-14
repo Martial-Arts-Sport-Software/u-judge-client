@@ -46,7 +46,9 @@ class DurableEventOutbox(
     private val retryBaseMillis: Long = 1_000,
     private val retryMaximumMillis: Long = 30_000
 ) {
-    private val records = decode(storage.load()).toMutableList()
+    private val journal = decode(storage.load())
+    private val records = journal.records.toMutableList()
+    private var nextClientSequence = journal.nextClientSequence
 
     init {
         require(retryBaseMillis > 0)
@@ -58,7 +60,28 @@ class DurableEventOutbox(
         require(event.clientSequence >= 0)
         require(records.none { it.event.eventId == event.eventId })
         records += Record.Pending(event, attempt = 0, nextAttemptAtMillis = event.clientTimestampMillis)
+        nextClientSequence = maxOf(nextClientSequence, event.clientSequence + 1)
         persist()
+    }
+
+    /** Creates and persists one physical action before any transport attempt. */
+    fun enqueueNew(
+        eventId: String,
+        clientTimestampMillis: Long,
+        clientTimestamp: String,
+        sessionId: String,
+        payload: String
+    ): OutboxEvent {
+        val event = OutboxEvent(
+            eventId = eventId,
+            clientSequence = nextClientSequence,
+            clientTimestampMillis = clientTimestampMillis,
+            clientTimestamp = clientTimestamp,
+            sessionId = sessionId,
+            payload = payload
+        )
+        enqueue(event)
+        return event
     }
 
     fun pendingEvents(): List<OutboxEvent> = records.filterIsInstance<Record.Pending>()
@@ -111,9 +134,11 @@ class DurableEventOutbox(
     }
 
     private fun persist() {
-        storage.save(buildJsonArray {
-            records.forEach { record ->
-                add(buildJsonObject {
+        storage.save(buildJsonObject {
+            put("nextClientSequence", nextClientSequence)
+            put("records", buildJsonArray {
+                records.forEach { record ->
+                    add(buildJsonObject {
                     put("eventId", record.event.eventId)
                     put("clientSequence", record.event.clientSequence)
                     put("clientTimestampMillis", record.event.clientTimestampMillis)
@@ -131,13 +156,18 @@ class DurableEventOutbox(
                             put("reason", record.reason)
                         }
                     }
-                })
-            }
+                    })
+                }
+            })
         }.toString())
     }
 
-    private fun decode(serialized: String?): List<Record> = try {
-        Json.parseToJsonElement(serialized.orEmpty()).jsonArray.mapNotNull { element ->
+    private fun decode(serialized: String?): Journal = try {
+        val root = Json.parseToJsonElement(serialized.orEmpty())
+        val rootObject = runCatching { root.jsonObject }.getOrNull()
+        val serializedRecords = rootObject?.get("records")?.jsonArray
+            ?: root.jsonArray
+        val records = serializedRecords.mapNotNull { element ->
             val record = element.jsonObject
             val event = OutboxEvent(
                 eventId = record["eventId"]?.jsonPrimitive?.contentOrNull ?: return@mapNotNull null,
@@ -160,8 +190,14 @@ class DurableEventOutbox(
                 else -> null
             }
         }
+        Journal(
+            records = records,
+            nextClientSequence = rootObject?.get("nextClientSequence")?.jsonPrimitive?.contentOrNull
+                ?.toLongOrNull()
+                ?: (records.maxOfOrNull { it.event.clientSequence + 1 } ?: 0)
+        )
     } catch (_: Exception) {
-        emptyList()
+        Journal(emptyList(), 0)
     }
 
     private sealed interface Record {
@@ -178,4 +214,6 @@ class DurableEventOutbox(
             val reason: String
         ) : Record
     }
+
+    private data class Journal(val records: List<Record>, val nextClientSequence: Long)
 }
