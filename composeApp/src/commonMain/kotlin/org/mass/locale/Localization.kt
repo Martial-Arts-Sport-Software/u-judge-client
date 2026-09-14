@@ -63,6 +63,9 @@ object Localization {
             "combat_red_body" to "Red participant: body",
             "combat_cross" to "Neutral cross",
             "combat_event_pending" to "Event queued. Waiting for server confirmation.",
+            "combat_event_accepted" to "Event accepted by the server.",
+            "combat_event_rejected" to "The server rejected this event.",
+            "combat_event_rejected_invalid_session" to "The scoring session is no longer active.",
             "combat_event_unavailable" to "Scoring is available only during a running Kerugi server session.",
 
             "category_title" to "Choose category",
@@ -190,6 +193,9 @@ object Localization {
             "combat_red_body" to "Красный участник: корпус",
             "combat_cross" to "Нейтральный крест",
             "combat_event_pending" to "Событие поставлено в очередь. Ожидаем подтверждения сервера.",
+            "combat_event_accepted" to "Событие подтверждено сервером.",
+            "combat_event_rejected" to "Сервер отклонил это событие.",
+            "combat_event_rejected_invalid_session" to "Серверная сессия оценки больше не активна.",
             "combat_event_unavailable" to "Оценка доступна только во время активной серверной сессии Kerugi.",
 
             "category_title" to "Выберите категорию",

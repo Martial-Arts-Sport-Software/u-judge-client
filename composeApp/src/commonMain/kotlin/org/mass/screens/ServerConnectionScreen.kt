@@ -58,6 +58,7 @@ import org.mass.connection.PairingStatusFlow
 import org.mass.connection.PairingStatusPolling
 import org.mass.connection.PairingStatusResult
 import org.mass.connection.RealtimeClient
+import org.mass.connection.RealtimeCommandClient
 import org.mass.connection.RealtimeReconnectLifecycle
 import org.mass.connection.ReconnectCredentialRepository
 import org.mass.connection.createReconnectCredentialStorage
@@ -318,7 +319,8 @@ object ServerConnectionScreen : Screen {
             createReconnectCredentialStorage(context)
         )
         val outboxReplay = DueRealtimeOutboxReplay(
-            State.eventOutbox
+            State.eventOutbox,
+            RealtimeCommandClient(State.eventOutbox, State.kerugiCommands::recordTerminalOutcome)
         )
         val realtimeHttpClient = createHttpClient()
         val realtimeClient = RealtimeClient(

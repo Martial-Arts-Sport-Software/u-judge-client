@@ -88,10 +88,10 @@ outbox только после terminal ACK.
 
 ## 5. Недели 4-5: Kerugi vertical slice
 
-- [x] Подключить четыре Kerugi combat buttons к durable typed events только для authenticated `running` Kerugi session (`CLI-030`, `CLI-032`, `CLI-033`, `CLI-035`, `CLI-038`; shared controller tests). Local tap сохраняет unique ID, client sequence, clock-adjusted timestamp и session ID с pending feedback; socket dispatch, terminal outcome UI и Tanbon pending.
+- [x] Подключить четыре Kerugi combat buttons к durable typed events только для authenticated `running` Kerugi session (`CLI-030`, `CLI-032`, `CLI-033`, `CLI-035`, `CLI-038`; shared controller tests). Local tap сохраняет unique ID, client sequence, clock-adjusted timestamp и session ID с pending feedback; direct socket dispatch and Tanbon remain pending.
 - Получать current bout, blue/red labels и session state от server.
 - Блокировать ввод вне `running`.
-- Показывать pending/accepted/rejected feedback без ложного подтверждения.
+- [x] Показывать локализованный pending/accepted/rejected feedback без ложного подтверждения для последнего Kerugi event (`CLI-036`, `CLI-066`, `CLI-084`; shared controller/replay tests). Direct socket dispatch and physical-device evidence remain pending.
 - Реализовать warning/attention event.
 - Добавить semantics и distinct non-color statuses.
 - Провести double tap, delayed ACK, duplicate, reorder и clock-offset tests.
