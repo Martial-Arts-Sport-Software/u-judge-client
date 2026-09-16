@@ -7,6 +7,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.mass.connection.ConnectionState
 import org.mass.connection.ConnectionStateStore
+import org.mass.connection.RealtimeCommandDispatcher
 import org.mass.connection.RealtimeCommandResult
 import org.mass.enums.Disciplines
 import org.mass.session.SessionState
@@ -35,7 +36,8 @@ class KerugiCommandController(
     private val session: SessionStateStore,
     private val outbox: DurableEventOutbox,
     private val nowMillis: () -> Long = { Clock.System.now().toEpochMilliseconds() },
-    private val eventId: () -> String = { newEventId() }
+    private val eventId: () -> String = { newEventId() },
+    private val dispatcher: () -> RealtimeCommandDispatcher? = { null }
 ) {
     var latestOutcome by mutableStateOf<KerugiCommandOutcome?>(null)
         private set
@@ -61,7 +63,10 @@ class KerugiCommandController(
                 put("target", target.name)
             }.toString()
         )
-        return KerugiCommandOutcome.Pending(event).also { latestOutcome = it }
+        return KerugiCommandOutcome.Pending(event).also { outcome ->
+            latestOutcome = outcome
+            dispatcher()?.dispatch(event, ::recordTerminalOutcome)
+        }
     }
 
     /** Updates feedback only for the latest physical Kerugi action, never for an unrelated replay. */

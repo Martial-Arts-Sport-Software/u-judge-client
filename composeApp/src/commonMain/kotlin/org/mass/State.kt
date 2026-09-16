@@ -11,6 +11,7 @@ import org.mass.connection.ConnectionEvent
 import org.mass.connection.ConnectionState
 import org.mass.connection.ConnectionStateStore
 import org.mass.connection.ManualServerEndpointResult
+import org.mass.connection.RealtimeCommandDispatcher
 import org.mass.connection.PairingIdentityRepository
 import org.mass.connection.createPairingIdentityStorage
 import org.mass.combat.KerugiCommandController
@@ -61,6 +62,7 @@ object State {
     lateinit var ratingDrafts: RatingDraftRepository
     lateinit var eventOutbox: DurableEventOutbox
     lateinit var kerugiCommands: KerugiCommandController
+    var realtimeCommands: RealtimeCommandDispatcher? = null
     val isOffline: Boolean
         get() = connection.state == ConnectionState.Offline
     var isAnimating by mutableStateOf(false)
@@ -82,7 +84,7 @@ object State {
     fun initializeEventOutbox(context: Any?) {
         if (!::eventOutbox.isInitialized) {
             eventOutbox = DurableEventOutbox(createEventOutboxStorage(context))
-            kerugiCommands = KerugiCommandController(connection, session, eventOutbox)
+            kerugiCommands = KerugiCommandController(connection, session, eventOutbox) { realtimeCommands }
         }
     }
 

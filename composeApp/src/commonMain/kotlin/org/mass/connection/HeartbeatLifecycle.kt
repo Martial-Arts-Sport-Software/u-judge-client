@@ -17,37 +17,43 @@ class HeartbeatLifecycle(
     private val heartbeatTimeoutMillis: Long = DEFAULT_TIMEOUT_MILLIS
 ) {
     private var heartbeatJob: Job? = null
-    private var activeSocket: RealtimeSocket? = null
+    private var activeChannel: RealtimeRequestChannel? = null
 
     suspend fun start(
         socket: RealtimeSocket,
         store: ConnectionStateStore,
         onFailure: suspend () -> Unit = {}
+    ) = start(SerializedRealtimeRequestChannel(socket), store, onFailure)
+
+    suspend fun start(
+        channel: RealtimeRequestChannel,
+        store: ConnectionStateStore,
+        onFailure: suspend () -> Unit = {}
     ) {
         if (store.state !is ConnectionState.ConnectedIdle) return
         stop()
-        activeSocket = socket
+        activeChannel = channel
         heartbeatJob = scope.launch {
             while (true) {
                 val result = try {
-                    withTimeout(heartbeatTimeoutMillis) { heartbeatClient.send(socket) }
+                    withTimeout(heartbeatTimeoutMillis) { heartbeatClient.send(channel) }
                 } catch (_: TimeoutCancellationException) {
-                    end(socket, store, ConnectionFailure.HeartbeatUnavailable, onFailure)
+                    end(channel, store, ConnectionFailure.HeartbeatUnavailable, onFailure)
                     return@launch
                 } catch (exception: CancellationException) {
                     throw exception
                 } catch (exception: Exception) {
-                    end(socket, store, ConnectionFailure.HeartbeatUnavailable, onFailure)
+                    end(channel, store, ConnectionFailure.HeartbeatUnavailable, onFailure)
                     return@launch
                 }
                 when (result) {
                     HeartbeatResult.Acknowledged -> delay(heartbeatIntervalMillis)
                     is HeartbeatResult.Rejected -> {
-                        end(socket, store, ConnectionFailure.HeartbeatRejected(result.code), onFailure)
+                        end(channel, store, ConnectionFailure.HeartbeatRejected(result.code), onFailure)
                         return@launch
                     }
                     HeartbeatResult.InvalidResponse -> {
-                        end(socket, store, ConnectionFailure.HeartbeatResponseInvalid, onFailure)
+                        end(channel, store, ConnectionFailure.HeartbeatResponseInvalid, onFailure)
                         return@launch
                     }
                 }
@@ -56,24 +62,24 @@ class HeartbeatLifecycle(
     }
 
     suspend fun stop() {
-        val socket = activeSocket ?: return
+        val channel = activeChannel ?: return
         heartbeatJob?.cancelAndJoin()
         heartbeatJob = null
-        activeSocket = null
-        socket.close()
+        activeChannel = null
+        channel.close()
     }
 
     private suspend fun end(
-        socket: RealtimeSocket,
+        channel: RealtimeRequestChannel,
         store: ConnectionStateStore,
         failure: ConnectionFailure,
         onFailure: suspend () -> Unit
     ) {
         store.dispatch(ConnectionEvent.HeartbeatFailed(failure))
-        if (activeSocket === socket) {
-            activeSocket = null
+        if (activeChannel === channel) {
+            activeChannel = null
         }
-        socket.close()
+        channel.close()
         onFailure()
     }
 

@@ -20,14 +20,21 @@ class RealtimeCommandClient(
     private val onTerminalResult: (RealtimeCommandResult) -> Unit = {}
 ) {
     suspend fun send(event: OutboxEvent, socket: RealtimeSocket, nowMillis: Long): RealtimeCommandResult {
+        return send(event, SerializedRealtimeRequestChannel(socket), nowMillis)
+    }
+
+    suspend fun send(
+        event: OutboxEvent,
+        channel: RealtimeRequestChannel,
+        nowMillis: Long
+    ): RealtimeCommandResult {
         require(event.clientTimestamp.isNotBlank())
         require(event.sessionId.isNotBlank())
         if (outbox.pendingEvents().none { it.eventId == event.eventId }) {
             outbox.enqueue(event)
         }
         outbox.recordAttempt(event.eventId, nowMillis)
-        socket.send(event.toJson())
-        val result = when (val response = decode(socket.receive())) {
+        val result = when (val response = decode(channel.exchange(event.toJson()))) {
             is Response.Acknowledged -> if (response.eventId == event.eventId && outbox.acknowledge(event.eventId)) {
                 RealtimeCommandResult.Accepted(event.eventId)
             } else {
