@@ -25,6 +25,8 @@ import u_judge_client.composeapp.generated.resources.kerugi_helmet
 import u_judge_client.composeapp.generated.resources.tanbon_body
 import u_judge_client.composeapp.generated.resources.tanbon_cross
 import org.mass.State
+import org.mass.combat.TanbonAction
+import org.mass.combat.TanbonCommandOutcome
 import org.mass.enums.Colors
 import org.mass.locale.Localization
 import org.mass.ui.button.CombatButtonComponent
@@ -103,6 +105,7 @@ object TanbonModeScreen : Screen {
                         }
                     }
                     else -> {
+                        val commands = State.tanbonCommands
                         Column(
                             Modifier
                                 .fillMaxHeight(0.95f)
@@ -117,7 +120,8 @@ object TanbonModeScreen : Screen {
                                     color = Colors.BLUE,
                                     icon = Res.drawable.kerugi_helmet,
                                     semanticLabel = Localization.getString("combat_blue_head"),
-                                    onclick = {},
+                                    onclick = { commands.submit(TanbonAction.BlueHead) },
+                                    enabled = commands.isAvailable,
                                     modifier = Modifier
                                         .weight(1f)
                                 )
@@ -127,7 +131,8 @@ object TanbonModeScreen : Screen {
                                     color = Colors.RED,
                                     icon = Res.drawable.kerugi_helmet,
                                     semanticLabel = Localization.getString("combat_red_head"),
-                                    onclick = {},
+                                    onclick = { commands.submit(TanbonAction.RedHead) },
+                                    enabled = commands.isAvailable,
                                     modifier = Modifier
                                         .weight(1f)
                                 )
@@ -142,7 +147,8 @@ object TanbonModeScreen : Screen {
                                     color = Colors.BLUE,
                                     icon = Res.drawable.tanbon_body,
                                     semanticLabel = Localization.getString("combat_blue_body"),
-                                    onclick = {},
+                                    onclick = { commands.submit(TanbonAction.BlueBody) },
+                                    enabled = commands.isAvailable,
                                     modifier = Modifier
                                         .weight(1f)
                                 )
@@ -152,7 +158,8 @@ object TanbonModeScreen : Screen {
                                     color = Colors.GRAY,
                                     icon = Res.drawable.tanbon_cross,
                                     semanticLabel = Localization.getString("combat_cross"),
-                                    onclick = {},
+                                    onclick = { commands.submit(TanbonAction.Cross) },
+                                    enabled = commands.isAvailable,
                                     modifier = Modifier
                                         .weight(1f)
                                 )
@@ -162,11 +169,28 @@ object TanbonModeScreen : Screen {
                                     color = Colors.RED,
                                     icon = Res.drawable.tanbon_body,
                                     semanticLabel = Localization.getString("combat_red_body"),
-                                    onclick = {},
+                                    onclick = { commands.submit(TanbonAction.RedBody) },
+                                    enabled = commands.isAvailable,
                                     modifier = Modifier
                                         .weight(1f)
                                 )
                             }
+                            val latestOutcome = commands.latestOutcome
+                            Text(
+                                text = when (latestOutcome) {
+                                    is TanbonCommandOutcome.Pending -> Localization.getString("combat_event_pending")
+                                    is TanbonCommandOutcome.Accepted -> Localization.getString("combat_event_accepted")
+                                    is TanbonCommandOutcome.Rejected -> Localization.getString(
+                                        "combat_event_rejected_${latestOutcome.code}"
+                                    ).takeUnless { it.startsWith("combat_event_rejected_") }
+                                        ?: Localization.getString("combat_event_rejected")
+                                    TanbonCommandOutcome.Unavailable -> Localization.getString("combat_event_unavailable")
+                                    null -> Localization.getString("combat_event_unavailable")
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                            )
                         }
                     }
                 }
