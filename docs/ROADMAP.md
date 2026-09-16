@@ -119,9 +119,9 @@ audit содержит каждый physical tap один раз.
 
 ### Tanbon
 
-- Подключить пять текущих buttons.
-- Отправлять `HEAD`, `BODY` и neutral `CROSS`.
-- Переиспользовать outbox/feedback Kerugi.
+- [x] Подключить пять текущих buttons к durable typed events только для authenticated `running` Tanbon session (`CLI-031`, `CLI-032`, `CLI-033`, `CLI-035`, `CLI-038`; shared controller tests). Local tap сохраняет unique ID, client sequence, clock-adjusted timestamp и session ID и немедленно dispatch через serialized authenticated channel; server integration и reconnect physical proof pending.
+- [x] Отправлять `HEAD`, `BODY` и neutral `CROSS` (`CLI-031`; shared payload contract tests).
+- [x] Переиспользовать outbox/feedback Kerugi (`CLI-036`, `CLI-066`, `CLI-084`; shared ACK/rejection, replay и matching-feedback tests). Server integration evidence pending.
 
 ### Технические дисциплины
 
