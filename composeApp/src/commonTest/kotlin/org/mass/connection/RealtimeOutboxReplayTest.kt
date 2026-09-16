@@ -32,6 +32,21 @@ class RealtimeOutboxReplayTest {
     }
 
     @Test
+    fun replayForwardsTerminalOutcomeToItsFeedbackListener() = runTest {
+        val outbox = DurableEventOutbox(FakeStorage())
+        val event = event("event-1", 1)
+        outbox.enqueue(event)
+        var feedback: RealtimeCommandResult? = null
+
+        val commandClient = RealtimeCommandClient(outbox) { feedback = it }
+        DueRealtimeOutboxReplay(outbox, commandClient, nowMillis = { 100 }).replay(
+            ResponseSocket("""{"type":"command_rejected","eventId":"event-1","code":"invalid_session"}""")
+        )
+
+        assertEquals(RealtimeCommandResult.Rejected("event-1", "invalid_session"), feedback)
+    }
+
+    @Test
     fun doesNotSendLaterCommandsWhenTheEarliestCommandIsNotDue() = runTest {
         val outbox = DurableEventOutbox(FakeStorage())
         val first = event("event-1", 1, timestampMillis = 200)

@@ -15,7 +15,10 @@ sealed interface RealtimeCommandResult {
 }
 
 /** Sends an already durable command and applies only its matching terminal server response. */
-class RealtimeCommandClient(private val outbox: DurableEventOutbox) {
+class RealtimeCommandClient(
+    private val outbox: DurableEventOutbox,
+    private val onTerminalResult: (RealtimeCommandResult) -> Unit = {}
+) {
     suspend fun send(event: OutboxEvent, socket: RealtimeSocket, nowMillis: Long): RealtimeCommandResult {
         return send(event, SerializedRealtimeRequestChannel(socket), nowMillis)
     }
@@ -31,7 +34,7 @@ class RealtimeCommandClient(private val outbox: DurableEventOutbox) {
             outbox.enqueue(event)
         }
         outbox.recordAttempt(event.eventId, nowMillis)
-        return when (val response = decode(channel.exchange(event.toJson()))) {
+        val result = when (val response = decode(channel.exchange(event.toJson()))) {
             is Response.Acknowledged -> if (response.eventId == event.eventId && outbox.acknowledge(event.eventId)) {
                 RealtimeCommandResult.Accepted(event.eventId)
             } else {
@@ -44,6 +47,10 @@ class RealtimeCommandClient(private val outbox: DurableEventOutbox) {
             }
             Response.Invalid -> RealtimeCommandResult.InvalidResponse
         }
+        if (result is RealtimeCommandResult.Accepted || result is RealtimeCommandResult.Rejected) {
+            onTerminalResult(result)
+        }
+        return result
     }
 
     private fun OutboxEvent.toJson(): String = buildJsonObject {

@@ -65,13 +65,25 @@ class KerugiCommandController(
         )
         return KerugiCommandOutcome.Pending(event).also { outcome ->
             latestOutcome = outcome
-            dispatcher()?.dispatch(event) { result ->
-                latestOutcome = when (result) {
-                    is RealtimeCommandResult.Accepted -> KerugiCommandOutcome.Accepted(result.eventId)
-                    is RealtimeCommandResult.Rejected -> KerugiCommandOutcome.Rejected(result.eventId, result.code)
-                    RealtimeCommandResult.InvalidResponse -> outcome
+            dispatcher()?.dispatch(event, ::recordTerminalOutcome)
+        }
+    }
+
+    /** Updates feedback only for the latest physical Kerugi action, never for an unrelated replay. */
+    fun recordTerminalOutcome(result: RealtimeCommandResult) {
+        val pending = latestOutcome as? KerugiCommandOutcome.Pending ?: return
+        latestOutcome = when (result) {
+            is RealtimeCommandResult.Accepted -> {
+                if (result.eventId == pending.event.eventId) KerugiCommandOutcome.Accepted(result.eventId) else pending
+            }
+            is RealtimeCommandResult.Rejected -> {
+                if (result.eventId == pending.event.eventId) {
+                    KerugiCommandOutcome.Rejected(result.eventId, result.code)
+                } else {
+                    pending
                 }
             }
+            RealtimeCommandResult.InvalidResponse -> pending
         }
     }
 

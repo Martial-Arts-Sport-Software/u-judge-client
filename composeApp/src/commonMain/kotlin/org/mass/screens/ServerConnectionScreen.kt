@@ -320,7 +320,8 @@ object ServerConnectionScreen : Screen {
             createReconnectCredentialStorage(context)
         )
         val outboxReplay = DueRealtimeOutboxReplay(
-            State.eventOutbox
+            State.eventOutbox,
+            RealtimeCommandClient(State.eventOutbox, State.kerugiCommands::recordTerminalOutcome)
         )
         State.realtimeCommands = RealtimeCommandDispatcher(
             scope,

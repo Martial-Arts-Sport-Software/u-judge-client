@@ -39,6 +39,20 @@ class RealtimeCommandClientTest {
     }
 
     @Test
+    fun terminalResultNotifiesFeedbackAfterApplyingTheOutboxOutcome() = runTest {
+        val outbox = DurableEventOutbox(FakeStorage())
+        val event = event("event-1", 1)
+        var feedback: RealtimeCommandResult? = null
+
+        RealtimeCommandClient(outbox) { result ->
+            assertEquals(emptyList(), outbox.pendingEvents())
+            feedback = result
+        }.send(event, FakeSocket("""{"type":"command_ack","eventId":"event-1"}"""), 100)
+
+        assertEquals(RealtimeCommandResult.Accepted("event-1"), feedback)
+    }
+
+    @Test
     fun malformedResponseLeavesPersistedCommandPendingForRetry() = runTest {
         val outbox = DurableEventOutbox(FakeStorage())
         val event = event("event-1", 1)
