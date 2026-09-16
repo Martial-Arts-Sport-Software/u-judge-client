@@ -7,6 +7,8 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.mass.connection.ConnectionState
 import org.mass.connection.ConnectionStateStore
+import org.mass.connection.RealtimeCommandDispatcher
+import org.mass.connection.RealtimeCommandResult
 import org.mass.enums.Disciplines
 import org.mass.session.SessionState
 import org.mass.session.SessionStateStore
@@ -23,6 +25,8 @@ enum class KerugiTarget { HEAD, BODY }
 
 sealed interface KerugiCommandOutcome {
     data class Pending(val event: OutboxEvent) : KerugiCommandOutcome
+    data class Accepted(val eventId: String) : KerugiCommandOutcome
+    data class Rejected(val eventId: String, val code: String) : KerugiCommandOutcome
     data object Unavailable : KerugiCommandOutcome
 }
 
@@ -32,7 +36,8 @@ class KerugiCommandController(
     private val session: SessionStateStore,
     private val outbox: DurableEventOutbox,
     private val nowMillis: () -> Long = { Clock.System.now().toEpochMilliseconds() },
-    private val eventId: () -> String = { newEventId() }
+    private val eventId: () -> String = { newEventId() },
+    private val dispatcher: () -> RealtimeCommandDispatcher? = { null }
 ) {
     var latestOutcome by mutableStateOf<KerugiCommandOutcome?>(null)
         private set
@@ -58,7 +63,16 @@ class KerugiCommandController(
                 put("target", target.name)
             }.toString()
         )
-        return KerugiCommandOutcome.Pending(event).also { latestOutcome = it }
+        return KerugiCommandOutcome.Pending(event).also { outcome ->
+            latestOutcome = outcome
+            dispatcher()?.dispatch(event) { result ->
+                latestOutcome = when (result) {
+                    is RealtimeCommandResult.Accepted -> KerugiCommandOutcome.Accepted(result.eventId)
+                    is RealtimeCommandResult.Rejected -> KerugiCommandOutcome.Rejected(result.eventId, result.code)
+                    RealtimeCommandResult.InvalidResponse -> outcome
+                }
+            }
+        }
     }
 
     private fun activeSession() = (session.state as? SessionState.Running)?.snapshot

@@ -166,6 +166,8 @@ object KerugiModeScreen : Screen {
                             Text(
                                 text = when (commands.latestOutcome) {
                                     is KerugiCommandOutcome.Pending -> Localization.getString("combat_event_pending")
+                                    is KerugiCommandOutcome.Accepted -> Localization.getString("combat_event_accepted")
+                                    is KerugiCommandOutcome.Rejected -> Localization.getString("combat_event_rejected")
                                     KerugiCommandOutcome.Unavailable -> Localization.getString("combat_event_unavailable")
                                     null -> Localization.getString("combat_event_unavailable")
                                 },

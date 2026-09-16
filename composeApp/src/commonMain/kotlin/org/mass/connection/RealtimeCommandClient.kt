@@ -17,14 +17,21 @@ sealed interface RealtimeCommandResult {
 /** Sends an already durable command and applies only its matching terminal server response. */
 class RealtimeCommandClient(private val outbox: DurableEventOutbox) {
     suspend fun send(event: OutboxEvent, socket: RealtimeSocket, nowMillis: Long): RealtimeCommandResult {
+        return send(event, SerializedRealtimeRequestChannel(socket), nowMillis)
+    }
+
+    suspend fun send(
+        event: OutboxEvent,
+        channel: RealtimeRequestChannel,
+        nowMillis: Long
+    ): RealtimeCommandResult {
         require(event.clientTimestamp.isNotBlank())
         require(event.sessionId.isNotBlank())
         if (outbox.pendingEvents().none { it.eventId == event.eventId }) {
             outbox.enqueue(event)
         }
         outbox.recordAttempt(event.eventId, nowMillis)
-        socket.send(event.toJson())
-        return when (val response = decode(socket.receive())) {
+        return when (val response = decode(channel.exchange(event.toJson()))) {
             is Response.Acknowledged -> if (response.eventId == event.eventId && outbox.acknowledge(event.eventId)) {
                 RealtimeCommandResult.Accepted(event.eventId)
             } else {

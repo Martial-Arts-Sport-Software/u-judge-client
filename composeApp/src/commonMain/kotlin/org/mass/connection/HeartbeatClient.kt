@@ -15,8 +15,11 @@ sealed interface HeartbeatResult {
 /** Sends one authenticated heartbeat and validates its terminal server response. */
 class HeartbeatClient {
     suspend fun send(socket: RealtimeSocket): HeartbeatResult {
-        socket.send(buildJsonObject { put("type", "heartbeat") }.toString())
-        return decode(socket.receive())
+        return send(SerializedRealtimeRequestChannel(socket))
+    }
+
+    suspend fun send(channel: RealtimeRequestChannel): HeartbeatResult {
+        return decode(channel.exchange(buildJsonObject { put("type", "heartbeat") }.toString()))
     }
 
     private fun decode(payload: String): HeartbeatResult = try {

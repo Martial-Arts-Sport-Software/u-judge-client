@@ -7,7 +7,9 @@ class RealtimeReconnectLifecycle(
     private val reconnectCredentialRepository: ReconnectCredentialRepository,
     private val realtimeClient: RealtimeClient,
     private val heartbeatLifecycle: HeartbeatLifecycle,
-    private val outboxReplay: RealtimeOutboxReplay = RealtimeOutboxReplay { true }
+    private val outboxReplay: RealtimeOutboxReplay = RealtimeOutboxReplay { true },
+    private val onChannelReady: (RealtimeRequestChannel) -> Unit = {},
+    private val onChannelClosed: () -> Unit = {}
 ) {
     suspend fun start(socket: RealtimeSocket, store: ConnectionStateStore) {
         val replayFailure = try {
@@ -23,11 +25,17 @@ class RealtimeReconnectLifecycle(
             reconnect(store)
             return
         }
-        heartbeatLifecycle.start(socket, store) { reconnect(store) }
+        val channel = SerializedRealtimeRequestChannel(socket)
+        onChannelReady(channel)
+        heartbeatLifecycle.start(channel, store) {
+            onChannelClosed()
+            reconnect(store)
+        }
     }
 
     suspend fun stop() {
         heartbeatLifecycle.stop()
+        onChannelClosed()
     }
 
     private suspend fun reconnect(store: ConnectionStateStore) {

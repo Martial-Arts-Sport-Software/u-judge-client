@@ -1,7 +1,14 @@
 package org.mass.combat
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.mass.connection.ConnectionEvent
 import org.mass.connection.ConnectionStateStore
+import org.mass.connection.RealtimeCommandClient
+import org.mass.connection.RealtimeCommandDispatcher
+import org.mass.connection.RealtimeSocket
+import org.mass.connection.SerializedRealtimeRequestChannel
 import org.mass.enums.Disciplines
 import org.mass.session.SessionPhase
 import org.mass.session.SessionSnapshot
@@ -13,6 +20,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class KerugiCommandControllerTest {
     @Test
     fun runningKerugiSessionPersistsTypedCommandsWithAdjustedTimestampAndSequence() {
@@ -98,6 +106,57 @@ class KerugiCommandControllerTest {
         assertEquals(1, assertIs<KerugiCommandOutcome.Pending>(second).event.clientSequence)
     }
 
+    @Test
+    fun matchingAcknowledgementUpdatesFeedbackAndRemovesTheDurableCommand() = runTest {
+        val storage = FakeStorage()
+        val outbox = DurableEventOutbox(storage)
+        val dispatcher = RealtimeCommandDispatcher(this, RealtimeCommandClient(outbox), nowMillis = { 1_000 })
+        dispatcher.activate(SerializedRealtimeRequestChannel(ResponseSocket("""{"type":"command_ack","eventId":"event-1"}""")))
+        val controller = KerugiCommandController(
+            connectedStore(0), runningKerugiSession(), outbox, { 1_000 }, { "event-1" }
+        ) { dispatcher }
+
+        controller.submit(KerugiParticipant.BLUE, KerugiTarget.HEAD)
+        advanceUntilIdle()
+
+        assertEquals(KerugiCommandOutcome.Accepted("event-1"), controller.latestOutcome)
+        assertEquals(emptyList(), outbox.pendingEvents())
+    }
+
+    @Test
+    fun terminalRejectionRemainsDurableAndShowsRejectedFeedback() = runTest {
+        val storage = FakeStorage()
+        val outbox = DurableEventOutbox(storage)
+        val dispatcher = RealtimeCommandDispatcher(this, RealtimeCommandClient(outbox), nowMillis = { 1_000 })
+        dispatcher.activate(SerializedRealtimeRequestChannel(ResponseSocket("""{"type":"command_rejected","eventId":"event-1","code":"invalid_session"}""")))
+        val controller = KerugiCommandController(
+            connectedStore(0), runningKerugiSession(), outbox, { 1_000 }, { "event-1" }
+        ) { dispatcher }
+
+        controller.submit(KerugiParticipant.BLUE, KerugiTarget.HEAD)
+        advanceUntilIdle()
+
+        assertEquals(KerugiCommandOutcome.Rejected("event-1", "invalid_session"), controller.latestOutcome)
+        assertEquals("invalid_session", outbox.rejectedEvents().single().reason)
+    }
+
+    @Test
+    fun transportFailureKeepsPendingFeedbackAndTheOriginalDurableCommandForReplay() = runTest {
+        val storage = FakeStorage()
+        val outbox = DurableEventOutbox(storage)
+        val dispatcher = RealtimeCommandDispatcher(this, RealtimeCommandClient(outbox), nowMillis = { 1_000 })
+        dispatcher.activate(SerializedRealtimeRequestChannel(FailingSocket()))
+        val controller = KerugiCommandController(
+            connectedStore(0), runningKerugiSession(), outbox, { 1_000 }, { "event-1" }
+        ) { dispatcher }
+
+        controller.submit(KerugiParticipant.BLUE, KerugiTarget.HEAD)
+        advanceUntilIdle()
+
+        assertIs<KerugiCommandOutcome.Pending>(controller.latestOutcome)
+        assertEquals("event-1", outbox.pendingEvents().single().eventId)
+    }
+
     private fun connectedStore(clockOffsetMillis: Long) = ConnectionStateStore().apply {
         dispatch(ConnectionEvent.StartDiscovery)
         dispatch(ConnectionEvent.SelectServer("server-1"))
@@ -138,5 +197,21 @@ class KerugiCommandControllerTest {
         override fun save(value: String) {
             this.value = value
         }
+    }
+
+    private class ResponseSocket(private val response: String) : RealtimeSocket {
+        override suspend fun send(payload: String) = Unit
+
+        override suspend fun receive(): String = response
+
+        override suspend fun close() = Unit
+    }
+
+    private class FailingSocket : RealtimeSocket {
+        override suspend fun send(payload: String): Nothing = error("connection dropped")
+
+        override suspend fun receive(): String = error("connection dropped")
+
+        override suspend fun close() = Unit
     }
 }
