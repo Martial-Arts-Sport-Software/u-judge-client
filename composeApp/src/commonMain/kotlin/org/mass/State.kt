@@ -15,6 +15,7 @@ import org.mass.connection.RealtimeCommandDispatcher
 import org.mass.connection.PairingIdentityRepository
 import org.mass.connection.createPairingIdentityStorage
 import org.mass.combat.KerugiCommandController
+import org.mass.combat.TanbonCommandController
 import org.mass.discovery.ServerDiscoveryStore
 import org.mass.entities.Rating
 import org.mass.enums.Categories
@@ -62,6 +63,7 @@ object State {
     lateinit var ratingDrafts: RatingDraftRepository
     lateinit var eventOutbox: DurableEventOutbox
     lateinit var kerugiCommands: KerugiCommandController
+    lateinit var tanbonCommands: TanbonCommandController
     var realtimeCommands: RealtimeCommandDispatcher? = null
     val isOffline: Boolean
         get() = connection.state == ConnectionState.Offline
@@ -85,6 +87,7 @@ object State {
         if (!::eventOutbox.isInitialized) {
             eventOutbox = DurableEventOutbox(createEventOutboxStorage(context))
             kerugiCommands = KerugiCommandController(connection, session, eventOutbox) { realtimeCommands }
+            tanbonCommands = TanbonCommandController(connection, session, eventOutbox) { realtimeCommands }
         }
     }
 
