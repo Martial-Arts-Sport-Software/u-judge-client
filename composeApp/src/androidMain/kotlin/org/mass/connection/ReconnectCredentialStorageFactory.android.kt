@@ -19,7 +19,19 @@ actual fun createReconnectCredentialStorage(context: Any?): ReconnectCredentialS
 private class AndroidReconnectCredentialStorage(
     private val preferences: android.content.SharedPreferences
 ) : ReconnectCredentialStorage {
-    override fun load(): String? = preferences.getString(CREDENTIAL_KEY, null)?.let { encrypted ->
+    override fun load(): String? = load(CREDENTIAL_KEY)
+
+    override fun save(credential: String) = save(CREDENTIAL_KEY, credential)
+
+    override fun clear() = clear(CREDENTIAL_KEY)
+
+    override fun loadPairingDeliveryProof(): String? = load(PAIRING_PROOF_KEY)
+
+    override fun savePairingDeliveryProof(proof: String) = save(PAIRING_PROOF_KEY, proof)
+
+    override fun clearPairingDeliveryProof() = clear(PAIRING_PROOF_KEY)
+
+    private fun load(key: String): String? = preferences.getString(key, null)?.let { encrypted ->
         runCatching {
             val (encodedIv, encodedCredential) = encrypted.split(SEPARATOR, limit = 2)
             val cipher = Cipher.getInstance(TRANSFORMATION).apply {
@@ -27,21 +39,21 @@ private class AndroidReconnectCredentialStorage(
             }
             cipher.doFinal(decode(encodedCredential)).decodeToString()
         }.getOrElse {
-            clear()
+            clear(key)
             null
         }
     }
 
-    override fun save(credential: String) {
+    private fun save(key: String, credential: String) {
         val cipher = Cipher.getInstance(TRANSFORMATION).apply {
             init(Cipher.ENCRYPT_MODE, secretKey())
         }
         val encrypted = "${encode(cipher.iv)}$SEPARATOR${encode(cipher.doFinal(credential.encodeToByteArray()))}"
-        preferences.edit().putString(CREDENTIAL_KEY, encrypted).apply()
+        preferences.edit().putString(key, encrypted).apply()
     }
 
-    override fun clear() {
-        preferences.edit().remove(CREDENTIAL_KEY).apply()
+    private fun clear(key: String) {
+        preferences.edit().remove(key).apply()
     }
 
     private fun secretKey(): SecretKey {
@@ -68,6 +80,7 @@ private class AndroidReconnectCredentialStorage(
 
     private companion object {
         const val CREDENTIAL_KEY = "credential"
+        const val PAIRING_PROOF_KEY = "pairing_delivery_proof"
         const val KEY_ALIAS = "org.mass.reconnect_credential"
         const val KEY_STORE = "AndroidKeyStore"
         const val TRANSFORMATION = "AES/GCM/NoPadding"

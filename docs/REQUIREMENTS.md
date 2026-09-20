@@ -31,7 +31,7 @@
 | CLI-002 | Must      | Partial | Судья вводит фамилию до выбора режима                     | Пустое/пробельное значение не позволяет продолжить                                 |
 | CLI-003 | Must      | Partial | Клиент поддерживает online и offline                      | Выбранный режим явно виден и не меняется из-за навигации                           |
 | CLI-004 | Must      | Implemented | Offline разрешает только технические дисциплины; Kerugi/Tanbon disabled с локализованной причиной | Kerugi/Tanbon заблокированы с объяснением причины                                  |
-| CLI-005 | Must      | Partial | Shared realtime handshake переводит pairing-pending state в connected только после typed server acceptance и authenticated clock sync; UI запускает lifecycle после HTTP pairing acceptance со stored credential, credential issuance pending | Простого выбора mDNS service недостаточно для connected state                      |
+| CLI-005 | Must      | Partial | Shared realtime handshake переводит pairing-pending state в connected только после typed server acceptance и authenticated clock sync; UI persists a proof-bound issued credential in secure storage before lifecycle startup, while server delivery remains pending | Простого выбора mDNS service недостаточно для connected state                      |
 | CLI-006 | Should    | Planned | Post-v1 интерфейс переключается между RU/EN               | Все строки текущего flow локализованы; v1 Pilot требует русский интерфейс          |
 | CLI-007 | Should    | Planned | Фамилия, язык и локальные черновики переживают перезапуск | После restart значения восстановлены из локального persistence                     |
 
@@ -138,7 +138,7 @@
 | ID      | Приоритет | Статус  | Требование                                                                | Критерий приёмки                                          |
 |---------|-----------|---------|---------------------------------------------------------------------------|-----------------------------------------------------------|
 | CLI-090 | Must      | Planned | Client не отправляет события до pairing                                   | Anonymous write отклоняется и локально, и server-side     |
-| CLI-091 | Must      | Partial | Reconnect credential хранится в Android Keystore-backed storage и iOS Keychain; остальные competition/session credentials pending | Секреты отсутствуют в plain preferences/logs              |
+| CLI-091 | Must      | Partial | Reconnect credential и pairing delivery proof хранятся в Android Keystore-backed storage и iOS Keychain; server delivery и остальные competition/session credentials pending | Секреты отсутствуют в plain preferences/logs              |
 | CLI-092 | Must      | Planned | Логи не содержат полный rating payload и персональные данные по умолчанию | Production pilot log использует IDs и error codes         |
 | CLI-093 | Must      | Partial | Protocol/capability validation готова как shared domain boundary; mDNS и manual HTTP endpoint используют её, TLS trust UX pending | Подключение к сервису неверного типа/protocol отклоняется |
 | CLI-094 | Must      | Planned | Локальные черновики удаляются явным действием или после retention policy  | Судья понимает, какие данные остались на устройстве       |

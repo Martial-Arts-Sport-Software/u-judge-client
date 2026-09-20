@@ -14,15 +14,18 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 data class PairingRequest(
     val deviceId: String,
     val surname: String,
-    val platform: String
+    val platform: String,
+    val deliveryProof: String = PairingClient.newDeliveryProof()
 )
 
 sealed interface PairingResult {
-    data class Pending(val requestId: String) : PairingResult
+    data class Pending(val requestId: String, val deliveryProof: String = "") : PairingResult
     data object Rejected : PairingResult
     data object Unavailable : PairingResult
 }
@@ -40,7 +43,7 @@ class PairingClient(
             store.dispatch(ConnectionEvent.RejectPairing(ConnectionFailure.PairingUnavailable))
             return PairingResult.Unavailable
         }
-        val result = decodePending(response.bodyAsText())
+        val result = decodePending(response.bodyAsText(), request.deliveryProof)
         if (result == null) {
             store.dispatch(ConnectionEvent.RejectPairing(ConnectionFailure.PairingResponseInvalid))
             PairingResult.Rejected
@@ -54,11 +57,11 @@ class PairingClient(
         PairingResult.Unavailable
     }
 
-    private fun decodePending(response: String): PairingResult.Pending? = try {
+    private fun decodePending(response: String, deliveryProof: String): PairingResult.Pending? = try {
         val body = Json.parseToJsonElement(response).jsonObject
         val requestId = body["requestId"]?.jsonPrimitive?.content
         if (body["state"]?.jsonPrimitive?.content == "pending" && !requestId.isNullOrBlank()) {
-            PairingResult.Pending(requestId)
+            PairingResult.Pending(requestId, deliveryProof)
         } else {
             null
         }
@@ -70,5 +73,12 @@ class PairingClient(
         put("deviceId", deviceId)
         put("surname", surname)
         put("platform", platform)
+        put("deliveryProof", deliveryProof)
     }.toString()
+
+    @OptIn(ExperimentalUuidApi::class)
+    companion object {
+        /** The proof authorizes one confidential credential delivery, not realtime access. */
+        fun newDeliveryProof(): String = Uuid.random().toString()
+    }
 }

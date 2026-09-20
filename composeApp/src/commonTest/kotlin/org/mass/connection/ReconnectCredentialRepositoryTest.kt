@@ -24,8 +24,21 @@ class ReconnectCredentialRepositoryTest {
         assertNull(repository.load())
     }
 
+    @Test
+    fun clearsDeliveryProofAfterCredentialCommit() {
+        val storage = FakeStorage()
+        val repository = ReconnectCredentialRepository(storage)
+        repository.savePairingDeliveryProof("proof-1")
+        repository.save("credential-1")
+        repository.clearPairingDeliveryProof()
+
+        assertNull(repository.loadPairingDeliveryProof())
+        assertEquals("credential-1", repository.load())
+    }
+
     private class FakeStorage : ReconnectCredentialStorage {
         private var credential: String? = null
+        private var proof: String? = null
 
         override fun load(): String? = credential
 
@@ -35,6 +48,16 @@ class ReconnectCredentialRepositoryTest {
 
         override fun clear() {
             credential = null
+        }
+
+        override fun loadPairingDeliveryProof(): String? = proof
+
+        override fun savePairingDeliveryProof(proof: String) {
+            this.proof = proof
+        }
+
+        override fun clearPairingDeliveryProof() {
+            proof = null
         }
     }
 }

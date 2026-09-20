@@ -26,13 +26,13 @@ class PairingClientTest {
         val store = validatedStore()
 
         assertEquals(
-            PairingResult.Pending("request-1"),
-            client.request(PairingRequest("device-7", "Ivanov", "ios"), store)
+            PairingResult.Pending("request-1", "proof-1"),
+            client.request(PairingRequest("device-7", "Ivanov", "ios", "proof-1"), store)
         )
         assertEquals("POST", request.method.value)
         assertEquals("/v1/pairing-requests", request.url.encodedPath)
         assertEquals(
-            "{\"deviceId\":\"device-7\",\"surname\":\"Ivanov\",\"platform\":\"ios\"}",
+            "{\"deviceId\":\"device-7\",\"surname\":\"Ivanov\",\"platform\":\"ios\",\"deliveryProof\":\"proof-1\"}",
             (request.body as OutgoingContent.ByteArrayContent).bytes().decodeToString()
         )
         assertEquals(ConnectionState.PairingPending("court-1"), store.state)

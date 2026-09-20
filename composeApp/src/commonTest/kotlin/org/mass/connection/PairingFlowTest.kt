@@ -27,9 +27,9 @@ class PairingFlowTest {
         val result = PairingFlow(
             ServerMetadataClient(client, Url("http://court.local")),
             PairingClient(client, Url("http://court.local"))
-        ).connect(PairingRequest("device-1", "Ivanov", "android"), store)
+        ).connect(PairingRequest("device-1", "Ivanov", "android", "proof-1"), store)
 
-        assertEquals(PairingResult.Pending("request-1"), result)
+        assertEquals(PairingResult.Pending("request-1", "proof-1"), result)
         assertEquals(ConnectionState.PairingPending("court-1"), store.state)
     }
 
