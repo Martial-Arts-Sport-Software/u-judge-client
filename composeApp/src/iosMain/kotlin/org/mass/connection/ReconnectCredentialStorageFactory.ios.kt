@@ -43,9 +43,21 @@ actual fun createReconnectCredentialStorage(context: Any?): ReconnectCredentialS
     IosReconnectCredentialStorage()
 
 private class IosReconnectCredentialStorage : ReconnectCredentialStorage {
-    override fun load(): String? = memScoped {
+    override fun load(): String? = load(ACCOUNT_NAME)
+
+    override fun save(credential: String) = save(ACCOUNT_NAME, credential)
+
+    override fun clear() = clear(ACCOUNT_NAME)
+
+    override fun loadPairingDeliveryProof(): String? = load(PAIRING_PROOF_ACCOUNT)
+
+    override fun savePairingDeliveryProof(proof: String) = save(PAIRING_PROOF_ACCOUNT, proof)
+
+    override fun clearPairingDeliveryProof() = clear(PAIRING_PROOF_ACCOUNT)
+
+    private fun load(accountName: String): String? = memScoped {
         val result = alloc<CFTypeRefVar>()
-        val status = withQuery(
+        val status = withQuery(accountName,
             kSecReturnData to kCFBooleanTrue,
             kSecMatchLimit to kSecMatchLimitOne
         ) { SecItemCopyMatching(it, result.ptr) }
@@ -57,26 +69,27 @@ private class IosReconnectCredentialStorage : ReconnectCredentialStorage {
         }
     }
 
-    override fun save(credential: String) {
-        clear()
+    private fun save(accountName: String, credential: String) {
+        clear(accountName)
         val data = CFBridgingRetain(credential.encodeToByteArray().asNSData())
         try {
-            withQuery(kSecValueData to data) { SecItemAdd(it, null) }
+            withQuery(accountName, kSecValueData to data) { SecItemAdd(it, null) }
         } finally {
             CFBridgingRelease(data)
         }
     }
 
-    override fun clear() {
-        withQuery { SecItemDelete(it) }
+    private fun clear(accountName: String) {
+        withQuery(accountName) { SecItemDelete(it) }
     }
 
     private inline fun <T> withQuery(
+        accountName: String = ACCOUNT_NAME,
         vararg attributes: Pair<CFStringRef?, CFTypeRef?>,
         operation: (CFDictionaryRef?) -> T
     ): T = memScoped {
         val service = CFBridgingRetain(SERVICE_NAME)
-        val account = CFBridgingRetain(ACCOUNT_NAME)
+        val account = CFBridgingRetain(accountName)
         val query = cfDictionaryOf(
             kSecClass to kSecClassGenericPassword,
             kSecAttrService to service,
@@ -100,6 +113,7 @@ private class IosReconnectCredentialStorage : ReconnectCredentialStorage {
     private companion object {
         const val SERVICE_NAME = "org.mass.ujudge.reconnect"
         const val ACCOUNT_NAME = "credential"
+        const val PAIRING_PROOF_ACCOUNT = "pairing_delivery_proof"
     }
 }
 

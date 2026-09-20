@@ -27,7 +27,7 @@ class PairingStatusClientTest {
             Url("http://court.local")
         )
 
-        assertEquals(PairingStatusResult.Pending("android-8"), client.fetch("request-1"))
+        assertEquals(PairingStatusResult.Pending("android-8"), client.fetch("request-1", "proof-1"))
         assertEquals("GET", request.method.value)
         assertEquals("/v1/pairing-status/request-1", request.url.encodedPath)
     }
@@ -35,10 +35,10 @@ class PairingStatusClientTest {
     @Test
     fun readsAcceptedPairingStatus() = runTest {
         val client = clientReturning(
-            """{"type":"pairing_status","state":"accepted","deviceId":"ios-8"}"""
+            """{"type":"pairing_status","state":"accepted","deviceId":"ios-8","reconnectCredential":"credential-1"}"""
         )
 
-        assertEquals(PairingStatusResult.Accepted("ios-8"), client.fetch("request-2"))
+        assertEquals(PairingStatusResult.Accepted("ios-8", "credential-1"), client.fetch("request-2", "proof-1"))
     }
 
     @Test
@@ -49,7 +49,7 @@ class PairingStatusClientTest {
 
         assertEquals(
             PairingStatusResult.Rejected("android-10", "operator_rejected"),
-            client.fetch("request-3")
+            client.fetch("request-3", "proof-1")
         )
     }
 
@@ -60,7 +60,7 @@ class PairingStatusClientTest {
             Url("http://court.local")
         )
 
-        assertEquals(PairingStatusResult.NotFound, client.fetch("unknown-request"))
+        assertEquals(PairingStatusResult.NotFound, client.fetch("unknown-request", "proof-1"))
     }
 
     @Test
@@ -69,7 +69,7 @@ class PairingStatusClientTest {
             """{"type":"pairing_status","state":"rejected","deviceId":"android-10"}"""
         )
 
-        assertEquals(PairingStatusResult.MalformedResponse, client.fetch("request-3"))
+        assertEquals(PairingStatusResult.MalformedResponse, client.fetch("request-3", "proof-1"))
     }
 
     @Test
@@ -79,7 +79,7 @@ class PairingStatusClientTest {
             Url("http://court.local")
         )
 
-        assertEquals(PairingStatusResult.Unavailable, client.fetch("request-1"))
+        assertEquals(PairingStatusResult.Unavailable, client.fetch("request-1", "proof-1"))
     }
 
     @Test
@@ -89,7 +89,7 @@ class PairingStatusClientTest {
             Url("http://court.local")
         )
 
-        assertFailsWith<CancellationException> { client.fetch("request-1") }
+        assertFailsWith<CancellationException> { client.fetch("request-1", "proof-1") }
     }
 
     private fun clientReturning(response: String): PairingStatusClient = PairingStatusClient(

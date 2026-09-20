@@ -182,18 +182,28 @@ object ServerConnectionScreen : Screen {
                                 realtimeLifecycle?.stop()
                                 realtimeLifecycle = null
                                 createHttpClient().use { httpClient ->
+                                    val credentialRepository = ReconnectCredentialRepository(
+                                        createReconnectCredentialStorage(context)
+                                    )
+                                    val deliveryProof = PairingClient.newDeliveryProof()
+                                    credentialRepository.savePairingDeliveryProof(deliveryProof)
                                     val pairingResult = PairingFlow(
                                         ServerMetadataClient(httpClient, result.endpoint),
                                         PairingClient(httpClient, result.endpoint)
                                     ).connect(
-                                        PairingRequest(
-                                            deviceId = pairingIdentity.deviceId(),
-                                            surname = State.judgeSurname.trim(),
-                                            platform = getPlatformName()
+                                                PairingRequest(
+                                                    deviceId = pairingIdentity.deviceId(),
+                                                    surname = State.judgeSurname.trim(),
+                                                    platform = getPlatformName(),
+                                            deliveryProof = deliveryProof
                                         ),
                                         connection
                                     )
-                                    pairingStatus = pairingResult.pollStatus(httpClient, result.endpoint)
+                                    pairingStatus = pairingResult.pollStatus(
+                                        httpClient,
+                                        result.endpoint,
+                                        credentialRepository
+                                    )
                                     startRealtimeAfterPairingAcceptance(
                                         pairingStatus,
                                         result.endpoint,
@@ -266,6 +276,11 @@ object ServerConnectionScreen : Screen {
                                         val address = service.addresses.firstOrNull()
                                         if (address != null) {
                                             createHttpClient().use { httpClient ->
+                                                val credentialRepository = ReconnectCredentialRepository(
+                                                    createReconnectCredentialStorage(context)
+                                                )
+                                                val deliveryProof = PairingClient.newDeliveryProof()
+                                                credentialRepository.savePairingDeliveryProof(deliveryProof)
                                                 val endpoint = metadataEndpoint(address, service.port)
                                                 val pairingResult = PairingFlow(
                                                     ServerMetadataClient(httpClient, endpoint),
@@ -274,11 +289,16 @@ object ServerConnectionScreen : Screen {
                                                     PairingRequest(
                                                         deviceId = pairingIdentity.deviceId(),
                                                         surname = State.judgeSurname.trim(),
-                                                        platform = getPlatformName()
+                                                        platform = getPlatformName(),
+                                                        deliveryProof = deliveryProof
                                                     ),
                                                     connection
                                                 )
-                                                pairingStatus = pairingResult.pollStatus(httpClient, endpoint)
+                                                pairingStatus = pairingResult.pollStatus(
+                                                    httpClient,
+                                                    endpoint,
+                                                    credentialRepository
+                                                )
                                                 startRealtimeAfterPairingAcceptance(
                                                     pairingStatus,
                                                     endpoint,
@@ -300,11 +320,15 @@ object ServerConnectionScreen : Screen {
 
     private suspend fun PairingResult?.pollStatus(
         httpClient: io.ktor.client.HttpClient,
-        endpoint: io.ktor.http.Url
+        endpoint: io.ktor.http.Url,
+        credentialRepository: ReconnectCredentialRepository
     ): PairingStatusResult? = when (this) {
         is PairingResult.Pending -> PairingStatusFlow(
-            PairingStatusPolling(PairingStatusClient(httpClient, endpoint)::fetch)
-        ).awaitStatus(requestId, connection)
+            PairingStatusPolling(
+                fetch = { requestId -> PairingStatusClient(httpClient, endpoint).fetch(requestId, deliveryProof) }
+            ),
+            credentialRepository
+        ).awaitStatus(this, connection)
         else -> null
     }
 

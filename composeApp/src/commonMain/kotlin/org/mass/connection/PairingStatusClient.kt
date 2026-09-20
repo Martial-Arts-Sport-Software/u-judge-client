@@ -2,6 +2,7 @@ package org.mass.connection
 
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
@@ -13,7 +14,7 @@ import kotlinx.serialization.json.jsonPrimitive
 
 sealed interface PairingStatusResult {
     data class Pending(val deviceId: String) : PairingStatusResult
-    data class Accepted(val deviceId: String) : PairingStatusResult
+    data class Accepted(val deviceId: String, val reconnectCredential: String = "") : PairingStatusResult
     data class Rejected(val deviceId: String, val code: String) : PairingStatusResult
     data object NotFound : PairingStatusResult
     data object MalformedResponse : PairingStatusResult
@@ -24,9 +25,10 @@ class PairingStatusClient(
     private val httpClient: HttpClient,
     private val endpoint: Url
 ) {
-    suspend fun fetch(requestId: String): PairingStatusResult = try {
+    suspend fun fetch(requestId: String, deliveryProof: String): PairingStatusResult = try {
         val response = httpClient.get(endpoint) {
             url.appendPathSegments("v1", "pairing-status", requestId)
+            header("X-Pairing-Proof", deliveryProof)
         }
         when {
             response.status == HttpStatusCode.NotFound -> PairingStatusResult.NotFound
@@ -46,7 +48,10 @@ class PairingStatusClient(
         }
         when (body["state"]?.jsonPrimitive?.content) {
             "pending" -> PairingStatusResult.Pending(deviceId)
-            "accepted" -> PairingStatusResult.Accepted(deviceId)
+            "accepted" -> body["reconnectCredential"]?.jsonPrimitive?.content
+                ?.takeIf { it.isNotBlank() }
+                ?.let { PairingStatusResult.Accepted(deviceId, it) }
+                ?: PairingStatusResult.MalformedResponse
             "rejected" -> body["code"]?.jsonPrimitive?.content
                 ?.takeIf { it.isNotBlank() }
                 ?.let { PairingStatusResult.Rejected(deviceId, it) }

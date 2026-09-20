@@ -17,6 +17,8 @@ UI всех девяти дисциплин и локальные модели �
 
 Подробное разделение текущего и целевого состояния находится в [описании проекта](docs/PROJECT.md).
 
+Pairing client сохраняет delivery proof и server-issued reconnect credential только в platform secure storage. Полный pairing flow зависит от реализации proof-protected credential delivery на server.
+
 ## Модули
 
 | Путь | Назначение |

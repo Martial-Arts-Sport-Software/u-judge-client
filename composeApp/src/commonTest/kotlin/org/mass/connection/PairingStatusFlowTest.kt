@@ -9,10 +9,11 @@ class PairingStatusFlowTest {
     fun acceptedHttpStatusKeepsTheClientPendingForAuthenticatedRealtimeHandshake() = runTest {
         val store = pairingPendingStore()
         val flow = PairingStatusFlow(
-            PairingStatusPolling(fetch = { PairingStatusResult.Accepted("device-1") })
+            PairingStatusPolling(fetch = { PairingStatusResult.Accepted("device-1", "credential-1") }),
+            repository()
         )
 
-        assertEquals(PairingStatusResult.Accepted("device-1"), flow.awaitStatus("request-1", store))
+        assertEquals(PairingStatusResult.Accepted("device-1", "credential-1"), flow.awaitStatus(PairingResult.Pending("request-1", "proof-1"), store))
         assertEquals(ConnectionState.PairingPending("court-1"), store.state)
     }
 
@@ -20,10 +21,11 @@ class PairingStatusFlowTest {
     fun rejectedHttpStatusStoresTheOperatorRejection() = runTest {
         val store = pairingPendingStore()
         val flow = PairingStatusFlow(
-            PairingStatusPolling(fetch = { PairingStatusResult.Rejected("device-1", "operator_rejected") })
+            PairingStatusPolling(fetch = { PairingStatusResult.Rejected("device-1", "operator_rejected") }),
+            repository()
         )
 
-        flow.awaitStatus("request-1", store)
+        flow.awaitStatus(PairingResult.Pending("request-1", "proof-1"), store)
 
         assertEquals(
             ConnectionState.Rejected(
@@ -38,10 +40,11 @@ class PairingStatusFlowTest {
     fun unavailableHttpStatusStoresAPairingStatusFailure() = runTest {
         val store = pairingPendingStore()
         val flow = PairingStatusFlow(
-            PairingStatusPolling(fetch = { PairingStatusResult.Unavailable })
+            PairingStatusPolling(fetch = { PairingStatusResult.Unavailable }),
+            repository()
         )
 
-        flow.awaitStatus("request-1", store)
+        flow.awaitStatus(PairingResult.Pending("request-1", "proof-1"), store)
 
         assertEquals(
             ConnectionState.Rejected("court-1", ConnectionFailure.PairingStatusUnavailable),
@@ -55,6 +58,13 @@ class PairingStatusFlowTest {
         store.dispatch(ConnectionEvent.ValidateMetadata(validMetadata()))
         store.dispatch(ConnectionEvent.RequestPairing)
     }
+
+    private fun repository() = ReconnectCredentialRepository(object : ReconnectCredentialStorage {
+        private var credential: String? = null
+        override fun load(): String? = credential
+        override fun save(credential: String) { this.credential = credential }
+        override fun clear() { credential = null }
+    })
 
     private fun validMetadata() = ServerMetadata(
         protocolMajor = 1,
