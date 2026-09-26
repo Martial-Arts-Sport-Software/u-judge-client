@@ -74,13 +74,14 @@
 
 | Статус | ID | Недели | Gate | Client-сценарий | Requirement IDs |
 |--------|----|--------|------|-----------------|-----------------|
-| [ ] | I1 | 4-5 | C1 (без physical devices), C2 | Судья на emulator находит desktop server, проходит pairing с подтверждением оператора на desktop по local TLS, получает credential, выдерживает kill приложения и reconnect без повторного pairing; revoke на desktop блокирует новые события | `CLI-005`, `CLI-014`, `CLI-015`, `CLI-017`-`CLI-019`, `CLI-060`, `CLI-063`, `CLI-068`, `CLI-073`, `CLI-090`, `CLI-091`, `CLI-093`, `CLI-101`, `CLI-103` |
-| [ ] | I2 | 5-6 | C2, client-часть C3 | Два-три emulator-судьи проводят Kerugi-бой на desktop server: session snapshot с участниками и state, удары как server `kerugi_score_command`, ввод только в `running`, feedback только по ACK, warning, kill/reconnect с outbox и resync; server audit содержит каждый tap один раз | `CLI-022`-`CLI-025`, `CLI-030`, `CLI-032`-`CLI-038`, `CLI-061`, `CLI-062`, `CLI-064`-`CLI-066`, `CLI-102` |
-| [ ] | I3 | 7 | C1, C3 | Honor 50 Lite и iPhone 15 через роутер площадки: Local Network permission, mDNS, pairing, Kerugi-бой с disconnect во время серии нажатий и искусственной задержкой | `CLI-001`, `CLI-010`, `CLI-011`, `CLI-083`-`CLI-085`, `CLI-104` |
-| [ ] | I4 | 7-8 | C4 | Судья последовательно судит сессии импортированной сетки без перезапуска; draft и событие нельзя отправить в устаревшую или чужую сессию | `CLI-026`, `CLI-072`, `CLI-074`, `CLI-075` |
-| [ ] | I5 | 8-9 | C5 | Tanbon через server; технические дисциплины с подтверждаемым `Send`, final pending при disconnect, read-only после ACK и суммами, совпадающими с server | `CLI-021`, `CLI-031`, `CLI-042`, `CLI-044`, `CLI-045`, `CLI-048`-`CLI-053` |
+| [ ] | I1 | 4-5 | C1 (без physical devices) | Судья на emulator находит desktop server, проходит pairing с подтверждением оператора на desktop по local TLS, получает credential, выдерживает kill приложения и reconnect без повторного pairing; durable outbox против server (`CLI-060`, C2) перенесён в I2a, потому что события создаются только для server session; revoke на desktop блокирует новые события | `CLI-005`, `CLI-014`, `CLI-015`, `CLI-017`-`CLI-019`, `CLI-063`, `CLI-068`, `CLI-073`, `CLI-090`, `CLI-091`, `CLI-093`, `CLI-101`, `CLI-103` |
+| [ ] | I4 | 5-6 | - | Client-части нет: server импортирует сетки, по которым идут поединки I2a/I2b | - |
+| [ ] | I2a | 6-7 | C2, client-часть C3 | Kerugi: бой по баллам. Два-три emulator-судьи судят поединок импортированной сетки на desktop server: session snapshot с участниками и state, удары как server `kerugi_score_command`, ввод только в `running`, feedback только по ACK, warning, kill/reconnect с outbox и resync; server audit содержит каждый tap один раз | `CLI-022`-`CLI-025`, `CLI-030`, `CLI-032`-`CLI-038`, `CLI-060`, `CLI-061`, `CLI-062`, `CLI-064`-`CLI-066`, `CLI-102` |
+| [ ] | I2b | 7-8 | C4 | Kerugi: время боя и ход сетки. Судья видит период боя, после результата переходит к следующему поединку сетки без перезапуска; draft и событие нельзя отправить в устаревшую или чужую сессию | `CLI-026`, `CLI-072`, `CLI-074`, `CLI-075` |
+| [ ] | I3 | 8-9 | C1, C3 | Honor 50 Lite и iPhone 15 через роутер площадки: Local Network permission, mDNS, pairing, Kerugi-бой с disconnect во время серии нажатий и искусственной задержкой | `CLI-001`, `CLI-010`, `CLI-011`, `CLI-083`-`CLI-085`, `CLI-104` |
+| [ ] | I5 | 9-10 | C5 | Tanbon через server; технические дисциплины с подтверждаемым `Send`, final pending при disconnect, read-only после ACK и суммами, совпадающими с server | `CLI-021`, `CLI-031`, `CLI-042`, `CLI-044`, `CLI-045`, `CLI-048`-`CLI-053` |
 | [ ] | I6 | 10 | C6 | Русские critical flows без hardcoded строк, доступность и pilot screen sizes | `CLI-007`, `CLI-067`, `CLI-080`, `CLI-081`, `CLI-084`-`CLI-086`, `CLI-092`, `CLI-094` |
-| [ ] | I7 | 10-11 | C7 | Release APK и TestFlight на всех pilot devices против server installer | `CLI-105`, `CLI-106` |
+| [ ] | I7 | 11 | C7 | Release APK и TestFlight на всех pilot devices против server installer | `CLI-105`, `CLI-106` |
 | [ ] | I8 | 12 | C8 | Полевой пилот по разделу 10 | - |
 
 ### Известные расхождения с server на `main`
@@ -90,8 +91,8 @@
 | Расхождение | Инкремент |
 |-------------|-----------|
 | Local TLS для credential delivery не реализован ни в одном репозитории, поэтому pairing не может завершиться end-to-end | I1 |
-| Kerugi/Tanbon tap отправляется как generic `command`, который server ACK-ит без scoring; `kerugi_score_command` требует competition, bracket, session, judge и device IDs, которых у client нет | I2 |
-| Server не публикует session snapshot или assignment (`DEV-008`); client не обрабатывает `session_state_updated`, `kerugi_score_updated` и `resync_response` | I2 |
+| Kerugi/Tanbon tap отправляется как generic `command`, который server ACK-ит без scoring; `kerugi_score_command` требует competition, bracket, session, judge и device IDs, которых у client нет | I2a |
+| Server не публикует session snapshot или assignment (`DEV-008`); client не обрабатывает `session_state_updated`, `kerugi_score_updated` и `resync_response` | I2a |
 | Server не поддерживает Tanbon | I5 |
 
 ### Накопленное client-only доказательство
@@ -102,9 +103,9 @@ Shared unit tests против fake responses. Это partial evidence: server i
 |---------|----------------------|---------|
 | Discovery | Одна отменяемая mDNS scan job, дедупликация, удаление unavailable services, resolved/resolving статусы | Physical mDNS (I3) |
 | Metadata и pairing | Shared HTTP metadata/protocol/capability validation для mDNS и manual host/IP; pairing request с device identity, фамилией и platform; polling pending/accepted/rejected с отменой; delivery proof и credential в Android Keystore-backed storage и iOS Keychain | Local TLS и выдача credential настоящим server (I1) |
-| Realtime | Versioned handshake, four-timestamp clock sync, typed heartbeat lifecycle, reconnect со stored credential | Прогон против server (I1), resync (I2) |
-| Outbox | Platform-backed journal с event ID, client sequence, timestamp и retry metadata; ordered bounded backoff; terminal ACK/rejection; replay due commands после connect/reconnect; fault injection | App-kill против server (I1, I2) |
-| Kerugi/Tanbon controls | Durable typed command только в authenticated `running` matching session; feedback только для matching последнего event; semantic labels | Формат server `kerugi_score_command` и session snapshot (I2); Tanbon на server (I5) |
+| Realtime | Versioned handshake, four-timestamp clock sync, typed heartbeat lifecycle, reconnect со stored credential | Прогон против server (I1), resync (I2a) |
+| Outbox | Platform-backed journal с event ID, client sequence, timestamp и retry metadata; ordered bounded backoff; terminal ACK/rejection; replay due commands после connect/reconnect; fault injection | App-kill против server (I1, I2a) |
+| Kerugi/Tanbon controls | Durable typed command только в authenticated `running` matching session; feedback только для matching последнего event; semantic labels | Формат server `kerugi_score_command` и session snapshot (I2a); Tanbon на server (I5) |
 | Технические дисциплины | Семь offline-режимов, критерии `0.1..1.0` с шагом `0.1`, независимые черновики `Save` без network request | `Send` и server totals (I5) |
 
 ## 2. Неделя 1: baseline и тестовая основа
