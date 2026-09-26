@@ -25,7 +25,8 @@
 Статус сверяется только с влитыми в `main` изменениями и их тестами. Частично выполненная неделя не закрывает gate.
 
 - [x] Gate C0: baseline готов. GitHub Actions `Verify` на `main` подтверждает Android build/tests и iOS framework compilation; physical-device smoke относится к release/pilot acceptance, а не к C0.
-- [ ] Gate C1: discovery lifecycle готов частично; handshake, pairing и reconnect не готовы.
+- [ ] Gate C1: pairing по local TLS, restore после kill и reconnect против desktop server подтверждены на emulator (I1);
+  физические Android/iPhone и mDNS на роутере площадки открыты (I3).
 - [ ] Gate C2: не готов.
 - [ ] Gate C3: не готов.
 - [ ] Gate C4: не готов.
@@ -74,7 +75,7 @@
 
 | Статус | ID | Недели | Gate | Client-сценарий | Requirement IDs |
 |--------|----|--------|------|-----------------|-----------------|
-| [ ] | I1 | 4-5 | C1 (без physical devices) | Судья на emulator находит desktop server, проходит pairing с подтверждением оператора на desktop по local TLS, получает credential, выдерживает kill приложения и reconnect без повторного pairing; durable outbox против server (`CLI-060`, C2) перенесён в I2a, потому что события создаются только для server session; revoke на desktop блокирует новые события | `CLI-005`, `CLI-014`, `CLI-015`, `CLI-017`-`CLI-019`, `CLI-063`, `CLI-068`, `CLI-073`, `CLI-090`, `CLI-091`, `CLI-093`, `CLI-101`, `CLI-103` |
+| [x] | I1 | 4-5 | C1 (без physical devices) | Судья на emulator находит desktop server, проходит pairing с подтверждением оператора на desktop по local TLS, получает credential, выдерживает kill приложения и reconnect без повторного pairing; durable outbox против server (`CLI-060`, C2) перенесён в I2a, потому что события создаются только для server session; revoke на desktop блокирует новые события | `CLI-005`, `CLI-014`, `CLI-015`, `CLI-017`-`CLI-019`, `CLI-063`, `CLI-068`, `CLI-073`, `CLI-090`, `CLI-091`, `CLI-093`, `CLI-101`, `CLI-103` |
 | [ ] | I4 | 5-6 | - | Client-части нет: server импортирует сетки, по которым идут поединки I2a/I2b | - |
 | [ ] | I2a | 6-7 | C2, client-часть C3 | Kerugi: бой по баллам. Два-три emulator-судьи судят поединок импортированной сетки на desktop server: session snapshot с участниками и state, удары как server `kerugi_score_command`, ввод только в `running`, feedback только по ACK, warning, kill/reconnect с outbox и resync; server audit содержит каждый tap один раз | `CLI-022`-`CLI-025`, `CLI-030`, `CLI-032`-`CLI-038`, `CLI-060`, `CLI-061`, `CLI-062`, `CLI-064`-`CLI-066`, `CLI-102` |
 | [ ] | I2b | 7-8 | C4 | Kerugi: время боя и ход сетки. Судья видит период боя, после результата переходит к следующему поединку сетки без перезапуска; draft и событие нельзя отправить в устаревшую или чужую сессию | `CLI-026`, `CLI-072`, `CLI-074`, `CLI-075` |
@@ -84,13 +85,41 @@
 | [ ] | I7 | 11 | C7 | Release APK и TestFlight на всех pilot devices против server installer | `CLI-105`, `CLI-106` |
 | [ ] | I8 | 12 | C8 | Полевой пилот по разделу 10 | - |
 
+#### Доказательства I1
+
+Client [#114](https://github.com/Martial-Arts-Sport-Software/u-judge-client/pull/114); server
+[u-judge-server#125](https://github.com/Martial-Arts-Sport-Software/u-judge-server/pull/125),
+[u-judge-server#126](https://github.com/Martial-Arts-Sport-Software/u-judge-server/pull/126). Сценарий пройден 26.09.2026 на
+Android emulator `sdk_gphone16k_arm64` (Android 17, API 37) против `./gradlew :desktop:run` на macOS 27: pairing по коду
+сверки, подтверждение, kill приложения и restore без pairing, `kill -9` desktop и reconnect, отзыв, отклонение. Прогон нашёл
+и закрыл расхождения: заголовок delivery proof, отсутствие `WebSockets` в HTTP client, `eventId` в `command_rejected`,
+закрытие сокета server как `CancellationException` в OkHttp и повторный запрос с новым delivery proof.
+
+| Requirement | Статус | Доказательство |
+|-------------|--------|----------------|
+| `CLI-005` | Implemented | Connected только после metadata, pairing acceptance и handshake (emulator) |
+| `CLI-014` | Implemented | Metadata настоящего server проверяется по protocol major и capabilities; несовместимый server отклоняется (`ServerMetadataClientTest`) |
+| `CLI-015` | Implemented | Server показывает pending-запрос с фамилией и Android (emulator) |
+| `CLI-017` | Implemented | После kill приложения и после `kill -9` desktop client переподключается без pairing (emulator, `PairedServerReconnectTest`) |
+| `CLI-018` | Implemented | Отзыв на desktop приводит к «Оператор отозвал это устройство», credential удалён (emulator, `ServerClosedSocketTest`) |
+| `CLI-019` | Implemented | Manual host/IP с проверкой metadata и pairing (emulator) |
+| `CLI-063` | Implemented | Остановка desktop переводит client в reconnecting в пределах heartbeat timeout (emulator) |
+| `CLI-068` | Implemented | Four-timestamp `clock_sync` при каждом handshake против настоящего server |
+| `CLI-073` | Implemented | Локализованные discovery, pairing, transport, revocation и identity errors (emulator, shared tests) |
+| `CLI-090` | Implemented | Без pairing нет credential и authenticated socket; server отклоняет анонимные записи |
+| `CLI-091` | Implemented | Credential, endpoint и SPKI pin в Keystore-backed storage и Keychain; не логируются |
+| `CLI-093` | Implemented | Endpoint принимается только после TLS с pinned ключом и валидных metadata (`ServerTrustTest`, `PinningTrustManagerTest`) |
+| `CLI-101` | Partial | Discovery и pairing покрыты shared tests; против настоящего server автоматически проверен только pending (`RealServerSmokeTest`), accept/reject - вручную |
+| `CLI-103` | Implemented | CI сверяет client с contract fixtures server на `contract/server-ref` |
+
+`CLI-060` и Gate C2 перенесены в I2a.
+
 ### Известные расхождения с server на `main`
 
 Каждое расхождение закрывается в указанном инкременте в обоих репозиториях.
 
 | Расхождение | Инкремент |
 |-------------|-----------|
-| Local TLS для credential delivery не реализован ни в одном репозитории, поэтому pairing не может завершиться end-to-end | I1 |
 | Kerugi/Tanbon tap отправляется как generic `command`, который server ACK-ит без scoring; `kerugi_score_command` требует competition, bracket, session, judge и device IDs, которых у client нет | I2a |
 | Server не публикует session snapshot или assignment (`DEV-008`); client не обрабатывает `session_state_updated`, `kerugi_score_updated` и `resync_response` | I2a |
 | Server не поддерживает Tanbon | I5 |
@@ -102,9 +131,9 @@ Shared unit tests против fake responses. Это partial evidence: server i
 | Область | Подтверждено тестами | Открыто |
 |---------|----------------------|---------|
 | Discovery | Одна отменяемая mDNS scan job, дедупликация, удаление unavailable services, resolved/resolving статусы | Physical mDNS (I3) |
-| Metadata и pairing | Shared HTTP metadata/protocol/capability validation для mDNS и manual host/IP; pairing request с device identity, фамилией и platform; polling pending/accepted/rejected с отменой; delivery proof и credential в Android Keystore-backed storage и iOS Keychain | Local TLS и выдача credential настоящим server (I1) |
-| Realtime | Versioned handshake, four-timestamp clock sync, typed heartbeat lifecycle, reconnect со stored credential | Прогон против server (I1), resync (I2a) |
-| Outbox | Platform-backed journal с event ID, client sequence, timestamp и retry metadata; ordered bounded backoff; terminal ACK/rejection; replay due commands после connect/reconnect; fault injection | App-kill против server (I1, I2a) |
+| Metadata и pairing | Shared HTTP metadata/protocol/capability validation для mDNS и manual host/IP; pairing request с device identity, фамилией и platform; polling pending/accepted/rejected с отменой; delivery proof и credential в Android Keystore-backed storage и iOS Keychain | Physical devices и mDNS (I3) |
+| Realtime | Versioned handshake, four-timestamp clock sync, typed heartbeat lifecycle, reconnect со stored credential | Resync (I2a) |
+| Outbox | Platform-backed journal с event ID, client sequence, timestamp и retry metadata; ordered bounded backoff; terminal ACK/rejection; replay due commands после connect/reconnect; fault injection | App-kill против server (I2a) |
 | Kerugi/Tanbon controls | Durable typed command только в authenticated `running` matching session; feedback только для matching последнего event; semantic labels | Формат server `kerugi_score_command` и session snapshot (I2a); Tanbon на server (I5) |
 | Технические дисциплины | Семь offline-режимов, критерии `0.1..1.0` с шагом `0.1`, независимые черновики `Save` без network request | `Send` и server totals (I5) |
 
