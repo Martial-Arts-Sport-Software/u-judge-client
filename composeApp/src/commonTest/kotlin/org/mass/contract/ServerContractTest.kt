@@ -165,7 +165,7 @@ class ServerContractTest {
         assertEquals(command, Json.parseToJsonElement(acknowledged.sent.single()).jsonObject)
 
         assertEquals(
-            RealtimeCommandResult.Rejected("event-contract", "invalid_reconnect_credential"),
+            RealtimeCommandResult.Rejected("event-contract", "event_id_conflict"),
             RealtimeCommandClient(outbox()).send(event, ScriptedSocket("command_rejected"), nowMillis = 0)
         )
     }
