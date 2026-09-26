@@ -233,7 +233,8 @@ object ServerConnectionScreen : Screen {
                 serverTrust?.verificationCode?.takeIf { connection.state is ConnectionState.PairingPending }?.let { code ->
                     Text(
                         text = Localization.getString("connection_verification_code").replace("%s", formatVerificationCode(code)),
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                 }
@@ -347,6 +348,8 @@ object ServerConnectionScreen : Screen {
     @Composable
     private fun connectionStatus(pairingStatus: PairingStatusResult?): ConnectionStatusPresentation? = when (val state = connection.state) {
         is ConnectionState.Rejected -> ConnectionStatusPresentation(state.failure.localizationKey)
+        // The live connection outranks the pairing answer that led to it.
+        is ConnectionState.ConnectedIdle, is ConnectionState.Reconnecting -> connectionStatusPresentation(state)
         else -> when (pairingStatus) {
             is PairingStatusResult.Accepted -> ConnectionStatusPresentation("connection_pairing_accepted")
             else -> when (state) {

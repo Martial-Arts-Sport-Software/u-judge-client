@@ -7,6 +7,7 @@ data class ConnectionStatusPresentation(
 )
 
 fun connectionStatusPresentation(state: ConnectionState): ConnectionStatusPresentation? = when (state) {
+    is ConnectionState.ConnectedIdle -> ConnectionStatusPresentation("connection_connected")
     is ConnectionState.Reconnecting -> ConnectionStatusPresentation(
         statusKey = "connection_reconnecting",
         reasonKey = state.failure.localizationKey
