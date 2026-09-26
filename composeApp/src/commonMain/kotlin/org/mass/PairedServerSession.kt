@@ -1,5 +1,8 @@
 package org.mass
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import io.ktor.client.HttpClient
 import io.ktor.http.Url
 import kotlinx.coroutines.CoroutineScope
@@ -33,19 +36,22 @@ object PairedServerSession {
     private var reconnectLifecycle: RealtimeReconnectLifecycle? = null
     private var transport: HttpClient? = null
 
+    /** The stored pairing, observable by the UI; null when the device must pair again. */
+    var pairedServer: PairedServer? by mutableStateOf(null)
+        private set
+
     fun initialize(context: Any?) {
         if (!::credentials.isInitialized) {
             credentials = ReconnectCredentialRepository(createReconnectCredentialStorage(context))
+            pairedServer = credentials.loadPairedServer()
         }
     }
-
-    val pairedServer: PairedServer?
-        get() = credentials.loadPairedServer()
 
     /** Connects right after the operator approved this device; the credential is already stored. */
     suspend fun startAfterApproval(server: PairedServer) {
         stop()
         credentials.savePairedServer(server)
+        pairedServer = server
         val (realtimeClient, lifecycle) = build(server)
         InitialRealtimeLifecycle(credentials, realtimeClient, lifecycle).start(server.deviceId, State.connection)
     }
@@ -65,6 +71,7 @@ object PairedServerSession {
         scope.launch {
             stop()
             credentials.forget()
+            pairedServer = null
             State.connection.dispatch(ConnectionEvent.UseOffline)
         }
     }

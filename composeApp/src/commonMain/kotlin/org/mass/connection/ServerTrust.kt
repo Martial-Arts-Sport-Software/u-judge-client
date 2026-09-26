@@ -1,14 +1,19 @@
 package org.mass.connection
 
+import kotlin.concurrent.Volatile
+
 /**
  * Trust in one server's TLS key (server ADR-006). Without a stored pin the first presented key is captured (trust on first
  * use) and every later connection of the same flow must present it again; with a stored pin only that key is accepted.
  * Hostname and CA validation are replaced by the pin, so a DHCP address change does not break trust.
  */
 class ServerTrust(expectedPin: ByteArray? = null) {
+    // Written from TLS handshake threads, read from the UI and coroutines.
+    @Volatile
     private var pin: ByteArray? = expectedPin?.copyOf()
 
     /** Set when a connection presented a key other than the pinned one; the credential is never sent to it. */
+    @Volatile
     var identityChanged: Boolean = false
         private set
 
