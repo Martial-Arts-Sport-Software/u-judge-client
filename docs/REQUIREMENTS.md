@@ -23,6 +23,10 @@
 | Planned     | Требуется для v1 Pilot                          |
 | Blocked     | Нужны внешние данные/решение                    |
 
+Столбец «Требование» содержит только формулировку требования. Доказательства и оставшиеся пробелы ведутся в
+таблице доказательств и таблице инкрементов [roadmap](ROADMAP.md#инкременты-поставки). Требование, зависящее от server,
+получает `Implemented` только после прогона против настоящего desktop server.
+
 ## 2. Запуск и режимы
 
 | ID      | Приоритет | Статус  | Требование                                                | Критерий приёмки                                                                   |
@@ -31,7 +35,7 @@
 | CLI-002 | Must      | Partial | Судья вводит фамилию до выбора режима                     | Пустое/пробельное значение не позволяет продолжить                                 |
 | CLI-003 | Must      | Partial | Клиент поддерживает online и offline                      | Выбранный режим явно виден и не меняется из-за навигации                           |
 | CLI-004 | Must      | Implemented | Offline разрешает только технические дисциплины; Kerugi/Tanbon disabled с локализованной причиной | Kerugi/Tanbon заблокированы с объяснением причины                                  |
-| CLI-005 | Must      | Partial | Shared realtime handshake переводит pairing-pending state в connected только после typed server acceptance и authenticated clock sync; UI persists a proof-bound issued credential in secure storage before lifecycle startup, while server delivery remains pending | Простого выбора mDNS service недостаточно для connected state                      |
+| CLI-005 | Must | Partial | Online-функции доступны только после handshake и pairing | Простого выбора mDNS service недостаточно для connected state |
 | CLI-006 | Should    | Planned | Post-v1 интерфейс переключается между RU/EN               | Все строки текущего flow локализованы; v1 Pilot требует русский интерфейс          |
 | CLI-007 | Should    | Planned | Фамилия, язык и локальные черновики переживают перезапуск | После restart значения восстановлены из локального persistence                     |
 
@@ -41,14 +45,14 @@
 |---------|-----------|---------|----------------------------------------------------------------|---------------------------------------------------------------------------------------|
 | CLI-010 | Must      | Partial | Клиент обнаруживает `_u-judge._tcp.local.`                     | Server появляется без ручного IP в общей LAN                                          |
 | CLI-011 | Must      | Partial | Найденные servers дедуплицируются и удаляются при mDNS removed | В списке нет дублей и заведомо недоступных записей                                    |
-| CLI-012 | Must      | Implemented | Повторный scan отменяет предыдущую job до запуска новой; lifecycle shared-tested | Многократное нажатие Search не создаёт несколько collectors                           |
+| CLI-012 | Must | Implemented | Повторный scan отменяет предыдущую job до запуска новой | Многократное нажатие Search не создаёт несколько collectors |
 | CLI-013 | Must      | Implemented | Судья выбирает площадку по понятному имени                     | UI показывает имя, адрес и статус; resolving площадка недоступна для выбора           |
-| CLI-014 | Must      | Partial | Resolved mDNS endpoint проходит shared HTTP metadata validation; manual fallback использует ту же validation/pairing chain, TLS trust UX pending | Несовместимый server отклоняется с локализованной причиной                            |
-| CLI-015 | Must      | Partial | Выбор validated mDNS server отправляет pairing request с device identity, нормализованной фамилией судьи и platform; TLS pending | Server видит pending device и фамилию                                                 |
-| CLI-016 | Must      | Implemented | UI polls typed public HTTP pairing status after a pending request, renders pending/accepted/rejected and terminal local errors, and cancels the poll with the connection screen or replacement attempt; realtime push remains pending | Судья не попадает на рабочий экран до authenticated realtime acceptance and clock sync |
-| CLI-017 | Must      | Partial | Shared reconnect lifecycle reuses the securely stored credential after heartbeat failure and repeats authenticated realtime handshake; initial UI lifecycle wiring готово, credential issuance pending | Подтверждённый клиент не требует ручного pairing после каждого packet loss            |
+| CLI-014 | Must | Partial | Client проверяет protocol version/capabilities | Несовместимый server отклоняется с локализованной причиной |
+| CLI-015 | Must | Partial | Client отправляет pairing request с judge/device identity | Server видит pending device и фамилию |
+| CLI-016 | Must | Implemented | UI показывает pending, accepted и rejected | Судья не попадает на рабочий экран до authenticated realtime acceptance and clock sync |
+| CLI-017 | Must | Partial | Pairing session восстанавливается при кратком reconnect | Подтверждённый клиент не требует ручного pairing после каждого packet loss |
 | CLI-018 | Must      | Planned | Отзыв server немедленно блокирует новые события                | Client показывает disconnected/rejected и сохраняет только допустимые pending records |
-| CLI-019 | Must      | Partial | Client поддерживает manual host/IP fallback после mDNS: HTTP endpoint проходит metadata, protocol и capability validation и начинает pairing; TLS trust UX pending | Ручной endpoint не даёт online state без metadata validation и pairing acceptance     |
+| CLI-019 | Must | Partial | Client поддерживает manual host/IP fallback после mDNS | Ручной endpoint не даёт online state без metadata validation и pairing acceptance |
 
 ## 4. Выбор дисциплины и сессии
 
@@ -66,15 +70,15 @@
 
 | ID      | Приоритет | Статус  | Требование                                              | Критерий приёмки                                                       |
 |---------|-----------|---------|---------------------------------------------------------|------------------------------------------------------------------------|
-| CLI-030 | Must      | Partial | Kerugi `HEAD`/`BODY` для blue/red создают durable typed command только в authenticated running Kerugi session; client dispatches it on the serialized authenticated channel and renders terminal server feedback; server integration pending | Каждая кнопка создаёт правильный typed event                           |
-| CLI-031 | Must      | Partial | Tanbon `HEAD`/`BODY` для blue/red и neutral `CROSS` создают durable typed command только в authenticated running Tanbon session; server integration pending | Пять кнопок создают правильные typed events                            |
-| CLI-032 | Must      | Partial | Shared outbox сохраняет caller-provided unique event ID; Kerugi и Tanbon controls generate IDs before durable write | Два намеренных нажатия различаются, transport retry сохраняет ID       |
-| CLI-033 | Must      | Partial | Shared outbox and typed command envelope preserve client sequence and timestamp; Kerugi и Tanbon controls persist monotonic sequence and clock-adjusted timestamp, reconnect pending | Server может восстановить локальный порядок и clock offset             |
+| CLI-030 | Must | Partial | Kerugi имеет `HEAD`/`BODY` для blue/red | Каждая кнопка создаёт правильный typed event |
+| CLI-031 | Must | Partial | Tanbon имеет `HEAD`/`BODY` для blue/red и `CROSS` | Пять кнопок создают правильные typed events |
+| CLI-032 | Must | Partial | Каждое физическое нажатие получает уникальный event ID | Два намеренных нажатия различаются, transport retry сохраняет ID |
+| CLI-033 | Must | Partial | Client отправляет client sequence и timestamp | Server может восстановить локальный порядок и clock offset |
 | CLI-034 | Must      | Planned | Client не вычисляет кворум и итоговый балл              | UI не объявляет score accepted до server ACK/state update; server разрешает конфликт score candidates по минимальной оценке |
-| CLI-035 | Must      | Partial | Realtime command client journals the complete command before socket send; Kerugi и Tanbon taps dispatch durable commands on a serialized authenticated channel; app-kill/server integration proof pending | App kill до ACK не теряет событие                                      |
-| CLI-036 | Must      | Partial | Shared command transport applies terminal ACK/rejection to outbox; Kerugi и Tanbon render localized pending/accepted/rejected feedback only for their latest matching event; server integration evidence pending | Состояние каждого недавнего события понятно судье                      |
+| CLI-035 | Must | Partial | Нажатие немедленно попадает в durable outbox | App kill до ACK не теряет событие |
+| CLI-036 | Must | Partial | Client отображает pending/accepted/rejected | Состояние каждого недавнего события понятно судье |
 | CLI-037 | Must      | Planned | Warning/attention отправляется отдельно от scoring      | Server получает judge, device, session и timestamp; счёт не меняется   |
-| CLI-038 | Must      | Partial | Offline исключает выбор Kerugi/Tanbon; Kerugi и Tanbon controls are gated to an authenticated running matching session | Боевые кнопки недоступны без server session                            |
+| CLI-038 | Must | Partial | Offline Kerugi/Tanbon не генерирует официальные события | Боевые кнопки недоступны без server session |
 | CLI-039 | Should    | Planned | У кнопок есть настраиваемый haptic feedback             | Feedback на tap не выдаётся за ACK; accessibility settings учитываются |
 
 ## 6. Технические дисциплины
@@ -82,13 +86,13 @@
 | ID      | Приоритет | Статус  | Требование                                                         | Критерий приёмки                                                         |
 |---------|-----------|---------|--------------------------------------------------------------------|--------------------------------------------------------------------------|
 | CLI-040 | Must      | Implemented | Клиент поддерживает Hosinsool, Pair, Group, Sword, Pole, Paired Nunchaku и Paired Fans | Набор критериев соответствует дисциплине и категории |
-| CLI-041 | Must      | Implemented | Обязательный критерий вводится в `0.1..1.0`, шаг `0.1`; инвариант проверяется при создании и изменении модели | UI не создаёт `0.0`, NaN или значение вне диапазона                      |
+| CLI-041 | Must | Implemented | Обязательный критерий вводится в `0.1..1.0`, шаг `0.1` | UI не создаёт `0.0`, NaN или значение вне диапазона |
 | CLI-042 | Must      | Partial | Hosinsool/Pair содержит 4 или 6 технических критериев              | Juniors даёт 4, Adults даёт 6                                            |
 | CLI-043 | Must      | Implemented | Group и каждая weapon-дисциплина содержат 6 технических критериев | Все значения входят в payload                                            |
 | CLI-044 | Must      | Partial | Презентация содержит 4 критерия                                    | Все значения входят в payload                                            |
 | CLI-045 | Must      | Partial | Client показывает technique, presentation, extra points и total    | Total округлён до `0.1` и не меньше нуля                                 |
-| CLI-046 | Must      | Implemented | `Save` сохраняет локальный черновик всех семи технических экранов по discipline/category и восстанавливает его после restart; session binding pending | Черновик переживает navigation/restart и не вызывает network request     |
-| CLI-047 | Must      | Implemented | `Save` доступна offline для поддерживаемых технических экранов и не вызывает network request | Технический калькулятор выполняет своё автономное назначение             |
+| CLI-046 | Must | Implemented | `Save` сохраняет локальный черновик | Черновик переживает navigation/restart и не вызывает network request |
+| CLI-047 | Must | Implemented | `Save` доступна offline | Технический калькулятор выполняет своё автономное назначение |
 | CLI-048 | Must      | Planned | `Send` доступна только для активной online-сессии                  | Offline/неподтверждённый client не может отправить оценку                |
 | CLI-049 | Must      | Planned | `Send` требует подтверждения                                       | Диалог сообщает, что после отправки оценка неизменяема                   |
 | CLI-050 | Must      | Planned | Payload содержит исходные критерии, extra points и локальный total | Server может независимо проверить расчёт                                 |
@@ -100,25 +104,25 @@
 
 | ID      | Приоритет | Статус  | Требование                                                 | Критерий приёмки                                                       |
 |---------|-----------|---------|------------------------------------------------------------|------------------------------------------------------------------------|
-| CLI-060 | Must      | Partial | Shared JSON journal сохраняется в Android SharedPreferences/iOS NSUserDefaults; event wiring and app-kill integration proof pending | Process death не очищает неподтверждённые events                       |
-| CLI-061 | Must      | Partial | Authenticated initial/reconnect lifecycle replays due durable commands with their original event ID; Kerugi actions dispatch immediately when the serialized channel is active; server integration evidence pending | Server применяет событие не более одного раза                          |
-| CLI-062 | Must      | Partial | Shared outbox uses ordered bounded exponential backoff; authenticated lifecycle replays only due events in client sequence and stops on an invalid response; Kerugi action wiring is complete while remaining actions and server integration evidence are pending | Client не создаёт request storm при недоступном server                 |
-| CLI-063 | Must      | Partial | Shared typed heartbeat lifecycle schedules exchange only from `ConnectedIdle`, closes the socket and enters typed reconnecting state after timeout/rejection/invalid response; shared transport reconnect reopens the authenticated socket; UI owns lifecycle after pairing acceptance and cancels it with the connection screen, resync pending | UI переходит в reconnecting в ограниченное protocol timeout время      |
+| CLI-060 | Must | Partial | Outbox хранится в локальном durable storage | Process death не очищает неподтверждённые events |
+| CLI-061 | Must | Partial | Retry использует тот же event ID | Server применяет событие не более одного раза |
+| CLI-062 | Must | Partial | Retry применяет bounded exponential backoff | Client не создаёт request storm при недоступном server |
+| CLI-063 | Must | Partial | WebSocket heartbeat обнаруживает разрыв | UI переходит в reconnecting в ограниченное protocol timeout время |
 | CLI-064 | Must      | Planned | После reconnect client отправляет cursor и получает resync | Session state сходится до разрешения новых действий                    |
-| CLI-065 | Must      | Partial | Shared command ACK removes only its matching durable event; authenticated replay stops before a later command on a mismatched/invalid response, and Kerugi renders matching ACK feedback; server integration pending | Поздний ACK не удаляет более новое pending event                       |
-| CLI-066 | Must      | Partial | Terminal command rejection is persisted and excluded from retry; Kerugi renders localized feedback for its latest matching rejection; server integration pending | Outbox отмечает final rejection и показывает действие пользователю     |
+| CLI-065 | Must | Partial | Event ordering сохраняется для одного client | Поздний ACK не удаляет более новое pending event |
+| CLI-066 | Must | Partial | Rejected terminal event не повторяется бесконечно | Outbox отмечает final rejection и показывает действие пользователю |
 | CLI-067 | Must      | Planned | Logout/смена server не удаляет pending events молча        | Требуется успешная доставка или явное подтверждённое discard с аудитом |
-| CLI-068 | Must      | Partial | Shared `ClockSyncClient` выполняет typed four-timestamp exchange через authenticated realtime socket во время initial handshake и reconnect; UI lifecycle wiring готово, credential issuance pending | Four-timestamp exchange оценивает offset/round-trip; combat timestamp не полагается только на device wall clock |
+| CLI-068 | Must | Partial | Clock offset согласуется при handshake/reconnect | Four-timestamp exchange оценивает offset/round-trip; combat timestamp не полагается только на device wall clock |
 
 ## 8. Состояние и навигация
 
 | ID      | Приоритет | Статус  | Требование                                                              | Критерий приёмки                                                         |
 |---------|-----------|---------|-------------------------------------------------------------------------|--------------------------------------------------------------------------|
 | CLI-070 | Must      | Implemented | Connection представлено state machine, а не boolean                  | Невозможны одновременно offline/connected или paired/no-server состояния |
-| CLI-071 | Must      | Implemented | Session state отделено от navigation state; shared store хранит immutable server snapshot и explicit lifecycle | Возврат назад не завершает серверную сессию неявно                       |
+| CLI-071 | Must | Implemented | Session state отделено от navigation state | Возврат назад не завершает серверную сессию неявно |
 | CLI-072 | Must      | Planned | Rating draft имеет ID дисциплины, категории и сессии                    | Черновик другой сессии не отправляется случайно                          |
-| CLI-073 | Must      | Partial | Metadata validation, pairing request и realtime handshake имеют типизированные локализуемые errors; reconnect preserves typed handshake/clock-sync failures, while remaining transport feedback and protocol errors remain pending | UI различает discovery, pairing, transport, validation и protocol errors |
-| CLI-074 | Must      | Partial | Discovery/pairing jobs and the shared realtime reconnect lifecycle cancel on their owning lifecycle; connection screen owns and cancels authenticated realtime lifecycle, app-level lifecycle wiring for sessions/sends pending | Уход с экрана не оставляет лишние scans, reconnects или sends            |
+| CLI-073 | Must | Partial | Ошибки типизированы и локализованы | UI различает discovery, pairing, transport, validation и protocol errors |
+| CLI-074 | Must | Partial | Loading/action jobs отменяются по lifecycle | Уход с экрана не оставляет лишние scans, reconnects или sends |
 | CLI-075 | Must      | Planned | Значимый state восстанавливается после configuration/process recreation | Android recreation и iOS lifecycle не сбрасывают active flow             |
 
 ## 9. Локализация, правила и доступность
@@ -128,8 +132,8 @@
 | CLI-080 | Must      | Partial | Все пользовательские строки находятся в resources               | Search по screens не находит hardcoded UI RU/EN, кроме имён языков при необходимости |
 | CLI-081 | Must      | Partial | Информационный popup открывает правила текущей дисциплины/языка | Ресурс существует и соответствует выбранной дисциплине                               |
 | CLI-082 | Could     | Planned | Английские PDF действительно англоязычные                       | Post-v1 контент проверен владельцем продукта и не является копией RU                 |
-| CLI-083 | Must      | Partial | Kerugi и Tanbon combat controls имеют semantic labels; physical accessibility audit pending | Accessibility tree сообщает participant и event type                                 |
-| CLI-084 | Must      | Partial | Pending/accepted/rejected Kerugi и Tanbon feedback and reconnecting connection status have textual localized labels; non-color treatment for remaining status surfaces pending | Pending/accepted/rejected имеют текст/иконку/форму                                   |
+| CLI-083 | Must | Partial | Combat controls имеют semantic labels | Accessibility tree сообщает participant и event type |
+| CLI-084 | Must | Partial | Статус не кодируется только цветом | Pending/accepted/rejected имеют текст/иконку/форму |
 | CLI-085 | Must      | Planned | Все критические элементы доступны при pilot screen sizes        | Physical-device smoke test не обнаруживает clipping/недоступных кнопок               |
 | CLI-086 | Should    | Planned | Dynamic font не скрывает критические действия                   | Поддерживаемый accessibility scale проходит layout test                              |
 
@@ -138,9 +142,9 @@
 | ID      | Приоритет | Статус  | Требование                                                                | Критерий приёмки                                          |
 |---------|-----------|---------|---------------------------------------------------------------------------|-----------------------------------------------------------|
 | CLI-090 | Must      | Planned | Client не отправляет события до pairing                                   | Anonymous write отклоняется и локально, и server-side     |
-| CLI-091 | Must      | Partial | Reconnect credential и pairing delivery proof хранятся в Android Keystore-backed storage и iOS Keychain; server delivery и остальные competition/session credentials pending | Секреты отсутствуют в plain preferences/logs              |
+| CLI-091 | Must | Partial | Competition/session credentials хранятся в platform secure storage | Секреты отсутствуют в plain preferences/logs |
 | CLI-092 | Must      | Planned | Логи не содержат полный rating payload и персональные данные по умолчанию | Production pilot log использует IDs и error codes         |
-| CLI-093 | Must      | Partial | Protocol/capability validation готова как shared domain boundary; mDNS и manual HTTP endpoint используют её, TLS trust UX pending | Подключение к сервису неверного типа/protocol отклоняется |
+| CLI-093 | Must | Partial | Client валидирует endpoint из discovery | Подключение к сервису неверного типа/protocol отклоняется |
 | CLI-094 | Must      | Planned | Локальные черновики удаляются явным действием или после retention policy  | Судья понимает, какие данные остались на устройстве       |
 
 ## 11. Качество и выпуск
@@ -149,7 +153,7 @@
 |---------|-----------|---------|---------------------------------------------|-----------------------------------------------------------------------------------|
 | CLI-100 | Must      | Implemented | Формулы rating покрыты unit tests        | Есть boundary cases для всех criteria models и rounding                           |
 | CLI-101 | Must      | Planned | Discovery/pairing покрыты integration tests | Проверены discovered/resolved/removed, accept/reject и version mismatch           |
-| CLI-102 | Must      | Partial | Shared fault-injection tests cover dropped send, recreation, delayed/mismatched ACK and ordered authenticated replay; physical app-kill/reconnect integration proof pending | Drop, duplicate, reorder, app kill и reconnect не теряют/не дублируют events      |
+| CLI-102 | Must | Partial | Outbox покрыт fault-injection tests | Drop, duplicate, reorder, app kill и reconnect не теряют/не дублируют events |
 | CLI-103 | Must      | Planned | DTO совместимы с server contract tests      | Несовпадение protocol/schema блокирует CI                                         |
 | CLI-104 | Must      | Planned | Critical UI flow покрыт smoke tests         | Entry -> connect/offline -> discipline -> event/save/send проходит на Android/iOS |
 | CLI-105 | Must      | Planned | APK устанавливается без developer tooling   | Pilot Android devices запускают release build                                     |
