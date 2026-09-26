@@ -11,6 +11,7 @@ interface Popup {
         NONE,
         SETTINGS,
         WARNING,
-        INFORMATION
+        INFORMATION,
+        LEAVE_PAIRED_SERVER
     }
 }

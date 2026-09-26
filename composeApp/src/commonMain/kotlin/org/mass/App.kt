@@ -140,7 +140,11 @@ fun NavGraphBuilder.animatedComposable(
                 }
             }
             BackHandler {
-                if (State.navController!!.currentBackStackEntry?.destination?.route !in arrayOf(
+                val route = State.navController!!.currentBackStackEntry?.destination?.route
+                if (route == Routes.SERVER_CONNECTION.path && PairedServerSession.isPaired) {
+                    State.currentPopupMode = if (State.currentPopupMode == Popup.Modes.NONE)
+                        Popup.Modes.LEAVE_PAIRED_SERVER else Popup.Modes.NONE
+                } else if (route !in arrayOf(
                         Routes.KERUGI_MODE.path,
                         Routes.TANBON_MODE.path,
                         Routes.HOSINSOOL_MODE.path,

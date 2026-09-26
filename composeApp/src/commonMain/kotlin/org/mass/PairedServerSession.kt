@@ -40,6 +40,10 @@ object PairedServerSession {
     var pairedServer: PairedServer? by mutableStateOf(null)
         private set
 
+    /** A usable pairing exists: the surname is fixed and leaving the connection screen asks for confirmation. */
+    val isPaired: Boolean
+        get() = pairedServer != null && State.connection.state !is ConnectionState.Rejected
+
     fun initialize(context: Any?) {
         if (!::credentials.isInitialized) {
             credentials = ReconnectCredentialRepository(createReconnectCredentialStorage(context))

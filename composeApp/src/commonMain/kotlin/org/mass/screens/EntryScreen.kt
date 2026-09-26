@@ -112,8 +112,7 @@ object EntryScreen: Screen {
                     Spacer(Modifier.weight(1.5f))
 
                     // The server knows the judge by the surname the operator approved; changing it means pairing again.
-                    val surnameLocked = PairedServerSession.pairedServer != null &&
-                        State.connection.state !is org.mass.connection.ConnectionState.Rejected
+                    val surnameLocked = PairedServerSession.isPaired
                     TextInputComponent(
                         Localization.getString("entry_judge_surname"),
                         inputValue = State.judgeSurname,
@@ -123,14 +122,6 @@ object EntryScreen: Screen {
                         },
                         enabled = !surnameLocked
                     )
-                    if (surnameLocked) {
-                        Text(
-                            text = Localization.getString("entry_surname_locked"),
-                            style = MaterialTheme.typography.bodySmall,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth(0.8f)
-                        )
-                    }
 
                     val loginOnClick = remember { {
                         State.startDiscovery()
