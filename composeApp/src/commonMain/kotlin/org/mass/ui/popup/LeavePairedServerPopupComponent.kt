@@ -1,11 +1,14 @@
 package org.mass.ui.popup
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -37,47 +40,34 @@ fun LeavePairedServerPopupComponent() {
             .background(Colors.SECONDARY.color)
             .padding(horizontal = 5.dp)
     ) {
+        // Equal gaps above the title, between title, text and buttons, and below the buttons.
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier.fillMaxSize()
         ) {
-            Box(
-                Modifier
-                    .weight(0.3f)
+            Text(
+                text = Localization.getString("leave_paired_title"),
+                style = MaterialTheme.typography.displayLarge,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Text(
+                text = Localization.getString("leave_paired_text"),
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
                     .fillMaxWidth()
-            ) {
-                Text(
-                    text = Localization.getString("leave_paired_title"),
-                    style = MaterialTheme.typography.displayLarge,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-            Box(
-                Modifier
-                    .weight(0.3f)
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = Localization.getString("leave_paired_text"),
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center
-                )
-            }
-            Column(
-                Modifier
-                    .weight(0.4f)
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
+                    .padding(horizontal = 20.dp)
+            )
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 ButtonComponent(
                     text = Localization.getString("leave_paired_stay"),
                     onclick = {
                         State.currentPopupMode = Popup.Modes.NONE
                     },
                 )
-                Spacer(Modifier.fillMaxHeight(0.05f))
+                Spacer(Modifier.height(10.dp))
                 ButtonComponent(
                     text = Localization.getString("leave_paired_exit"),
                     onclick = {
@@ -86,7 +76,6 @@ fun LeavePairedServerPopupComponent() {
                         clickWithTransition(Routes.BACK)
                     },
                 )
-                Spacer(Modifier.fillMaxHeight(0.05f))
             }
         }
     }
