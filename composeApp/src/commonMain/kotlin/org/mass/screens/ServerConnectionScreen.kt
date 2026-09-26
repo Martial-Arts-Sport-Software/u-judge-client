@@ -1,5 +1,9 @@
 package org.mass.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -345,7 +349,12 @@ object ServerConnectionScreen : Screen {
                     }
                 }
             }
-            if (State.currentPopupMode == Popup.Modes.LEAVE_PAIRED_SERVER) {
+            // Same 300 ms fade as the other popups.
+            AnimatedVisibility(
+                visible = State.currentPopupMode == Popup.Modes.LEAVE_PAIRED_SERVER,
+                enter = fadeIn(animationSpec = tween(300)),
+                exit = fadeOut(animationSpec = tween(300))
+            ) {
                 // The backdrop takes every tap: the screen below stays inactive and a tap outside dismisses the popup.
                 Box(
                     Modifier
