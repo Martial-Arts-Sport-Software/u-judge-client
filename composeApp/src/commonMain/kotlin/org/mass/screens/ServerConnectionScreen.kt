@@ -90,6 +90,7 @@ import org.mass.ui.button.ButtonStyles
 import org.mass.ui.button.clickWithTransition
 import org.mass.ui.input.TextInputComponent
 import org.mass.ui.popup.Popup
+import org.mass.utils.DiscoveryPermissionEffect
 import org.mass.utils.ServerConnectionUtil
 import u_judge_client.composeapp.generated.resources.Res
 import u_judge_client.composeapp.generated.resources.arrow_right_icon
@@ -177,13 +178,14 @@ object ServerConnectionScreen : Screen {
             state is ConnectionState.ConnectedIdle || state is ConnectionState.Reconnecting || state is ConnectionState.Rejected
             )
 
-        LaunchedEffect(showCurrent, tab) {
-            // A running pairing must not be reset to discovery by switching tabs.
-            if (!showCurrent && tab == Tab.SEARCH && pairingJob?.isActive != true) {
-                ServerConnectionUtil.scan(coroutineScope)
-            } else {
-                ServerConnectionUtil.stopScan()
+        val searching = !showCurrent && tab == Tab.SEARCH
+        if (searching) {
+            DiscoveryPermissionEffect(key = searching) {
+                // A running pairing must not be reset to discovery by the permission answer or a tab switch.
+                if (pairingJob?.isActive != true) ServerConnectionUtil.scan(coroutineScope)
             }
+        } else {
+            LaunchedEffect(Unit) { ServerConnectionUtil.stopScan() }
         }
 
         Column(
