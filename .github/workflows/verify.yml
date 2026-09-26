@@ -10,6 +10,24 @@ permissions:
   contents: read
 
 jobs:
+  contract:
+    name: Server contract fixtures
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Read pinned server revision
+        id: server
+        run: echo "ref=$(cat contract/server-ref)" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v6
+        with:
+          repository: Martial-Arts-Sport-Software/u-judge-server
+          ref: ${{ steps.server.outputs.ref }}
+          path: u-judge-server
+      - name: Fail when client fixtures differ from the server contract
+        run: |
+          scripts/sync-server-contract.sh u-judge-server
+          git diff --exit-code -- composeApp/src/commonTest/kotlin/org/mass/contract
+
   android:
     name: Android build and tests
     runs-on: ubuntu-latest
