@@ -47,6 +47,8 @@ fun App() {
     State.initializePairingIdentity(getContext())
     State.initializeRatingDrafts(getContext())
     State.initializeEventOutbox(getContext())
+    PairedServerSession.initialize(getContext())
+    LaunchedEffect(Unit) { PairedServerSession.restore() }
     State.navController = rememberNavController()
     State.density = LocalDensity.current
     MaterialTheme(
