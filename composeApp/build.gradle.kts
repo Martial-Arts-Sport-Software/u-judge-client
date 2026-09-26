@@ -78,6 +78,12 @@ kotlin {
             implementation(libs.ktor.client.websockets)
         }
 
+        getByName("androidHostTest").dependencies {
+            // A real WebSocket server for transport tests of the OkHttp engine.
+            implementation(libs.ktor.server.cio)
+            implementation(libs.ktor.server.websockets)
+        }
+
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation(libs.kotlinx.coroutines.test)

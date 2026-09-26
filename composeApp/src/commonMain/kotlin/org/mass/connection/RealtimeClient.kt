@@ -11,6 +11,8 @@ import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
@@ -164,13 +166,29 @@ class RealtimeClient(
     }
 }
 
+/** The server closed the realtime socket; callers treat it as a transport failure and reconnect. */
+class RealtimeSocketClosedException(cause: Throwable) : Exception("Realtime socket closed", cause)
+
 private class KtorRealtimeSocket(private val session: DefaultClientWebSocketSession) : RealtimeSocket {
-    override suspend fun send(payload: String) {
+    override suspend fun send(payload: String) = transport {
         session.send(Frame.Text(payload))
     }
 
-    override suspend fun receive(): String = (session.incoming.receive() as? Frame.Text)?.readText()
-        ?: throw IllegalStateException("Expected a text WebSocket frame")
+    override suspend fun receive(): String = transport {
+        (session.incoming.receive() as? Frame.Text)?.readText()
+            ?: throw IllegalStateException("Expected a text WebSocket frame")
+    }
+
+    /**
+     * Ktor engines (OkHttp) report a socket closed by the server as a [CancellationException]. Coroutine code must
+     * rethrow cancellation, so heartbeat and reconnect would stop silently; only a cancellation of the caller stays one.
+     */
+    private suspend inline fun <T> transport(block: () -> T): T = try {
+        block()
+    } catch (exception: CancellationException) {
+        currentCoroutineContext().ensureActive()
+        throw RealtimeSocketClosedException(exception)
+    }
 
     override suspend fun close() {
         session.close()
