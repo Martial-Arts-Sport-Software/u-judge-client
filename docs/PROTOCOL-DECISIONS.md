@@ -7,6 +7,7 @@
 - [ADR-002: P2P Discovery, Join, and Anti-Entropy](https://github.com/Martial-Arts-Sport-Software/u-judge-server/blob/main/docs/adr/ADR-002-p2p-discovery-join-anti-entropy.md)
 - [ADR-003: Managed PostgreSQL Persistence](https://github.com/Martial-Arts-Sport-Software/u-judge-server/blob/main/docs/adr/ADR-003-managed-postgresql.md)
 - [ADR-004: HTTP/WebSocket Contract and Version Negotiation](https://github.com/Martial-Arts-Sport-Software/u-judge-server/blob/main/docs/adr/ADR-004-http-websocket-contract.md)
+- [ADR-006: Local TLS And Mobile Trust](https://github.com/Martial-Arts-Sport-Software/u-judge-server/blob/main/docs/adr/ADR-006-local-tls-trust.md)
 
 Этот документ определяет только обязанности mobile client. Desktop peer identity, P2P replication и managed PostgreSQL
 реализуются server application.
@@ -19,8 +20,15 @@
 - Metadata содержит protocol version, capabilities, desktop peer/court ID, server name, pairing policy и server time.
 - Каждый новый mobile device требует explicit operator approval. После approval client хранит reconnect credential только в
   platform secure storage, до server-side revocation или credential rotation.
-- Protocol требует TLS и локальный certificate/trust flow. Текущий client manual/mDNS pre-pilot path использует HTTP metadata
-  validation и не предоставляет TLS trust UX; endpoint не считается online до metadata validation и pairing acceptance.
+- Client подключается только по HTTPS/WSS (по умолчанию порт `8443`) и доверяет ключу server по SPKI pin (ADR-006): при
+  первом контакте ключ запоминается, а экран pairing показывает 6-значный код, который оператор сверяет с desktop до
+  подтверждения. После approval pin хранится вместе с endpoint и credential в platform secure storage; другой ключ даёт
+  terminal `server_identity_changed` без отправки credential, выход - явное «Забыть сервер» и новый pairing.
+- Credential запрашивается с delivery proof в заголовке `X-UJudge-Pairing-Delivery-Proof`.
+- После перезапуска приложения client восстанавливает paired server и переподключается без нового pairing, повторяя
+  попытки с backoff 1-30 с; `invalid_reconnect_credential` означает отзыв устройства: credential и pairing удаляются.
+- Форма сообщений проверяется по contract fixtures server (`contract/server-ref`, `scripts/sync-server-contract.sh`);
+  расхождение останавливает CI.
 
 ## Realtime contract
 
