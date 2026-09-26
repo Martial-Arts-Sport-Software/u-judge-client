@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import org.mass.PairedServerSession
 import org.mass.State
 import org.mass.enums.Colors
 import org.mass.enums.Routes
@@ -24,7 +25,7 @@ import org.mass.ui.button.ButtonComponent
 import org.mass.ui.button.clickWithTransition
 
 /**
- * Renders popup when a paired judge leaves the connection screen: the surname stays the one the operator approved
+ * Renders popup when a paired judge leaves the connection screen: leaving disconnects and forgets the server
  */
 @Composable
 fun LeavePairedServerPopupComponent() {
@@ -46,14 +47,14 @@ fun LeavePairedServerPopupComponent() {
             ) {
                 Text(
                     text = Localization.getString("leave_paired_title"),
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.displayLarge,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
             Text(
                 text = Localization.getString("leave_paired_text"),
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .weight(0.3f)
@@ -77,6 +78,7 @@ fun LeavePairedServerPopupComponent() {
                     text = Localization.getString("leave_paired_exit"),
                     onclick = {
                         State.currentPopupMode = Popup.Modes.NONE
+                        PairedServerSession.forget()
                         clickWithTransition(Routes.BACK)
                     },
                 )
