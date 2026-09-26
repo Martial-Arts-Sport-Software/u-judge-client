@@ -17,6 +17,7 @@ description: Use when changing U'Judge Kotlin Multiplatform Compose UI, navigati
 - Keep navigation separate from connection, pairing, session, and rating-draft state.
 - Avoid bare global booleans for transport truth. Model lifecycle jobs so leaving a screen cancels pending discovery or actions.
 - Persist only meaningful user state: identity, locale, settings, drafts, and pending events.
+- A screen is done only when its scenario runs in the installed app against a real server, not only in previews or tests.
 - Do not implement empty click handlers for declared pilot flows. Either deliver the behavior or visibly mark it unavailable.
 
 ## Verification

@@ -7,9 +7,11 @@ description: Use when testing, releasing, packaging, or changing Gradle, depende
 
 ## Delivery scope
 
-- Before implementation, name the acceptance outcome or gate evidence the PR will advance and map it to requirement IDs.
+- Before implementation, name the shared increment (`I1`...`I8` in `docs/ROADMAP.md`) and the requirement IDs or gate
+  items it will close. Use the `u-judge-client-increment-planning` skill.
 - Include every client-owned layer required to prove that outcome: state, durable storage/outbox, transport contract, UI feedback, and Android/iPhone evidence when applicable.
-- For a cross-repository outcome, link the server work and record the integration or physical-device evidence needed to close it.
+- For a cross-repository outcome, link the server issue and PR, run the scenario against `./gradlew :desktop:run` from
+  `u-judge-server`, and record the integration or physical-device evidence needed to close it.
 - A narrow prerequisite is allowed only for an urgent fix, blocking preparation, CI/docs change, or independently useful dependency. Explain the exception and the parent outcome in the issue and PR; never mark partial evidence as a completed requirement or gate.
 
 ## Required checks
@@ -19,6 +21,7 @@ description: Use when testing, releasing, packaging, or changing Gradle, depende
 - Verify shared/iOS compilation with `./gradlew :composeApp:compileKotlinIosArm64 :composeApp:compileKotlinIosSimulatorArm64`.
 - Run `./gradlew :composeApp:testAndroidHostTest` after shared model changes.
 - Run `./gradlew :composeApp:iosSimulatorArm64Test` when iOS simulator testing is available.
+- For transport or combat changes, run the increment scenario on an Android emulator against a real server and record it in the PR.
 - Run `git diff --check` before committing.
 
 ## Toolchain rules
