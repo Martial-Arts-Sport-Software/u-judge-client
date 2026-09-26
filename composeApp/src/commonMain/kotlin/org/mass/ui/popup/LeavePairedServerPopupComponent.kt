@@ -52,15 +52,19 @@ fun LeavePairedServerPopupComponent() {
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
-            Text(
-                text = Localization.getString("leave_paired_text"),
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
+            Box(
+                Modifier
                     .weight(0.3f)
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-            )
+                    .padding(horizontal = 20.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = Localization.getString("leave_paired_text"),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center
+                )
+            }
             Column(
                 Modifier
                     .weight(0.4f)
