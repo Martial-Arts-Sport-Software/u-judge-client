@@ -202,9 +202,16 @@ object ServerConnectionScreen : Screen {
                 Spacer(Modifier.weight(1f))
             }
             Spacer(Modifier.height(12.dp))
+            // A gray panel like the server's, not the whole screen, carries the connection content.
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxWidth(0.72f).weight(1f).verticalScroll(rememberScrollState())
+                modifier = Modifier
+                    .fillMaxWidth(0.78f)
+                    .weight(1f)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(Colors.GRAY.color)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 20.dp, vertical = 16.dp)
             ) {
                 if (showCurrent && pairedServer != null) {
                     CurrentServer(pairedServer, state) {
