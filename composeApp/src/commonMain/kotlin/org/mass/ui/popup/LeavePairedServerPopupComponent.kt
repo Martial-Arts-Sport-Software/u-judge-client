@@ -1,5 +1,9 @@
 package org.mass.ui.popup
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -32,6 +36,32 @@ import org.mass.ui.button.ButtonStyles
 import org.mass.ui.button.clickWithTransition
 import u_judge_client.composeapp.generated.resources.Res
 import u_judge_client.composeapp.generated.resources.cross_icon
+
+/**
+ * Full-screen backdrop with [LeavePairedServerPopupComponent], faded like the other popups. It takes every tap, so the
+ * screen below stays inactive, and a tap outside the card dismisses the popup. Rendered by `App` above the padded
+ * navigation host so it covers the whole screen.
+ */
+@Composable
+fun LeavePairedServerOverlay() {
+    AnimatedVisibility(
+        visible = State.currentPopupMode == Popup.Modes.LEAVE_PAIRED_SERVER,
+        enter = fadeIn(animationSpec = tween(300)),
+        exit = fadeOut(animationSpec = tween(300))
+    ) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(Colors.BROWN.color.copy(alpha = 0.7f))
+                .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
+                    State.currentPopupMode = Popup.Modes.NONE
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            LeavePairedServerPopupComponent()
+        }
+    }
+}
 
 /**
  * Renders popup when a paired judge leaves the connection screen: leaving disconnects and forgets the server

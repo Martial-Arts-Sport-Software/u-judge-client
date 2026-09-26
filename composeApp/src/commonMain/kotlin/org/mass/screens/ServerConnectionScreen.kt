@@ -1,12 +1,6 @@
 package org.mass.screens
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -86,7 +80,6 @@ import org.mass.ui.button.ButtonComponent
 import org.mass.ui.button.ButtonStyles
 import org.mass.ui.button.clickWithTransition
 import org.mass.ui.input.TextInputComponent
-import org.mass.ui.popup.LeavePairedServerPopupComponent
 import org.mass.ui.popup.Popup
 import org.mass.utils.ServerConnectionUtil
 import u_judge_client.composeapp.generated.resources.Res
@@ -107,265 +100,244 @@ object ServerConnectionScreen : Screen {
         val coroutineScope = rememberCoroutineScope()
         val context = getContext()
 
-        Box(Modifier.fillMaxSize()) {
-            Column(
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(15.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(15.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxHeight(0.15f)
+                    .fillMaxWidth()
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
+                ButtonComponent(
+                    style = ButtonStyles.Icon,
+                    iconSrc = Res.drawable.back_icon,
+                    onclick = goBackOnclick,
                     modifier = Modifier
-                        .fillMaxHeight(0.15f)
-                        .fillMaxWidth()
-                ) {
-                    ButtonComponent(
-                        style = ButtonStyles.Icon,
-                        iconSrc = Res.drawable.back_icon,
-                        onclick = goBackOnclick,
-                        modifier = Modifier
-                            .fillMaxHeight()
-                    )
-                    Spacer(Modifier.weight(0.8f))
-                    Text(
-                        text = Localization.getString("connection_title"),
-                        style = MaterialTheme.typography.titleLarge,
-                    )
-                    Spacer(Modifier.weight(1f))
+                        .fillMaxHeight()
+                )
+                Spacer(Modifier.weight(0.8f))
+                Text(
+                    text = Localization.getString("connection_title"),
+                    style = MaterialTheme.typography.titleLarge,
+                )
+                Spacer(Modifier.weight(1f))
+            }
+
+            Spacer(Modifier.height(20.dp))
+
+            var manualHost by remember { mutableStateOf("") }
+            var manualPort by remember { mutableStateOf("8443") }
+            var manualEndpointError by remember { mutableStateOf(false) }
+            var pairingStatus by remember { mutableStateOf<PairingStatusResult?>(null) }
+            var pairingJob by remember { mutableStateOf<Job?>(null) }
+            var serverTrust by remember { mutableStateOf<ServerTrust?>(null) }
+
+            DisposableEffect(Unit) {
+                onDispose {
+                    pairingJob?.cancel()
+                    ServerConnectionUtil.stopScan()
                 }
+            }
 
-                Spacer(Modifier.height(20.dp))
-
-                var manualHost by remember { mutableStateOf("") }
-                var manualPort by remember { mutableStateOf("8443") }
-                var manualEndpointError by remember { mutableStateOf(false) }
-                var pairingStatus by remember { mutableStateOf<PairingStatusResult?>(null) }
-                var pairingJob by remember { mutableStateOf<Job?>(null) }
-                var serverTrust by remember { mutableStateOf<ServerTrust?>(null) }
-
-                DisposableEffect(Unit) {
-                    onDispose {
+            // While a paired session is active the judge sees it instead of search and manual entry; switching
+            // servers starts with "Forget this server".
+            val pairedServer = PairedServerSession.pairedServer
+            val sessionActive = pairedServer != null &&
+                (connection.state is ConnectionState.ConnectedIdle || connection.state is ConnectionState.Reconnecting)
+            if (!sessionActive) {
+                ButtonComponent(
+                    onclick = {
                         pairingJob?.cancel()
-                        ServerConnectionUtil.stopScan()
-                    }
-                }
-
-                // While a paired session is active the judge sees it instead of search and manual entry; switching
-                // servers starts with "Forget this server".
-                val pairedServer = PairedServerSession.pairedServer
-                val sessionActive = pairedServer != null &&
-                    (connection.state is ConnectionState.ConnectedIdle || connection.state is ConnectionState.Reconnecting)
-                if (!sessionActive) {
-                    ButtonComponent(
-                        onclick = {
-                            pairingJob?.cancel()
-                            pairingStatus = null
-                            ServerConnectionUtil.scan(coroutineScope)
-                        },
-                        text = Localization.getString("connection_search_btn")
+                        pairingStatus = null
+                        ServerConnectionUtil.scan(coroutineScope)
+                    },
+                    text = Localization.getString("connection_search_btn")
+                )
+                Text(
+                    text = Localization.getString("connection_manual_hint"),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(top = 12.dp)
+                )
+                Row(modifier = Modifier.fillMaxWidth(0.8f)) {
+                    TextInputComponent(
+                        labelText = Localization.getString("connection_manual_host"),
+                        onChange = { manualHost = it },
+                        modifier = Modifier.weight(3f)
                     )
+                    Spacer(Modifier.weight(0.1f))
+                    TextInputComponent(
+                        labelText = Localization.getString("connection_manual_port"),
+                        inputValue = manualPort,
+                        onChange = { manualPort = it },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                ButtonComponent(
+                    onclick = {
+                        when (val result = manualServerEndpoint(manualHost, manualPort)) {
+                            ManualServerEndpointResult.Invalid -> manualEndpointError = true
+                            is ManualServerEndpointResult.Valid -> {
+                                manualEndpointError = false
+                                selectManualServer(result)
+                                pairingJob?.cancel()
+                                pairingStatus = null
+                                pairingJob = coroutineScope.launch {
+                                    val trust = ServerTrust().also { serverTrust = it }
+                                    createHttpClient(trust).use { httpClient ->
+                                        val credentialRepository = ReconnectCredentialRepository(
+                                            createReconnectCredentialStorage(context)
+                                        )
+                                        val deliveryProof = PairingClient.newDeliveryProof()
+                                        credentialRepository.savePairingDeliveryProof(deliveryProof)
+                                        val pairingResult = PairingFlow(
+                                            ServerMetadataClient(httpClient, result.endpoint),
+                                            PairingClient(httpClient, result.endpoint)
+                                        ).connect(
+                                                    PairingRequest(
+                                                        deviceId = pairingIdentity.deviceId(),
+                                                        surname = State.judgeSurname.trim(),
+                                                        platform = getPlatformName(),
+                                                deliveryProof = deliveryProof
+                                            ),
+                                            connection
+                                        )
+                                        pairingStatus = pairingResult.pollStatus(
+                                            httpClient,
+                                            result.endpoint,
+                                            credentialRepository
+                                        )
+                                        startRealtimeAfterPairingAcceptance(pairingStatus, result.endpoint, trust)
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    text = Localization.getString("connection_manual_connect_btn")
+                )
+                if (manualEndpointError) {
                     Text(
-                        text = Localization.getString("connection_manual_hint"),
-                        style = MaterialTheme.typography.bodyMedium,
+                        text = Localization.getString("connection_error_manual_endpoint"),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            } else {
+                pairedServer?.let { server ->
+                    Text(
+                        text = Localization.getString("connection_paired_server").replace("%s", server.endpoint.removePrefix("https://")),
+                        style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(top = 12.dp)
                     )
-                    Row(modifier = Modifier.fillMaxWidth(0.8f)) {
-                        TextInputComponent(
-                            labelText = Localization.getString("connection_manual_host"),
-                            onChange = { manualHost = it },
-                            modifier = Modifier.weight(3f)
+                }
+            }
+            if (PairedServerSession.pairedServer != null || connection.state is ConnectionState.Rejected) {
+                ButtonComponent(
+                    onclick = {
+                        pairingJob?.cancel()
+                        pairingStatus = null
+                        serverTrust = null
+                        PairedServerSession.forget()
+                    },
+                    text = Localization.getString("connection_forget_server_btn")
+                )
+            }
+            connectionStatus(pairingStatus)?.let { status ->
+                Text(
+                    text = Localization.getString(status.statusKey),
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+                serverTrust?.verificationCode?.takeIf { connection.state is ConnectionState.PairingPending }?.let { code ->
+                    Text(
+                        text = Localization.getString("connection_verification_code").replace("%s", formatVerificationCode(code)),
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+                status.reasonKey?.let { reasonKey ->
+                    Text(
+                        text = Localization.getString(reasonKey),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+            if (!sessionActive) {
+                Box(
+                    Modifier
+                        .fillMaxWidth(0.8f)
+                        .fillMaxHeight(0.9f)
+                        .clip(RoundedCornerShape(15.dp))
+                        .background(Colors.SECONDARY.color),
+                ) {
+                    if (availableServers.servers.isEmpty()) {
+                        Text(
+                            text = Localization.getString("connection_server_not_found"),
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(16.dp)
                         )
-                        Spacer(Modifier.weight(0.1f))
-                        TextInputComponent(
-                            labelText = Localization.getString("connection_manual_port"),
-                            inputValue = manualPort,
-                            onChange = { manualPort = it },
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                    ButtonComponent(
-                        onclick = {
-                            when (val result = manualServerEndpoint(manualHost, manualPort)) {
-                                ManualServerEndpointResult.Invalid -> manualEndpointError = true
-                                is ManualServerEndpointResult.Valid -> {
-                                    manualEndpointError = false
-                                    selectManualServer(result)
-                                    pairingJob?.cancel()
-                                    pairingStatus = null
-                                    pairingJob = coroutineScope.launch {
-                                        val trust = ServerTrust().also { serverTrust = it }
-                                        createHttpClient(trust).use { httpClient ->
-                                            val credentialRepository = ReconnectCredentialRepository(
-                                                createReconnectCredentialStorage(context)
-                                            )
-                                            val deliveryProof = PairingClient.newDeliveryProof()
-                                            credentialRepository.savePairingDeliveryProof(deliveryProof)
-                                            val pairingResult = PairingFlow(
-                                                ServerMetadataClient(httpClient, result.endpoint),
-                                                PairingClient(httpClient, result.endpoint)
-                                            ).connect(
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize().padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(availableServers.servers, key = { it.server.key }) { discoveredServer ->
+                                val service = discoveredServer.server
+                                val isAvailable = discoveredServer.status == DiscoveryStatus.Available
+                                val status = if (isAvailable) {
+                                    Localization.getString("connection_court_available")
+                                } else {
+                                    Localization.getString("connection_court_resolving")
+                                }
+                                ButtonComponent(
+                                    modifier = Modifier
+                                        .background((if (service == selectedServer) Colors.SECONDARY else Colors.PRIMARY).color),
+                                    text = "${service.name}\n${Localization.getString("connection_court_address")}: ${service.addresses.joinToString()}\n$status",
+                                    onclick = {
+                                        selectServer(service)
+                                        pairingJob?.cancel()
+                                        pairingStatus = null
+                                        pairingJob = coroutineScope.launch {
+                                            val address = service.addresses.firstOrNull()
+                                            if (address != null) {
+                                                val trust = ServerTrust().also { serverTrust = it }
+                                                createHttpClient(trust).use { httpClient ->
+                                                    val credentialRepository = ReconnectCredentialRepository(
+                                                        createReconnectCredentialStorage(context)
+                                                    )
+                                                    val deliveryProof = PairingClient.newDeliveryProof()
+                                                    credentialRepository.savePairingDeliveryProof(deliveryProof)
+                                                    val endpoint = metadataEndpoint(address, service.port)
+                                                    val pairingResult = PairingFlow(
+                                                        ServerMetadataClient(httpClient, endpoint),
+                                                        PairingClient(httpClient, endpoint)
+                                                    ).connect(
                                                         PairingRequest(
                                                             deviceId = pairingIdentity.deviceId(),
                                                             surname = State.judgeSurname.trim(),
                                                             platform = getPlatformName(),
-                                                    deliveryProof = deliveryProof
-                                                ),
-                                                connection
-                                            )
-                                            pairingStatus = pairingResult.pollStatus(
-                                                httpClient,
-                                                result.endpoint,
-                                                credentialRepository
-                                            )
-                                            startRealtimeAfterPairingAcceptance(pairingStatus, result.endpoint, trust)
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        text = Localization.getString("connection_manual_connect_btn")
-                    )
-                    if (manualEndpointError) {
-                        Text(
-                            text = Localization.getString("connection_error_manual_endpoint"),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                } else {
-                    pairedServer?.let { server ->
-                        Text(
-                            text = Localization.getString("connection_paired_server").replace("%s", server.endpoint.removePrefix("https://")),
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(top = 12.dp)
-                        )
-                    }
-                }
-                if (PairedServerSession.pairedServer != null || connection.state is ConnectionState.Rejected) {
-                    ButtonComponent(
-                        onclick = {
-                            pairingJob?.cancel()
-                            pairingStatus = null
-                            serverTrust = null
-                            PairedServerSession.forget()
-                        },
-                        text = Localization.getString("connection_forget_server_btn")
-                    )
-                }
-                connectionStatus(pairingStatus)?.let { status ->
-                    Text(
-                        text = Localization.getString(status.statusKey),
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
-                    serverTrust?.verificationCode?.takeIf { connection.state is ConnectionState.PairingPending }?.let { code ->
-                        Text(
-                            text = Localization.getString("connection_verification_code").replace("%s", formatVerificationCode(code)),
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                    }
-                    status.reasonKey?.let { reasonKey ->
-                        Text(
-                            text = Localization.getString(reasonKey),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                }
-                if (!sessionActive) {
-                    Box(
-                        Modifier
-                            .fillMaxWidth(0.8f)
-                            .fillMaxHeight(0.9f)
-                            .clip(RoundedCornerShape(15.dp))
-                            .background(Colors.SECONDARY.color),
-                    ) {
-                        if (availableServers.servers.isEmpty()) {
-                            Text(
-                                text = Localization.getString("connection_server_not_found"),
-                                style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.padding(16.dp)
-                            )
-                        } else {
-                            LazyColumn(
-                                modifier = Modifier.fillMaxSize().padding(16.dp),
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                items(availableServers.servers, key = { it.server.key }) { discoveredServer ->
-                                    val service = discoveredServer.server
-                                    val isAvailable = discoveredServer.status == DiscoveryStatus.Available
-                                    val status = if (isAvailable) {
-                                        Localization.getString("connection_court_available")
-                                    } else {
-                                        Localization.getString("connection_court_resolving")
-                                    }
-                                    ButtonComponent(
-                                        modifier = Modifier
-                                            .background((if (service == selectedServer) Colors.SECONDARY else Colors.PRIMARY).color),
-                                        text = "${service.name}\n${Localization.getString("connection_court_address")}: ${service.addresses.joinToString()}\n$status",
-                                        onclick = {
-                                            selectServer(service)
-                                            pairingJob?.cancel()
-                                            pairingStatus = null
-                                            pairingJob = coroutineScope.launch {
-                                                val address = service.addresses.firstOrNull()
-                                                if (address != null) {
-                                                    val trust = ServerTrust().also { serverTrust = it }
-                                                    createHttpClient(trust).use { httpClient ->
-                                                        val credentialRepository = ReconnectCredentialRepository(
-                                                            createReconnectCredentialStorage(context)
-                                                        )
-                                                        val deliveryProof = PairingClient.newDeliveryProof()
-                                                        credentialRepository.savePairingDeliveryProof(deliveryProof)
-                                                        val endpoint = metadataEndpoint(address, service.port)
-                                                        val pairingResult = PairingFlow(
-                                                            ServerMetadataClient(httpClient, endpoint),
-                                                            PairingClient(httpClient, endpoint)
-                                                        ).connect(
-                                                            PairingRequest(
-                                                                deviceId = pairingIdentity.deviceId(),
-                                                                surname = State.judgeSurname.trim(),
-                                                                platform = getPlatformName(),
-                                                                deliveryProof = deliveryProof
-                                                            ),
-                                                            connection
-                                                        )
-                                                        pairingStatus = pairingResult.pollStatus(
-                                                            httpClient,
-                                                            endpoint,
-                                                            credentialRepository
-                                                        )
-                                                        startRealtimeAfterPairingAcceptance(pairingStatus, endpoint, trust)
-                                                    }
+                                                            deliveryProof = deliveryProof
+                                                        ),
+                                                        connection
+                                                    )
+                                                    pairingStatus = pairingResult.pollStatus(
+                                                        httpClient,
+                                                        endpoint,
+                                                        credentialRepository
+                                                    )
+                                                    startRealtimeAfterPairingAcceptance(pairingStatus, endpoint, trust)
                                                 }
                                             }
-                                        },
-                                        enabled = isAvailable && connection.state is ConnectionState.Discovering
-                                    )
-                                }
+                                        }
+                                    },
+                                    enabled = isAvailable && connection.state is ConnectionState.Discovering
+                                )
                             }
                         }
                     }
-                }
-            }
-            // Same 300 ms fade as the other popups.
-            AnimatedVisibility(
-                visible = State.currentPopupMode == Popup.Modes.LEAVE_PAIRED_SERVER,
-                enter = fadeIn(animationSpec = tween(300)),
-                exit = fadeOut(animationSpec = tween(300))
-            ) {
-                // The backdrop takes every tap: the screen below stays inactive and a tap outside dismisses the popup.
-                Box(
-                    Modifier
-                        .fillMaxSize()
-                        .background(Colors.BROWN.color.copy(alpha = 0.7f))
-                        .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
-                            State.currentPopupMode = Popup.Modes.NONE
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    LeavePairedServerPopupComponent()
                 }
             }
         }

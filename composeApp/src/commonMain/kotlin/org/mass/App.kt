@@ -35,6 +35,7 @@ import org.mass.screens.HosinsoolModeScreen
 import org.mass.screens.KerugiModeScreen
 import org.mass.screens.ServerConnectionScreen
 import org.mass.screens.TanbonModeScreen
+import org.mass.ui.popup.LeavePairedServerOverlay
 import org.mass.ui.popup.Popup
 
 /**
@@ -111,6 +112,7 @@ fun App() {
                         }
                     }
                 }
+                LeavePairedServerOverlay()
             }
         }
     }
