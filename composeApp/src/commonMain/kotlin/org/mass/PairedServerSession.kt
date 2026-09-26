@@ -44,6 +44,7 @@ object PairedServerSession {
         if (!::credentials.isInitialized) {
             credentials = ReconnectCredentialRepository(createReconnectCredentialStorage(context))
             pairedServer = credentials.loadPairedServer()
+            pairedServer?.surname?.takeIf(String::isNotBlank)?.let { State.judgeSurname = it }
         }
     }
 

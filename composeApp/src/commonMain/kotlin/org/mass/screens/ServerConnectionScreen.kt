@@ -359,7 +359,9 @@ object ServerConnectionScreen : Screen {
     ) {
         if (pairingStatus !is PairingStatusResult.Accepted) return
         val pin = trust.pinnedSpki ?: return
-        PairedServerSession.startAfterApproval(PairedServer(endpoint.toString(), pairingIdentity.deviceId(), pin))
+        PairedServerSession.startAfterApproval(
+            PairedServer(endpoint.toString(), pairingIdentity.deviceId(), pin, State.judgeSurname.trim())
+        )
     }
 
     @Composable

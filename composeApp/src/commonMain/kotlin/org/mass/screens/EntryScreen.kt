@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import u_judge_client.composeapp.generated.resources.Res
 import u_judge_client.composeapp.generated.resources.club_logo
 import org.jetbrains.compose.resources.painterResource
+import org.mass.PairedServerSession
 import org.mass.State
 import org.mass.enums.Routes
 import org.mass.locale.Localization
@@ -110,14 +111,26 @@ object EntryScreen: Screen {
 
                     Spacer(Modifier.weight(1.5f))
 
+                    // The server knows the judge by the surname the operator approved; changing it means pairing again.
+                    val surnameLocked = PairedServerSession.pairedServer != null &&
+                        State.connection.state !is org.mass.connection.ConnectionState.Rejected
                     TextInputComponent(
                         Localization.getString("entry_judge_surname"),
                         inputValue = State.judgeSurname,
                         onChange = { inputValue ->
                             State.judgeSurname = inputValue
                             State.currentError = ""
-                        }
+                        },
+                        enabled = !surnameLocked
                     )
+                    if (surnameLocked) {
+                        Text(
+                            text = Localization.getString("entry_surname_locked"),
+                            style = MaterialTheme.typography.bodySmall,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth(0.8f)
+                        )
+                    }
 
                     val loginOnClick = remember { {
                         State.startDiscovery()

@@ -121,6 +121,15 @@ class PairedServerReconnectTest {
     }
 
     @Test
+    fun pairedServerKeepsTheApprovedSurnameAndReadsOlderRecords() {
+        val withSurname = PAIRED.copy(surname = "Safin")
+        assertEquals(withSurname, PairedServer.fromJson(withSurname.toJson()))
+
+        val older = """{"endpoint":"https://10.0.2.2:8443","deviceId":"device-1","spkiSha256":"${"00".repeat(32)}"}"""
+        assertEquals("", PairedServer.fromJson(older)?.surname)
+    }
+
+    @Test
     fun resumeAndLoseAccessTransitions() {
         val store = ConnectionStateStore()
         store.dispatch(ConnectionEvent.ResumePairedServer("device-1"))

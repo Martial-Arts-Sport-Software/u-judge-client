@@ -34,16 +34,19 @@ interface ReconnectCredentialStorage {
 data class PairedServer(
     val endpoint: String,
     val deviceId: String,
-    val spkiSha256: ByteArray
+    val spkiSha256: ByteArray,
+    /** The surname the operator approved; the judge changes it only by pairing again. */
+    val surname: String = ""
 ) {
     fun toJson(): String = buildJsonObject {
         put("endpoint", endpoint)
         put("deviceId", deviceId)
         put("spkiSha256", spkiSha256.joinToString("") { (it.toInt() and 0xff).toString(16).padStart(2, '0') })
+        put("surname", surname)
     }.toString()
 
     override fun equals(other: Any?): Boolean = other is PairedServer && endpoint == other.endpoint &&
-        deviceId == other.deviceId && spkiSha256.contentEquals(other.spkiSha256)
+        deviceId == other.deviceId && spkiSha256.contentEquals(other.spkiSha256) && surname == other.surname
 
     override fun hashCode(): Int = (endpoint.hashCode() * 31 + deviceId.hashCode()) * 31 + spkiSha256.contentHashCode()
 
@@ -55,7 +58,8 @@ data class PairedServer(
             PairedServer(
                 endpoint = body.getValue("endpoint").jsonPrimitive.content,
                 deviceId = body.getValue("deviceId").jsonPrimitive.content,
-                spkiSha256 = hex.chunked(2).map { it.toInt(16).toByte() }.toByteArray()
+                spkiSha256 = hex.chunked(2).map { it.toInt(16).toByte() }.toByteArray(),
+                surname = body["surname"]?.jsonPrimitive?.content.orEmpty()
             )
         } catch (_: Exception) {
             null
