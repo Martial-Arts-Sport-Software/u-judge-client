@@ -40,6 +40,73 @@
 - [x] Kerugi conflict resolution использует `1000 мс` coincidence window и minimum-score policy на server; client не вычисляет итоговый score. Implementation evidence ещё не готово.
 - [x] v1 device/language scope определён: iOS 18 minimum с тестом на iOS 26; Android 5.1/TZ55 и English UI deferred beyond v1. Implementation evidence ещё не готово.
 
+## Инкременты поставки
+
+Единица планирования и PR - инкремент поставки, общий для обоих репозиториев. ID, недели и gates совпадают с
+[server roadmap](https://github.com/Martial-Arts-Sport-Software/u-judge-server/blob/main/docs/ROADMAP.md#инкременты-поставки);
+ниже описана client-часть. Правила закреплены в `AGENTS.md` (пункты 9-10, 12) и skill `u-judge-client-increment-planning`.
+
+### Ретроспектива 30.08-20.09.2026
+
+| Наблюдение | Факт на `main` |
+|------------|----------------|
+| Частота PR | 49 merged PR за 3 недели; медиана 131 строка client code, 75-й перцентиль - 206 |
+| Результат | 15 `CLI-*` имеют статус `Implemented`, и все они локальные: offline, discovery, state machine, формулы, Save. Все требования, зависящие от server, остаются `Partial` или `Planned`; Gate C1 не закрыт |
+| Интеграция | Client ни разу не прогонялся против настоящего server: все transport tests используют собственные fake responses, а `CLI-103` (совместимость DTO с server contract tests) остаётся `Planned` |
+| Расхождение контракта | Kerugi/Tanbon tap отправляется как generic `command` с payload `kerugi_score`/`tanbon_score`. Server отвечает `command_ack` и сохраняет такой command без scoring: счёт считается только из `kerugi_score_command` с полным audit context. Client показывает `accepted` для удара, который не попадает в счёт |
+| Документация | В 32 из 86 строк `REQUIREMENTS.md` текст требования был заменён описанием прогресса, поэтому исходный критерий требования перестал быть виден |
+
+Причина та же, что и на server: slice определялся client-слоем (outbox → transport → feedback) и проверялся fake server,
+а не сценарием судьи против настоящего desktop server. Cross-repository evidence каждый раз оставалось «pending».
+
+### Правила для client
+
+- Client-часть инкремента заканчивается сценарием на Android emulator или устройстве против server, запущенного
+  `./gradlew :desktop:run` из `u-judge-server`, а не только против fake responses.
+- Сообщения client совпадают с server contract: имена типов и поля берутся из server contract tests или ADR-004, а
+  расхождение исправляется в том же инкременте в обоих репозиториях.
+- Cross-repo инкремент имеет по одной issue и одному PR в каждом репозитории; они ссылаются друг на друга, а статусы
+  отмечаются после merge обоих PR.
+- Локальный сценарий без server (offline Save, формулы, локализация) может быть самостоятельным инкрементом, если он
+  переводит требование в `Implemented`.
+
+### План
+
+| Статус | ID | Недели | Gate | Client-сценарий | Requirement IDs |
+|--------|----|--------|------|-----------------|-----------------|
+| [ ] | I1 | 4-5 | C1 (без physical devices), C2 | Судья на emulator находит desktop server, проходит pairing с подтверждением оператора на desktop по local TLS, получает credential, выдерживает kill приложения и reconnect без повторного pairing; revoke на desktop блокирует новые события | `CLI-005`, `CLI-014`, `CLI-015`, `CLI-017`-`CLI-019`, `CLI-060`, `CLI-063`, `CLI-068`, `CLI-073`, `CLI-090`, `CLI-091`, `CLI-093`, `CLI-101`, `CLI-103` |
+| [ ] | I2 | 5-6 | C2, client-часть C3 | Два-три emulator-судьи проводят Kerugi-бой на desktop server: session snapshot с участниками и state, удары как server `kerugi_score_command`, ввод только в `running`, feedback только по ACK, warning, kill/reconnect с outbox и resync; server audit содержит каждый tap один раз | `CLI-022`-`CLI-025`, `CLI-030`, `CLI-032`-`CLI-038`, `CLI-061`, `CLI-062`, `CLI-064`-`CLI-066`, `CLI-102` |
+| [ ] | I3 | 7 | C1, C3 | Honor 50 Lite и iPhone 15 через роутер площадки: Local Network permission, mDNS, pairing, Kerugi-бой с disconnect во время серии нажатий и искусственной задержкой | `CLI-001`, `CLI-010`, `CLI-011`, `CLI-083`-`CLI-085`, `CLI-104` |
+| [ ] | I4 | 7-8 | C4 | Судья последовательно судит сессии импортированной сетки без перезапуска; draft и событие нельзя отправить в устаревшую или чужую сессию | `CLI-026`, `CLI-072`, `CLI-074`, `CLI-075` |
+| [ ] | I5 | 8-9 | C5 | Tanbon через server; технические дисциплины с подтверждаемым `Send`, final pending при disconnect, read-only после ACK и суммами, совпадающими с server | `CLI-021`, `CLI-031`, `CLI-042`, `CLI-044`, `CLI-045`, `CLI-048`-`CLI-053` |
+| [ ] | I6 | 10 | C6 | Русские critical flows без hardcoded строк, доступность и pilot screen sizes | `CLI-007`, `CLI-067`, `CLI-080`, `CLI-081`, `CLI-084`-`CLI-086`, `CLI-092`, `CLI-094` |
+| [ ] | I7 | 10-11 | C7 | Release APK и TestFlight на всех pilot devices против server installer | `CLI-105`, `CLI-106` |
+| [ ] | I8 | 12 | C8 | Полевой пилот по разделу 10 | - |
+
+### Известные расхождения с server на `main`
+
+Каждое расхождение закрывается в указанном инкременте в обоих репозиториях.
+
+| Расхождение | Инкремент |
+|-------------|-----------|
+| Local TLS для credential delivery не реализован ни в одном репозитории, поэтому pairing не может завершиться end-to-end | I1 |
+| Kerugi/Tanbon tap отправляется как generic `command`, который server ACK-ит без scoring; `kerugi_score_command` требует competition, bracket, session, judge и device IDs, которых у client нет | I2 |
+| Server не публикует session snapshot или assignment (`DEV-008`); client не обрабатывает `session_state_updated`, `kerugi_score_updated` и `resync_response` | I2 |
+| Server не поддерживает Tanbon | I5 |
+
+### Накопленное client-only доказательство
+
+Shared unit tests против fake responses. Это partial evidence: server integration и physical devices отсутствуют.
+
+| Область | Подтверждено тестами | Открыто |
+|---------|----------------------|---------|
+| Discovery | Одна отменяемая mDNS scan job, дедупликация, удаление unavailable services, resolved/resolving статусы | Physical mDNS (I3) |
+| Metadata и pairing | Shared HTTP metadata/protocol/capability validation для mDNS и manual host/IP; pairing request с device identity, фамилией и platform; polling pending/accepted/rejected с отменой; delivery proof и credential в Android Keystore-backed storage и iOS Keychain | Local TLS и выдача credential настоящим server (I1) |
+| Realtime | Versioned handshake, four-timestamp clock sync, typed heartbeat lifecycle, reconnect со stored credential | Прогон против server (I1), resync (I2) |
+| Outbox | Platform-backed journal с event ID, client sequence, timestamp и retry metadata; ordered bounded backoff; terminal ACK/rejection; replay due commands после connect/reconnect; fault injection | App-kill против server (I1, I2) |
+| Kerugi/Tanbon controls | Durable typed command только в authenticated `running` matching session; feedback только для matching последнего event; semantic labels | Формат server `kerugi_score_command` и session snapshot (I2); Tanbon на server (I5) |
+| Технические дисциплины | Семь offline-режимов, критерии `0.1..1.0` с шагом `0.1`, независимые черновики `Save` без network request | `Send` и server totals (I5) |
+
 ## 2. Неделя 1: baseline и тестовая основа
 
 - [x] Зафиксировать актуальную ветку `feat/server-connection` как исходную точку.
@@ -59,11 +126,11 @@ Shared/Android/iOS targets собираются в CI, формулы текущ
 
 - [x] Управлять единственной mDNS discovery job и её lifecycle (`CLI-012`; shared rescan/cancellation tests).
 - [x] Показывать понятные имя площадки, адрес и статус (`CLI-013`; resolved и resolving состояния покрыты shared unit tests).
-- [ ] Реализовать HTTP metadata/handshake, protocol version/capability check и manual host/IP fallback (resolved mDNS и manual host/IP вызывают shared HTTP client, validation domain model и pairing flow; client persists a proof-bound issued credential before realtime startup; server delivery contract and TLS trust UX pending).
-- [ ] Реализовать WebSocket connect, heartbeat и typed envelope (shared Ktor handshake, credential storage, typed command envelope, terminal ACK/rejection outbox handling и typed heartbeat lifecycle готовы; Kerugi physical action dispatches over the serialized authenticated channel; authenticated lifecycle replays due durable commands in client sequence before heartbeat after initial connection and reconnect; после HTTP pairing acceptance UI запускает lifecycle со stored credential и останавливает его при уходе с connection screen; credential issuance, server integration и resync pending).
-- [x] Получать pairing pending/accepted/rejected через public HTTP status polling с локальным UI без online access (`CLI-016`; shared contract tests). После accepted UI запускает authenticated realtime lifecycle со stored credential; pairing credential issuance, realtime status push и resync remain pending.
-- [ ] Согласовать clock offset (authenticated realtime handshake и transport reconnect выполняют shared typed four-timestamp exchange, сохраняют offset/round-trip и отклоняют invalid/rejected responses; initial UI lifecycle wiring готово, credential issuance и resync pending).
-- [ ] Отправить событие, получить ACK, разорвать сеть и повторить тот же ID (shared command/ACK contract сохраняет stable ID and terminal outcome; disconnect/reconnect proof pending).
+- [ ] Реализовать HTTP metadata/handshake, protocol version/capability check и manual host/IP fallback (см. «Накопленное client-only доказательство»).
+- [ ] Реализовать WebSocket connect, heartbeat и typed envelope (см. «Накопленное client-only доказательство»).
+- [x] Получать pairing pending/accepted/rejected через public HTTP status polling с локальным UI без online access (`CLI-016`; shared contract tests).
+- [ ] Согласовать clock offset (см. «Накопленное client-only доказательство»).
+- [ ] Отправить событие, получить ACK, разорвать сеть и повторить тот же ID (см. «Накопленное client-only доказательство»).
 - [ ] Проверить iOS Local Network permission и mDNS на TestFlight-like build.
 
 ### Gate C1
@@ -75,9 +142,9 @@ Shared/Android/iOS targets собираются в CI, формулы текущ
 
 - [x] Заменить `State.isConnectedToServer` connection state machine (`CLI-070`; переходы покрыты shared unit tests).
 - [x] Отделить session state от navigation state (`CLI-071`; shared lifecycle/isolation tests); отдельный UI state pairing и rating draft остаётся pending.
-- [ ] Ввести локальное durable storage для identity, settings, drafts и outbox (shared outbox journal уже сохраняет pending/rejected records в platform storage; wiring domain events, drafts и settings pending).
-- [ ] Добавить event ID, client sequence, timestamp и retry metadata (shared outbox model, retry metadata и typed command envelope готовы; Kerugi action wiring dispatches immediately when the serialized authenticated channel is active; authenticated lifecycle replays due events in order after initial connection and reconnect; remaining actions pending).
-- [ ] Реализовать bounded exponential backoff и terminal rejection (shared ordered retry, terminal rejection и drop/reorder fault-injection tests готовы; Kerugi shows terminal feedback, authenticated lifecycle replays only due events and stops on an invalid terminal response; remaining actions and resync pending).
+- [ ] Ввести локальное durable storage для identity, settings, drafts и outbox (см. «Накопленное client-only доказательство»).
+- [ ] Добавить event ID, client sequence, timestamp и retry metadata (см. «Накопленное client-only доказательство»).
+- [ ] Реализовать bounded exponential backoff и terminal rejection (см. «Накопленное client-only доказательство»).
 - Восстанавливать active connection/session после lifecycle events.
 - Локализовать типизированные transport/protocol errors.
 
@@ -88,10 +155,10 @@ outbox только после terminal ACK.
 
 ## 5. Недели 4-5: Kerugi vertical slice
 
-- [x] Подключить четыре Kerugi combat buttons к durable typed events только для authenticated `running` Kerugi session (`CLI-030`, `CLI-032`, `CLI-033`, `CLI-035`, `CLI-038`; shared controller tests). Local tap сохраняет unique ID, client sequence, clock-adjusted timestamp и session ID, немедленно dispatch через serialized authenticated channel; server integration, reconnect physical proof и Tanbon pending.
+- [x] Подключить четыре Kerugi combat buttons к durable typed events только для authenticated `running` Kerugi session (`CLI-030`, `CLI-032`, `CLI-033`, `CLI-035`, `CLI-038`; shared controller tests).
 - Получать current bout, blue/red labels и session state от server.
 - Блокировать ввод вне `running`.
-- [x] Показывать локализованный pending/accepted/rejected feedback без ложного подтверждения только для matching последнего Kerugi event (`CLI-036`, `CLI-065`, `CLI-066`, `CLI-084`; shared ACK/rejection/disconnect, replay и serialized-channel tests). Server integration и physical-device evidence pending.
+- [x] Показывать локализованный pending/accepted/rejected feedback без ложного подтверждения только для matching последнего Kerugi event (`CLI-036`, `CLI-065`, `CLI-066`, `CLI-084`; shared ACK/rejection/disconnect, replay и serialized-channel tests).
 - Реализовать warning/attention event.
 - Добавить semantics и distinct non-color statuses.
 - Провести double tap, delayed ACK, duplicate, reorder и clock-offset tests.
@@ -119,9 +186,9 @@ audit содержит каждый physical tap один раз.
 
 ### Tanbon
 
-- [x] Подключить пять текущих buttons к durable typed events только для authenticated `running` Tanbon session (`CLI-031`, `CLI-032`, `CLI-033`, `CLI-035`, `CLI-038`; shared controller tests). Local tap сохраняет unique ID, client sequence, clock-adjusted timestamp и session ID и немедленно dispatch через serialized authenticated channel; server integration и reconnect physical proof pending.
+- [x] Подключить пять текущих buttons к durable typed events только для authenticated `running` Tanbon session (`CLI-031`, `CLI-032`, `CLI-033`, `CLI-035`, `CLI-038`; shared controller tests).
 - [x] Отправлять `HEAD`, `BODY` и neutral `CROSS` (`CLI-031`; shared payload contract tests).
-- [x] Переиспользовать outbox/feedback Kerugi (`CLI-036`, `CLI-066`, `CLI-084`; shared ACK/rejection, replay и matching-feedback tests). Server integration evidence pending.
+- [x] Переиспользовать outbox/feedback Kerugi (`CLI-036`, `CLI-066`, `CLI-084`; shared ACK/rejection, replay и matching-feedback tests).
 
 ### Технические дисциплины
 
@@ -211,6 +278,7 @@ Client не потерял и не продублировал подтвержд
 | Physical-device compatibility ещё не проверена   | Среднее     | Зафиксированы iOS 18 minimum и smoke test на iOS 26                 |
 | Английские PDF не локализованы                   | Низкое      | English rules явно deferred beyond v1                                |
 | Один разработчик и два приложения                | Высокое     | Shared contract tests, минимальная architecture, вертикальные gates |
+| Client и server расходятся в контракте            | Критическое | Общие инкременты I1-I8 и прогон против настоящего desktop server    |
 
 ## 13. После pilot
 
