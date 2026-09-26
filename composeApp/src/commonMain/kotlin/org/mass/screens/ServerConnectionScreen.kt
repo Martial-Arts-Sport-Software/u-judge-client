@@ -69,6 +69,8 @@ import org.mass.connection.metadataEndpoint
 import org.mass.connection.manualServerEndpoint
 import org.mass.connection.ManualServerEndpointResult
 import org.mass.connection.ServerMetadataClient
+import org.mass.connection.ServerTrust
+import org.mass.connection.formatVerificationCode
 import org.mass.enums.Colors
 import org.mass.enums.Routes
 import org.mass.locale.Localization
@@ -121,11 +123,12 @@ object ServerConnectionScreen : Screen {
             Spacer(Modifier.height(20.dp))
 
             var manualHost by remember { mutableStateOf("") }
-            var manualPort by remember { mutableStateOf("8080") }
+            var manualPort by remember { mutableStateOf("8443") }
             var manualEndpointError by remember { mutableStateOf(false) }
             var pairingStatus by remember { mutableStateOf<PairingStatusResult?>(null) }
             var pairingJob by remember { mutableStateOf<Job?>(null) }
             var realtimeLifecycle by remember { mutableStateOf<InitialRealtimeLifecycle?>(null) }
+            var serverTrust by remember { mutableStateOf<ServerTrust?>(null) }
 
             LaunchedEffect(Unit) {
                 try {
@@ -181,7 +184,8 @@ object ServerConnectionScreen : Screen {
                             pairingJob = coroutineScope.launch {
                                 realtimeLifecycle?.stop()
                                 realtimeLifecycle = null
-                                createHttpClient().use { httpClient ->
+                                val trust = ServerTrust().also { serverTrust = it }
+                                createHttpClient(trust).use { httpClient ->
                                     val credentialRepository = ReconnectCredentialRepository(
                                         createReconnectCredentialStorage(context)
                                     )
@@ -207,6 +211,7 @@ object ServerConnectionScreen : Screen {
                                     startRealtimeAfterPairingAcceptance(
                                         pairingStatus,
                                         result.endpoint,
+                                        trust,
                                         coroutineScope,
                                         context
                                     ) { lifecycle -> realtimeLifecycle = lifecycle }
@@ -229,6 +234,13 @@ object ServerConnectionScreen : Screen {
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
+                serverTrust?.verificationCode?.takeIf { connection.state is ConnectionState.PairingPending }?.let { code ->
+                    Text(
+                        text = Localization.getString("connection_verification_code").replace("%s", formatVerificationCode(code)),
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
                 status.reasonKey?.let { reasonKey ->
                     Text(
                         text = Localization.getString(reasonKey),
@@ -275,7 +287,8 @@ object ServerConnectionScreen : Screen {
                                         realtimeLifecycle = null
                                         val address = service.addresses.firstOrNull()
                                         if (address != null) {
-                                            createHttpClient().use { httpClient ->
+                                            val trust = ServerTrust().also { serverTrust = it }
+                                            createHttpClient(trust).use { httpClient ->
                                                 val credentialRepository = ReconnectCredentialRepository(
                                                     createReconnectCredentialStorage(context)
                                                 )
@@ -302,6 +315,7 @@ object ServerConnectionScreen : Screen {
                                                 startRealtimeAfterPairingAcceptance(
                                                     pairingStatus,
                                                     endpoint,
+                                                    trust,
                                                     coroutineScope,
                                                     context
                                                 ) { lifecycle -> realtimeLifecycle = lifecycle }
@@ -335,6 +349,7 @@ object ServerConnectionScreen : Screen {
     private suspend fun startRealtimeAfterPairingAcceptance(
         pairingStatus: PairingStatusResult?,
         endpoint: io.ktor.http.Url,
+        trust: ServerTrust,
         scope: CoroutineScope,
         context: Any?,
         setLifecycle: (InitialRealtimeLifecycle) -> Unit
@@ -351,7 +366,7 @@ object ServerConnectionScreen : Screen {
             scope,
             RealtimeCommandClient(State.eventOutbox)
         )
-        val realtimeHttpClient = createHttpClient()
+        val realtimeHttpClient = createHttpClient(ServerTrust(trust.pinnedSpki))
         val realtimeClient = RealtimeClient(
             endpoint = endpoint,
             socketOpener = KtorRealtimeSocketOpener(realtimeHttpClient)

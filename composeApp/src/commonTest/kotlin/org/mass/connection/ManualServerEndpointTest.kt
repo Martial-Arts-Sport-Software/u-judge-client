@@ -9,10 +9,10 @@ import kotlin.test.assertIs
 class ManualServerEndpointTest {
     @Test
     fun normalizesManualHostAndPortForMetadataValidation() {
-        val result = manualServerEndpoint(" court.local ", " 8080 ")
+        val result = manualServerEndpoint(" court.local ", " 8443 ")
 
         assertEquals(
-            ManualServerEndpointResult.Valid(Url("http://court.local:8080")),
+            ManualServerEndpointResult.Valid(Url("https://court.local:8443")),
             result
         )
     }

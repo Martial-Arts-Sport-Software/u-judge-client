@@ -14,8 +14,8 @@ class ServerMetadataClientTest {
     @Test
     fun buildsMetadataEndpointFromResolvedAddressAndPort() {
         assertEquals(
-            Url("http://192.168.1.10:8080"),
-            metadataEndpoint("192.168.1.10", 8080)
+            Url("https://192.168.1.10:8443"),
+            metadataEndpoint("192.168.1.10", 8443)
         )
     }
 

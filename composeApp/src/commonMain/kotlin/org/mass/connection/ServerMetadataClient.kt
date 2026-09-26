@@ -16,7 +16,8 @@ sealed interface MetadataFetchResult {
     data object Unavailable : MetadataFetchResult
 }
 
-fun metadataEndpoint(address: String, port: Int): Url = Url("http://$address:$port")
+/** Servers accept only HTTPS/WSS (server ADR-006). */
+fun metadataEndpoint(address: String, port: Int): Url = Url("https://$address:$port")
 
 class ServerMetadataClient(
     private val httpClient: HttpClient,
