@@ -1,6 +1,8 @@
 package org.mass.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -344,10 +346,14 @@ object ServerConnectionScreen : Screen {
                 }
             }
             if (State.currentPopupMode == Popup.Modes.LEAVE_PAIRED_SERVER) {
+                // The backdrop takes every tap: the screen below stays inactive and a tap outside dismisses the popup.
                 Box(
                     Modifier
                         .fillMaxSize()
-                        .background(Colors.BROWN.color.copy(alpha = 0.7f)),
+                        .background(Colors.BROWN.color.copy(alpha = 0.7f))
+                        .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {
+                            State.currentPopupMode = Popup.Modes.NONE
+                        },
                     contentAlignment = Alignment.Center
                 ) {
                     LeavePairedServerPopupComponent()

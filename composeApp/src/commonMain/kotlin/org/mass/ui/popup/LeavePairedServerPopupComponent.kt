@@ -1,6 +1,8 @@
 package org.mass.ui.popup
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,7 +28,10 @@ import org.mass.enums.Colors
 import org.mass.enums.Routes
 import org.mass.locale.Localization
 import org.mass.ui.button.ButtonComponent
+import org.mass.ui.button.ButtonStyles
 import org.mass.ui.button.clickWithTransition
+import u_judge_client.composeapp.generated.resources.Res
+import u_judge_client.composeapp.generated.resources.cross_icon
 
 /**
  * Renders popup when a paired judge leaves the connection screen: leaving disconnects and forgets the server
@@ -38,6 +44,8 @@ fun LeavePairedServerPopupComponent() {
             .fillMaxWidth(0.55f)
             .clip(RoundedCornerShape(25.dp))
             .background(Colors.SECONDARY.color)
+            // Taps inside the card stay here instead of reaching the backdrop that dismisses the popup.
+            .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {}
             .padding(horizontal = 5.dp)
     ) {
         // Equal gaps above the title, between title, text and buttons, and below the buttons.
@@ -78,5 +86,16 @@ fun LeavePairedServerPopupComponent() {
                 )
             }
         }
+        ButtonComponent(
+            style = ButtonStyles.Icon,
+            iconSrc = Res.drawable.cross_icon,
+            onclick = {
+                State.currentPopupMode = Popup.Modes.NONE
+            },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 10.dp, end = 10.dp)
+                .height(44.dp),
+        )
     }
 }
