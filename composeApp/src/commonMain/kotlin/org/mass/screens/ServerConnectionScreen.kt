@@ -138,80 +138,95 @@ object ServerConnectionScreen : Screen {
                 }
             }
 
-            ButtonComponent(
-                onclick = {
-                    pairingJob?.cancel()
-                    pairingStatus = null
-                    ServerConnectionUtil.scan(coroutineScope)
-                },
-                text = Localization.getString("connection_search_btn")
-            )
-            Text(
-                text = Localization.getString("connection_manual_hint"),
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(top = 12.dp)
-            )
-            Row(modifier = Modifier.fillMaxWidth(0.8f)) {
-                TextInputComponent(
-                    labelText = Localization.getString("connection_manual_host"),
-                    onChange = { manualHost = it },
-                    modifier = Modifier.weight(3f)
+            // While a paired session is active the judge sees it instead of search and manual entry; switching
+            // servers starts with "Forget this server".
+            val pairedServer = PairedServerSession.pairedServer
+            val sessionActive = pairedServer != null &&
+                (connection.state is ConnectionState.ConnectedIdle || connection.state is ConnectionState.Reconnecting)
+            if (!sessionActive) {
+                ButtonComponent(
+                    onclick = {
+                        pairingJob?.cancel()
+                        pairingStatus = null
+                        ServerConnectionUtil.scan(coroutineScope)
+                    },
+                    text = Localization.getString("connection_search_btn")
                 )
-                Spacer(Modifier.weight(0.1f))
-                TextInputComponent(
-                    labelText = Localization.getString("connection_manual_port"),
-                    inputValue = manualPort,
-                    onChange = { manualPort = it },
-                    modifier = Modifier.weight(1f)
+                Text(
+                    text = Localization.getString("connection_manual_hint"),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(top = 12.dp)
                 )
-            }
-            ButtonComponent(
-                onclick = {
-                    when (val result = manualServerEndpoint(manualHost, manualPort)) {
-                        ManualServerEndpointResult.Invalid -> manualEndpointError = true
-                        is ManualServerEndpointResult.Valid -> {
-                            manualEndpointError = false
-                            selectManualServer(result)
-                            pairingJob?.cancel()
-                            pairingStatus = null
-                            pairingJob = coroutineScope.launch {
-                                val trust = ServerTrust().also { serverTrust = it }
-                                createHttpClient(trust).use { httpClient ->
-                                    val credentialRepository = ReconnectCredentialRepository(
-                                        createReconnectCredentialStorage(context)
-                                    )
-                                    val deliveryProof = PairingClient.newDeliveryProof()
-                                    credentialRepository.savePairingDeliveryProof(deliveryProof)
-                                    val pairingResult = PairingFlow(
-                                        ServerMetadataClient(httpClient, result.endpoint),
-                                        PairingClient(httpClient, result.endpoint)
-                                    ).connect(
-                                                PairingRequest(
-                                                    deviceId = pairingIdentity.deviceId(),
-                                                    surname = State.judgeSurname.trim(),
-                                                    platform = getPlatformName(),
-                                            deliveryProof = deliveryProof
-                                        ),
-                                        connection
-                                    )
-                                    pairingStatus = pairingResult.pollStatus(
-                                        httpClient,
-                                        result.endpoint,
-                                        credentialRepository
-                                    )
-                                    startRealtimeAfterPairingAcceptance(pairingStatus, result.endpoint, trust)
+                Row(modifier = Modifier.fillMaxWidth(0.8f)) {
+                    TextInputComponent(
+                        labelText = Localization.getString("connection_manual_host"),
+                        onChange = { manualHost = it },
+                        modifier = Modifier.weight(3f)
+                    )
+                    Spacer(Modifier.weight(0.1f))
+                    TextInputComponent(
+                        labelText = Localization.getString("connection_manual_port"),
+                        inputValue = manualPort,
+                        onChange = { manualPort = it },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                ButtonComponent(
+                    onclick = {
+                        when (val result = manualServerEndpoint(manualHost, manualPort)) {
+                            ManualServerEndpointResult.Invalid -> manualEndpointError = true
+                            is ManualServerEndpointResult.Valid -> {
+                                manualEndpointError = false
+                                selectManualServer(result)
+                                pairingJob?.cancel()
+                                pairingStatus = null
+                                pairingJob = coroutineScope.launch {
+                                    val trust = ServerTrust().also { serverTrust = it }
+                                    createHttpClient(trust).use { httpClient ->
+                                        val credentialRepository = ReconnectCredentialRepository(
+                                            createReconnectCredentialStorage(context)
+                                        )
+                                        val deliveryProof = PairingClient.newDeliveryProof()
+                                        credentialRepository.savePairingDeliveryProof(deliveryProof)
+                                        val pairingResult = PairingFlow(
+                                            ServerMetadataClient(httpClient, result.endpoint),
+                                            PairingClient(httpClient, result.endpoint)
+                                        ).connect(
+                                                    PairingRequest(
+                                                        deviceId = pairingIdentity.deviceId(),
+                                                        surname = State.judgeSurname.trim(),
+                                                        platform = getPlatformName(),
+                                                deliveryProof = deliveryProof
+                                            ),
+                                            connection
+                                        )
+                                        pairingStatus = pairingResult.pollStatus(
+                                            httpClient,
+                                            result.endpoint,
+                                            credentialRepository
+                                        )
+                                        startRealtimeAfterPairingAcceptance(pairingStatus, result.endpoint, trust)
+                                    }
                                 }
                             }
                         }
-                    }
-                },
-                text = Localization.getString("connection_manual_connect_btn")
-            )
-            if (manualEndpointError) {
-                Text(
-                    text = Localization.getString("connection_error_manual_endpoint"),
-                    style = MaterialTheme.typography.bodyMedium
+                    },
+                    text = Localization.getString("connection_manual_connect_btn")
                 )
+                if (manualEndpointError) {
+                    Text(
+                        text = Localization.getString("connection_error_manual_endpoint"),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            } else {
+                pairedServer?.let { server ->
+                    Text(
+                        text = Localization.getString("connection_paired_server").replace("%s", server.endpoint.removePrefix("https://")),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(top = 12.dp)
+                    )
+                }
             }
             if (PairedServerSession.pairedServer != null || connection.state is ConnectionState.Rejected) {
                 ButtonComponent(
@@ -245,75 +260,77 @@ object ServerConnectionScreen : Screen {
                     )
                 }
             }
-            Box(
-                Modifier
-                    .fillMaxWidth(0.8f)
-                    .fillMaxHeight(0.9f)
-                    .clip(RoundedCornerShape(15.dp))
-                    .background(Colors.SECONDARY.color),
-            ) {
-                if (availableServers.servers.isEmpty()) {
-                    Text(
-                        text = Localization.getString("connection_server_not_found"),
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize().padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(availableServers.servers, key = { it.server.key }) { discoveredServer ->
-                            val service = discoveredServer.server
-                            val isAvailable = discoveredServer.status == DiscoveryStatus.Available
-                            val status = if (isAvailable) {
-                                Localization.getString("connection_court_available")
-                            } else {
-                                Localization.getString("connection_court_resolving")
-                            }
-                            ButtonComponent(
-                                modifier = Modifier
-                                    .background((if (service == selectedServer) Colors.SECONDARY else Colors.PRIMARY).color),
-                                text = "${service.name}\n${Localization.getString("connection_court_address")}: ${service.addresses.joinToString()}\n$status",
-                                onclick = {
-                                    selectServer(service)
-                                    pairingJob?.cancel()
-                                    pairingStatus = null
-                                    pairingJob = coroutineScope.launch {
-                                        val address = service.addresses.firstOrNull()
-                                        if (address != null) {
-                                            val trust = ServerTrust().also { serverTrust = it }
-                                            createHttpClient(trust).use { httpClient ->
-                                                val credentialRepository = ReconnectCredentialRepository(
-                                                    createReconnectCredentialStorage(context)
-                                                )
-                                                val deliveryProof = PairingClient.newDeliveryProof()
-                                                credentialRepository.savePairingDeliveryProof(deliveryProof)
-                                                val endpoint = metadataEndpoint(address, service.port)
-                                                val pairingResult = PairingFlow(
-                                                    ServerMetadataClient(httpClient, endpoint),
-                                                    PairingClient(httpClient, endpoint)
-                                                ).connect(
-                                                    PairingRequest(
-                                                        deviceId = pairingIdentity.deviceId(),
-                                                        surname = State.judgeSurname.trim(),
-                                                        platform = getPlatformName(),
-                                                        deliveryProof = deliveryProof
-                                                    ),
-                                                    connection
-                                                )
-                                                pairingStatus = pairingResult.pollStatus(
-                                                    httpClient,
-                                                    endpoint,
-                                                    credentialRepository
-                                                )
-                                                startRealtimeAfterPairingAcceptance(pairingStatus, endpoint, trust)
+            if (!sessionActive) {
+                Box(
+                    Modifier
+                        .fillMaxWidth(0.8f)
+                        .fillMaxHeight(0.9f)
+                        .clip(RoundedCornerShape(15.dp))
+                        .background(Colors.SECONDARY.color),
+                ) {
+                    if (availableServers.servers.isEmpty()) {
+                        Text(
+                            text = Localization.getString("connection_server_not_found"),
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize().padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(availableServers.servers, key = { it.server.key }) { discoveredServer ->
+                                val service = discoveredServer.server
+                                val isAvailable = discoveredServer.status == DiscoveryStatus.Available
+                                val status = if (isAvailable) {
+                                    Localization.getString("connection_court_available")
+                                } else {
+                                    Localization.getString("connection_court_resolving")
+                                }
+                                ButtonComponent(
+                                    modifier = Modifier
+                                        .background((if (service == selectedServer) Colors.SECONDARY else Colors.PRIMARY).color),
+                                    text = "${service.name}\n${Localization.getString("connection_court_address")}: ${service.addresses.joinToString()}\n$status",
+                                    onclick = {
+                                        selectServer(service)
+                                        pairingJob?.cancel()
+                                        pairingStatus = null
+                                        pairingJob = coroutineScope.launch {
+                                            val address = service.addresses.firstOrNull()
+                                            if (address != null) {
+                                                val trust = ServerTrust().also { serverTrust = it }
+                                                createHttpClient(trust).use { httpClient ->
+                                                    val credentialRepository = ReconnectCredentialRepository(
+                                                        createReconnectCredentialStorage(context)
+                                                    )
+                                                    val deliveryProof = PairingClient.newDeliveryProof()
+                                                    credentialRepository.savePairingDeliveryProof(deliveryProof)
+                                                    val endpoint = metadataEndpoint(address, service.port)
+                                                    val pairingResult = PairingFlow(
+                                                        ServerMetadataClient(httpClient, endpoint),
+                                                        PairingClient(httpClient, endpoint)
+                                                    ).connect(
+                                                        PairingRequest(
+                                                            deviceId = pairingIdentity.deviceId(),
+                                                            surname = State.judgeSurname.trim(),
+                                                            platform = getPlatformName(),
+                                                            deliveryProof = deliveryProof
+                                                        ),
+                                                        connection
+                                                    )
+                                                    pairingStatus = pairingResult.pollStatus(
+                                                        httpClient,
+                                                        endpoint,
+                                                        credentialRepository
+                                                    )
+                                                    startRealtimeAfterPairingAcceptance(pairingStatus, endpoint, trust)
+                                                }
                                             }
                                         }
-                                    }
-                                },
-                                enabled = isAvailable && connection.state is ConnectionState.Discovering
-                            )
+                                    },
+                                    enabled = isAvailable && connection.state is ConnectionState.Discovering
+                                )
+                            }
                         }
                     }
                 }

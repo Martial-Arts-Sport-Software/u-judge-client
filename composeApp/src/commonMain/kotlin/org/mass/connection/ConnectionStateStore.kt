@@ -162,7 +162,11 @@ class ConnectionStateStore(
     fun dispatch(event: ConnectionEvent) {
         state = when (event) {
             ConnectionEvent.UseOffline -> ConnectionState.Offline
-            ConnectionEvent.StartDiscovery -> ConnectionState.Discovering
+            // Looking for servers never drops a live or reconnecting paired session.
+            ConnectionEvent.StartDiscovery -> when (state) {
+                is ConnectionState.ConnectedIdle, is ConnectionState.Reconnecting -> state
+                else -> ConnectionState.Discovering
+            }
             is ConnectionEvent.SelectServer -> when (state) {
                 ConnectionState.Discovering -> ConnectionState.ServerSelected(event.serverKey)
                 else -> state

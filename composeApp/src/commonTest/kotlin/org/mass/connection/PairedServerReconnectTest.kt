@@ -129,6 +129,12 @@ class PairedServerReconnectTest {
         store.dispatch(ConnectionEvent.LoseAccess(ConnectionFailure.DeviceRevoked))
         assertEquals(ConnectionState.Rejected(PAIRED_SERVER_KEY, ConnectionFailure.DeviceRevoked), store.state)
 
+        val resumed = ConnectionStateStore().apply {
+            dispatch(ConnectionEvent.ResumePairedServer("device-1"))
+            dispatch(ConnectionEvent.StartDiscovery)
+        }
+        assertEquals(ConnectionState.Reconnecting("device-1", 0, ConnectionFailure.RealtimeUnavailable), resumed.state)
+
         val offline = ConnectionStateStore()
         offline.dispatch(ConnectionEvent.LoseAccess(ConnectionFailure.DeviceRevoked))
         assertEquals(ConnectionState.Offline, offline.state)
