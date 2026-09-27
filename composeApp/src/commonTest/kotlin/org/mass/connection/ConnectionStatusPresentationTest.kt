@@ -28,4 +28,12 @@ class ConnectionStatusPresentationTest {
             )
         }
     }
+
+    @Test
+    fun connectedStateShowsConnectedStatus() {
+        assertEquals(
+            ConnectionStatusPresentation("connection_connected"),
+            connectionStatusPresentation(ConnectionState.ConnectedIdle("device-1"))
+        )
+    }
 }

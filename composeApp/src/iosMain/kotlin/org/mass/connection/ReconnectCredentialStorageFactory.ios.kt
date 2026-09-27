@@ -55,6 +55,12 @@ private class IosReconnectCredentialStorage : ReconnectCredentialStorage {
 
     override fun clearPairingDeliveryProof() = clear(PAIRING_PROOF_ACCOUNT)
 
+    override fun loadPairedServer(): String? = load(PAIRED_SERVER_ACCOUNT)
+
+    override fun savePairedServer(server: String) = save(PAIRED_SERVER_ACCOUNT, server)
+
+    override fun clearPairedServer() = clear(PAIRED_SERVER_ACCOUNT)
+
     private fun load(accountName: String): String? = memScoped {
         val result = alloc<CFTypeRefVar>()
         val status = withQuery(accountName,
@@ -114,6 +120,7 @@ private class IosReconnectCredentialStorage : ReconnectCredentialStorage {
         const val SERVICE_NAME = "org.mass.ujudge.reconnect"
         const val ACCOUNT_NAME = "credential"
         const val PAIRING_PROOF_ACCOUNT = "pairing_delivery_proof"
+        const val PAIRED_SERVER_ACCOUNT = "paired_server"
     }
 }
 

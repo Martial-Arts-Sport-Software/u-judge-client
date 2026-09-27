@@ -182,7 +182,8 @@ fun clickWithTransition(
     route: Routes,
     inclusiveMode: Boolean = false
 ) {
-    if (route == Routes.SERVER_CONNECTION || State.isOffline || State.connection.isPaired) {
+    // Going back is always allowed; moving forward to judging screens needs offline mode or a paired server.
+    if (route == Routes.BACK || route == Routes.SERVER_CONNECTION || State.isOffline || State.connection.isPaired) {
         State.isAnimating = true
         if (route == Routes.BACK) {
             State.navController!!.popBackStack()

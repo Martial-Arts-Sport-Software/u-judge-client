@@ -113,6 +113,16 @@ sealed interface ConnectionFailure {
     data object HeartbeatUnavailable : ConnectionFailure {
         override val localizationKey = "connection_error_heartbeat_unavailable"
     }
+
+    /** The operator revoked this device; its credential was removed and a new pairing is required. */
+    data object DeviceRevoked : ConnectionFailure {
+        override val localizationKey = "connection_error_device_revoked"
+    }
+
+    /** The server presented a TLS key other than the pinned one; nothing was sent to it (server ADR-006). */
+    data object ServerIdentityChanged : ConnectionFailure {
+        override val localizationKey = "connection_error_server_identity_changed"
+    }
 }
 
 sealed interface ConnectionEvent {
@@ -126,11 +136,18 @@ sealed interface ConnectionEvent {
     data class RejectRealtime(val failure: ConnectionFailure) : ConnectionEvent
     data class ReconnectFailed(val failure: ConnectionFailure) : ConnectionEvent
     data class HeartbeatFailed(val failure: ConnectionFailure) : ConnectionEvent
+    /** Starts restoring the session of a server paired before the app was restarted. */
+    data class ResumePairedServer(val deviceId: String) : ConnectionEvent
+    /** Ends a paired session for good: the device was revoked or the server identity changed. */
+    data class LoseAccess(val failure: ConnectionFailure) : ConnectionEvent
     data class AcceptPairing(
         val deviceId: String,
         val clockOffsetMillis: Long = 0
     ) : ConnectionEvent
 }
+
+/** Server key of a restored or lost paired session, which is not tied to a discovery entry. */
+const val PAIRED_SERVER_KEY = "paired-server"
 
 class ConnectionStateStore(
     private val protocolMajor: Int = 1,
@@ -145,7 +162,11 @@ class ConnectionStateStore(
     fun dispatch(event: ConnectionEvent) {
         state = when (event) {
             ConnectionEvent.UseOffline -> ConnectionState.Offline
-            ConnectionEvent.StartDiscovery -> ConnectionState.Discovering
+            // Looking for servers never drops a live or reconnecting paired session.
+            ConnectionEvent.StartDiscovery -> when (state) {
+                is ConnectionState.ConnectedIdle, is ConnectionState.Reconnecting -> state
+                else -> ConnectionState.Discovering
+            }
             is ConnectionEvent.SelectServer -> when (state) {
                 ConnectionState.Discovering -> ConnectionState.ServerSelected(event.serverKey)
                 else -> state
@@ -180,6 +201,20 @@ class ConnectionStateStore(
                     clockOffsetMillis = currentState.clockOffsetMillis,
                     failure = event.failure
                 )
+                else -> state
+            }
+            is ConnectionEvent.ResumePairedServer -> when (state) {
+                is ConnectionState.ConnectedIdle, is ConnectionState.Reconnecting -> state
+                else -> ConnectionState.Reconnecting(
+                    deviceId = event.deviceId,
+                    clockOffsetMillis = 0,
+                    failure = ConnectionFailure.RealtimeUnavailable
+                )
+            }
+            is ConnectionEvent.LoseAccess -> when (state) {
+                is ConnectionState.ConnectedIdle,
+                is ConnectionState.Reconnecting,
+                is ConnectionState.PairingPending -> ConnectionState.Rejected(PAIRED_SERVER_KEY, event.failure)
                 else -> state
             }
             is ConnectionEvent.AcceptPairing -> when (state) {

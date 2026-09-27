@@ -31,6 +31,12 @@ private class AndroidReconnectCredentialStorage(
 
     override fun clearPairingDeliveryProof() = clear(PAIRING_PROOF_KEY)
 
+    override fun loadPairedServer(): String? = load(PAIRED_SERVER_KEY)
+
+    override fun savePairedServer(server: String) = save(PAIRED_SERVER_KEY, server)
+
+    override fun clearPairedServer() = clear(PAIRED_SERVER_KEY)
+
     private fun load(key: String): String? = preferences.getString(key, null)?.let { encrypted ->
         runCatching {
             val (encodedIv, encodedCredential) = encrypted.split(SEPARATOR, limit = 2)
@@ -49,11 +55,11 @@ private class AndroidReconnectCredentialStorage(
             init(Cipher.ENCRYPT_MODE, secretKey())
         }
         val encrypted = "${encode(cipher.iv)}$SEPARATOR${encode(cipher.doFinal(credential.encodeToByteArray()))}"
-        preferences.edit().putString(key, encrypted).apply()
+        preferences.edit().putString(key, encrypted).commit()
     }
 
     private fun clear(key: String) {
-        preferences.edit().remove(key).apply()
+        preferences.edit().remove(key).commit()
     }
 
     private fun secretKey(): SecretKey {
@@ -81,6 +87,7 @@ private class AndroidReconnectCredentialStorage(
     private companion object {
         const val CREDENTIAL_KEY = "credential"
         const val PAIRING_PROOF_KEY = "pairing_delivery_proof"
+        const val PAIRED_SERVER_KEY = "paired_server"
         const val KEY_ALIAS = "org.mass.reconnect_credential"
         const val KEY_STORE = "AndroidKeyStore"
         const val TRANSFORMATION = "AES/GCM/NoPadding"

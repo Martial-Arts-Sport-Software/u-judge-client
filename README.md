@@ -13,14 +13,11 @@
 
 ## Текущее состояние
 
-UI всех девяти дисциплин и локальные модели технической оценки уже существуют. Sword, Pole, Paired Nunchaku и Paired Fans являются отдельными offline-режимами и хранят независимые черновики. mDNS находит `_u-judge._tcp.local.`; повторный поиск отменяет предыдущий scan, а removed services исчезают из списка. Shared HTTP metadata/pairing, WebSocket handshake с authenticated four-timestamp clock sync, typed heartbeat lifecycle и typed command/terminal ACK outbox реализованы. Server session state изолирован от navigation и хранит immutable snapshot с явным lifecycle; его transport/resync ещё не подключён. Kerugi и Tanbon controls создают durable typed commands только для authenticated running matching-сессии, dispatch их через serialized authenticated socket channel и меняют pending на localized accepted/rejected только для matching terminal server outcome; Tanbon поддерживает blue/red `HEAD`/`BODY` и neutral `CROSS`. Server integration и physical reconnect proof ещё не подключены. При authenticated initial connection и reconnect lifecycle воспроизводит due durable commands в исходном порядке до heartbeat, сохраняя event ID. Reconnect credential хранится в Android Keystore-backed storage и iOS Keychain, но его безопасная выдача server остаётся blocker для полного pairing flow. `Save` локально сохраняет и восстанавливает черновик поддерживаемых технических экранов без network request; `Send` пока недоступна.
+UI всех девяти дисциплин и локальные модели технической оценки уже существуют. Sword, Pole, Paired Nunchaku и Paired Fans являются отдельными offline-режимами и хранят независимые черновики. mDNS находит `_u-judge._tcp.local.`; повторный поиск отменяет предыдущий scan, а removed services исчезают из списка. Shared HTTP metadata/pairing, WebSocket handshake с authenticated four-timestamp clock sync, typed heartbeat lifecycle и typed command/terminal ACK outbox реализованы. Server session state изолирован от navigation и хранит immutable snapshot с явным lifecycle; его transport/resync ещё не подключён. Kerugi и Tanbon controls создают durable typed commands только для authenticated running matching-сессии, dispatch их через serialized authenticated socket channel и меняют pending на localized accepted/rejected только для matching terminal server outcome; Tanbon поддерживает blue/red `HEAD`/`BODY` и neutral `CROSS`. Server integration и physical reconnect proof ещё не подключены. При authenticated initial connection и reconnect lifecycle воспроизводит due durable commands в исходном порядке до heartbeat, сохраняя event ID. Reconnect credential, endpoint и SPKI pin server хранятся в Android Keystore-backed storage и iOS Keychain; подключение идёт только по HTTPS/WSS с pinned ключом и кодом сверки (server ADR-006), а после перезапуска приложение переподключается к paired server без нового pairing. `Save` локально сохраняет и восстанавливает черновик поддерживаемых технических экранов без network request; `Send` пока недоступна.
 
-Client ещё не прогонялся против настоящего server: Kerugi/Tanbon tap отправляется как generic `command`, который server
-подтверждает без scoring. Это и остальные расхождения закрывают общие с server инкременты из
-[roadmap](docs/ROADMAP.md#инкременты-поставки).
+Kerugi/Tanbon tap отправляется как generic `command`, который server подтверждает без scoring; это и остальные
+расхождения закрывают общие с server инкременты из [roadmap](docs/ROADMAP.md#инкременты-поставки).
 Подробное разделение текущего и целевого состояния находится в [описании проекта](docs/PROJECT.md).
-
-Pairing client сохраняет delivery proof и server-issued reconnect credential только в platform secure storage. Полный pairing flow зависит от реализации proof-protected credential delivery на server.
 
 ## Модули
 
@@ -49,7 +46,20 @@ Pairing client сохраняет delivery proof и server-issued reconnect cred
 ```
 
 GitHub Actions запускает эти проверки для каждого push и pull request: Android tests/APK на Ubuntu,
-iOS framework compilation на macOS. Проверка не заменяет smoke test на физических pilot devices.
+iOS framework compilation на macOS и сверку contract fixtures с `u-judge-server` на commit из `contract/server-ref`.
+После изменения server contract обновите ref и выполните:
+
+```shell
+scripts/sync-server-contract.sh ../u-judge-server
+```
+
+Android transport против запущенного server (TLS, metadata, pairing request):
+
+```shell
+UJUDGE_SERVER_URL=https://127.0.0.1:8443 ./gradlew :composeApp:testAndroidHostTest --tests '*RealServerSmokeTest'
+```
+
+Проверка не заменяет smoke test на физических pilot devices.
 
 Запуск Android выполняется из Android Studio. Для iOS откройте `iosApp/iosApp.xcodeproj` в Xcode и запустите схему `iosApp`.
 

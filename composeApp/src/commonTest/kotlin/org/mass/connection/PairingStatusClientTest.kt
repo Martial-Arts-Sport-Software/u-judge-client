@@ -30,6 +30,7 @@ class PairingStatusClientTest {
         assertEquals(PairingStatusResult.Pending("android-8"), client.fetch("request-1", "proof-1"))
         assertEquals("GET", request.method.value)
         assertEquals("/v1/pairing-status/request-1", request.url.encodedPath)
+        assertEquals("proof-1", request.headers["X-UJudge-Pairing-Delivery-Proof"])
     }
 
     @Test

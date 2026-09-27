@@ -13,6 +13,7 @@ import org.mass.connection.ConnectionStateStore
 import org.mass.connection.ManualServerEndpointResult
 import org.mass.connection.RealtimeCommandDispatcher
 import org.mass.connection.PairingIdentityRepository
+import org.mass.connection.RecentServersRepository
 import org.mass.connection.createPairingIdentityStorage
 import org.mass.combat.KerugiCommandController
 import org.mass.combat.TanbonCommandController
@@ -60,6 +61,7 @@ object State {
     val connection = ConnectionStateStore()
     val session = SessionStateStore()
     lateinit var pairingIdentity: PairingIdentityRepository
+    lateinit var recentServers: RecentServersRepository
     lateinit var ratingDrafts: RatingDraftRepository
     lateinit var eventOutbox: DurableEventOutbox
     lateinit var kerugiCommands: KerugiCommandController
@@ -74,6 +76,10 @@ object State {
             pairingIdentity = PairingIdentityRepository(createPairingIdentityStorage(context)) {
                 "device-${Random.nextInt()}"
             }
+            recentServers = RecentServersRepository(
+                storage = createPairingIdentityStorage(context),
+                nowMillis = { kotlin.time.Clock.System.now().toEpochMilliseconds() }
+            )
         }
     }
 

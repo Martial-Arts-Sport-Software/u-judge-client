@@ -35,6 +35,7 @@ import org.mass.screens.HosinsoolModeScreen
 import org.mass.screens.KerugiModeScreen
 import org.mass.screens.ServerConnectionScreen
 import org.mass.screens.TanbonModeScreen
+import org.mass.ui.popup.LeavePairedServerOverlay
 import org.mass.ui.popup.Popup
 
 /**
@@ -47,6 +48,8 @@ fun App() {
     State.initializePairingIdentity(getContext())
     State.initializeRatingDrafts(getContext())
     State.initializeEventOutbox(getContext())
+    PairedServerSession.initialize(getContext())
+    LaunchedEffect(Unit) { PairedServerSession.restore() }
     State.navController = rememberNavController()
     State.density = LocalDensity.current
     MaterialTheme(
@@ -109,6 +112,7 @@ fun App() {
                         }
                     }
                 }
+                LeavePairedServerOverlay()
             }
         }
     }
@@ -138,7 +142,11 @@ fun NavGraphBuilder.animatedComposable(
                 }
             }
             BackHandler {
-                if (State.navController!!.currentBackStackEntry?.destination?.route !in arrayOf(
+                val route = State.navController!!.currentBackStackEntry?.destination?.route
+                if (route == Routes.SERVER_CONNECTION.path && PairedServerSession.isPaired) {
+                    State.currentPopupMode = if (State.currentPopupMode == Popup.Modes.NONE)
+                        Popup.Modes.LEAVE_PAIRED_SERVER else Popup.Modes.NONE
+                } else if (route !in arrayOf(
                         Routes.KERUGI_MODE.path,
                         Routes.TANBON_MODE.path,
                         Routes.HOSINSOOL_MODE.path,

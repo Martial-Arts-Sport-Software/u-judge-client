@@ -21,6 +21,9 @@ sealed interface PairingStatusResult {
     data object Unavailable : PairingStatusResult
 }
 
+/** Header name from the server contract (`PAIRING_DELIVERY_PROOF_HEADER` in u-judge-server). */
+const val PAIRING_DELIVERY_PROOF_HEADER = "X-UJudge-Pairing-Delivery-Proof"
+
 class PairingStatusClient(
     private val httpClient: HttpClient,
     private val endpoint: Url
@@ -28,7 +31,7 @@ class PairingStatusClient(
     suspend fun fetch(requestId: String, deliveryProof: String): PairingStatusResult = try {
         val response = httpClient.get(endpoint) {
             url.appendPathSegments("v1", "pairing-status", requestId)
-            header("X-Pairing-Proof", deliveryProof)
+            header(PAIRING_DELIVERY_PROOF_HEADER, deliveryProof)
         }
         when {
             response.status == HttpStatusCode.NotFound -> PairingStatusResult.NotFound
