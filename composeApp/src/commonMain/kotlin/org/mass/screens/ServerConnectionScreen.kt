@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -204,7 +206,8 @@ object ServerConnectionScreen : Screen {
                 Spacer(Modifier.weight(1f))
             }
             Spacer(Modifier.height(12.dp))
-            // A gray panel like the server's, not the whole screen, carries the connection content.
+            // A gray panel like the server's, not the whole screen, carries the connection content. The tab selector stays in
+            // place; only the server list and the recent addresses scroll.
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier
@@ -212,15 +215,19 @@ object ServerConnectionScreen : Screen {
                     .weight(1f)
                     .clip(RoundedCornerShape(20.dp))
                     .background(Colors.GRAY.color)
-                    .verticalScroll(rememberScrollState())
                     .padding(horizontal = 20.dp, vertical = 16.dp)
             ) {
                 if (showCurrent && pairedServer != null) {
-                    CurrentServer(pairedServer, state) {
-                        pairingJob?.cancel()
-                        pairingStatus = null
-                        serverTrust = null
-                        PairedServerSession.forget()
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())
+                    ) {
+                        CurrentServer(pairedServer, state) {
+                            pairingJob?.cancel()
+                            pairingStatus = null
+                            serverTrust = null
+                            PairedServerSession.forget()
+                        }
                     }
                 } else {
                     TabSelector(tab) { tab = it }
@@ -280,8 +287,9 @@ object ServerConnectionScreen : Screen {
         }
     }
 
+    /** The status line, one block with the found servers that fills the free height and scrolls, and the manual hint. */
     @Composable
-    private fun SearchTab(
+    private fun ColumnScope.SearchTab(
         onConnect: (com.appstractive.dnssd.DiscoveredService, String) -> Unit,
         onManual: () -> Unit
     ) {
@@ -290,38 +298,58 @@ object ServerConnectionScreen : Screen {
             Spacer(Modifier.width(10.dp))
             Text(Localization.getString("connection_searching"), style = MaterialTheme.typography.bodyLarge, color = Color.White)
         }
-        if (availableServers.servers.isEmpty()) {
-            Card {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .clip(CARD_SHAPE)
+                .background(Colors.SECONDARY.color)
+        ) {
+            if (availableServers.servers.isEmpty()) {
                 Text(
                     Localization.getString("connection_search_empty"),
                     color = Colors.PRIMARY.color,
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    modifier = Modifier.fillMaxWidth().padding(16.dp)
                 )
-            }
-        }
-        availableServers.servers.forEach { discovered ->
-            val service = discovered.server
-            val address = service.addresses.firstOrNull()
-            val available = discovered.status == DiscoveryStatus.Available && address != null
-            Card {
-                IconTile(Res.drawable.monitor_icon)
-                Spacer(Modifier.width(14.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(service.name, color = Colors.PRIMARY.color, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
-                    Text(
-                        address?.let { "$it:${service.port}" } ?: Localization.getString("connection_court_resolving"),
-                        color = Colors.PRIMARY.color.copy(alpha = 0.7f),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontFamily = FontFamily.Monospace
-                    )
+            } else {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(8.dp)
+                ) {
+                    availableServers.servers.forEach { discovered ->
+                        val service = discovered.server
+                        val address = service.addresses.firstOrNull()
+                        val available = discovered.status == DiscoveryStatus.Available && address != null
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(Color.White.copy(alpha = 0.55f))
+                                .padding(horizontal = 12.dp, vertical = 10.dp)
+                        ) {
+                            IconTile(Res.drawable.monitor_icon)
+                            Spacer(Modifier.width(14.dp))
+                            Column(Modifier.weight(1f)) {
+                                Text(service.name, color = Colors.PRIMARY.color, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                                Text(
+                                    address?.let { "$it:${service.port}" } ?: Localization.getString("connection_court_resolving"),
+                                    color = Colors.PRIMARY.color.copy(alpha = 0.7f),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontFamily = FontFamily.Monospace
+                                )
+                            }
+                            PrimaryButton(
+                                text = Localization.getString(if (available) "connection_connect_btn" else "connection_court_resolving"),
+                                enabled = available && connection.state is ConnectionState.Discovering,
+                                onClick = { if (address != null) onConnect(service, address) }
+                            )
+                        }
+                    }
                 }
-                PrimaryButton(
-                    text = Localization.getString(if (available) "connection_connect_btn" else "connection_court_resolving"),
-                    enabled = available && connection.state is ConnectionState.Discovering,
-                    onClick = { if (address != null) onConnect(service, address) }
-                )
             }
         }
         Text(
@@ -333,8 +361,12 @@ object ServerConnectionScreen : Screen {
         )
     }
 
+    /**
+     * Host and port with an icon connect button on the same line, the button in the column of the recent addresses'
+     * buttons and the fields as high as it; the recent addresses scroll on their own below.
+     */
     @Composable
-    private fun ManualTab(
+    private fun ColumnScope.ManualTab(
         host: String,
         port: String,
         error: Boolean,
@@ -343,22 +375,49 @@ object ServerConnectionScreen : Screen {
         onConnect: () -> Unit,
         onRecent: (RecentServer) -> Unit
     ) {
-        Row(Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.fillMaxWidth()) {
             Column(Modifier.weight(3f)) {
                 FieldLabel("connection_host_label")
-                TextInputComponent(inputValue = host, onChange = onHost, modifier = Modifier.fillMaxWidth())
+                TextInputComponent(
+                    inputValue = host,
+                    onChange = onHost,
+                    modifier = Modifier.fillMaxWidth(),
+                    fieldHeight = ICON_TILE_SIZE,
+                    bottomSpacing = 0.dp
+                )
             }
             Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f)) {
+            Column(Modifier.weight(1.2f)) {
                 FieldLabel("connection_port_label")
-                TextInputComponent(inputValue = port, onChange = onPort, modifier = Modifier.fillMaxWidth())
+                TextInputComponent(
+                    inputValue = port,
+                    onChange = onPort,
+                    modifier = Modifier.fillMaxWidth(),
+                    fieldHeight = ICON_TILE_SIZE,
+                    bottomSpacing = 0.dp
+                )
+            }
+            Spacer(Modifier.width(12.dp))
+            val label = Localization.getString("connection_manual_connect_btn")
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    // Same size and right inset as the recent addresses' buttons inside their cards.
+                    .padding(end = CARD_HORIZONTAL_PADDING)
+                    .size(ICON_TILE_SIZE)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Colors.PRIMARY.color)
+                    .clickable(role = Role.Button, onClickLabel = label, onClick = onConnect)
+                    .semantics { contentDescription = label }
+            ) {
+                Image(
+                    painterResource(Res.drawable.arrow_right_icon),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(Color.White),
+                    modifier = Modifier.size(24.dp)
+                )
             }
         }
-        PrimaryButton(
-            text = Localization.getString("connection_manual_connect_btn"),
-            onClick = onConnect,
-            modifier = Modifier.fillMaxWidth()
-        )
         if (error) {
             Text(
                 Localization.getString("connection_error_manual_endpoint"),
@@ -371,30 +430,38 @@ object ServerConnectionScreen : Screen {
             Spacer(Modifier.height(4.dp))
             FieldLabel("connection_recent_title")
             val now = Clock.System.now().toEpochMilliseconds()
-            recent.forEach { server ->
-                val time = relativeTime(now, server.lastUsedMillis)
-                val timeText = Localization.getString(time.key).replace("%s", time.amount?.toString().orEmpty())
-                Card {
-                    Box(Modifier.size(10.dp).clip(RoundedCornerShape(50)).background(Colors.PRIMARY.color))
-                    Spacer(Modifier.width(14.dp))
-                    Column(Modifier.weight(1f)) {
-                        Text(
-                            server.address,
-                            color = Colors.PRIMARY.color,
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontFamily = FontFamily.Monospace,
-                            fontWeight = FontWeight.Bold
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState())
+            ) {
+                recent.forEach { server ->
+                    val time = relativeTime(now, server.lastUsedMillis)
+                    val timeText = Localization.getString(time.key).replace("%s", time.amount?.toString().orEmpty())
+                    Card {
+                        Box(Modifier.size(10.dp).clip(RoundedCornerShape(50)).background(Colors.PRIMARY.color))
+                        Spacer(Modifier.width(14.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(
+                                server.address,
+                                color = Colors.PRIMARY.color,
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontFamily = FontFamily.Monospace,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(timeText, color = Colors.PRIMARY.color.copy(alpha = 0.6f), style = MaterialTheme.typography.bodySmall)
+                        }
+                        IconTile(
+                            Res.drawable.arrow_right_icon,
+                            modifier = Modifier
+                                .clickable(role = Role.Button) { onRecent(server) }
+                                .semantics { contentDescription = "${Localization.getString("connection_connect_btn")} ${server.address}" }
                         )
-                        Text(timeText, color = Colors.PRIMARY.color.copy(alpha = 0.6f), style = MaterialTheme.typography.bodySmall)
                     }
-                    IconTile(
-                        Res.drawable.arrow_right_icon,
-                        modifier = Modifier
-                            .clickable(role = Role.Button) { onRecent(server) }
-                            .semantics { contentDescription = "${Localization.getString("connection_connect_btn")} ${server.address}" }
-                    )
                 }
             }
+        } else {
+            // Keeps the pairing progress at the bottom of the panel, as on the search tab.
+            Spacer(Modifier.weight(1f))
         }
     }
 
@@ -531,7 +598,7 @@ object ServerConnectionScreen : Screen {
                 .fillMaxWidth()
                 .clip(CARD_SHAPE)
                 .background(Colors.SECONDARY.color)
-                .padding(horizontal = 14.dp, vertical = 12.dp),
+                .padding(horizontal = CARD_HORIZONTAL_PADDING, vertical = 12.dp),
             content = content
         )
     }
@@ -541,7 +608,7 @@ object ServerConnectionScreen : Screen {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .size(44.dp)
+                .size(ICON_TILE_SIZE)
                 .clip(RoundedCornerShape(12.dp))
                 .background(Colors.PRIMARY.color.copy(alpha = 0.15f))
                 .then(modifier)
@@ -621,6 +688,8 @@ object ServerConnectionScreen : Screen {
     }
 
     private val CARD_SHAPE = RoundedCornerShape(16.dp)
+    private val CARD_HORIZONTAL_PADDING = 14.dp
+    private val ICON_TILE_SIZE = 44.dp
     private val SUCCESS_BACKGROUND = Color(0xFFDDF4E4)
     private val SUCCESS_BORDER = Color(0xFF2E9E5B)
     private val SUCCESS_TEXT = Color(0xFF17603A)

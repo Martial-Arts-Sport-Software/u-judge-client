@@ -2,6 +2,7 @@ package org.mass.ui.input
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,9 +15,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
@@ -25,6 +28,10 @@ import androidx.compose.ui.unit.dp
  * @param inputValue - initial value of text input
  * @param onChange - callback, that is called on component's value change
  * @param enabled - is input available to fill or not, true by default
+ * @param modifier - width and placement; by default 80% of the available width
+ * @param fieldHeight - fixed height of the field with the text centered in it, to line it up with a button; null keeps
+ * the height of the text and padding
+ * @param bottomSpacing - space under the field
  */
 @Composable
 fun TextInputComponent(
@@ -32,12 +39,13 @@ fun TextInputComponent(
     inputValue: String = "",
     onChange: (inputValue: String) -> Unit,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier.fillMaxWidth(0.8f),
+    fieldHeight: Dp? = null,
+    bottomSpacing: Dp = 10.dp,
 ) {
     Column(
         modifier
-            .padding(bottom = 10.dp)
-            .fillMaxWidth(0.8f)
+            .padding(bottom = bottomSpacing)
             .alpha(if (enabled) 1f else 0.5f)
     ) {
         if (labelText != null) {
@@ -66,9 +74,12 @@ fun TextInputComponent(
                     Color(0xFF7C45E2),
                     RoundedCornerShape(5.dp)
                 )
-                .padding(10.dp, 11.dp)
+                .then(if (fieldHeight != null) Modifier.height(fieldHeight).padding(horizontal = 10.dp) else Modifier.padding(10.dp, 11.dp))
                 .fillMaxWidth(),
-            textStyle = MaterialTheme.typography.labelLarge
+            textStyle = MaterialTheme.typography.labelLarge,
+            decorationBox = { innerTextField ->
+                Box(contentAlignment = Alignment.CenterStart) { innerTextField() }
+            }
         )
     }
 }
