@@ -361,7 +361,10 @@ object ServerConnectionScreen : Screen {
         )
     }
 
-    /** Host and port with an icon connect button on the same line; the recent addresses scroll on their own below. */
+    /**
+     * Host and port with an icon connect button on the same line, the button in the column of the recent addresses'
+     * buttons and the fields as high as it; the recent addresses scroll on their own below.
+     */
     @Composable
     private fun ColumnScope.ManualTab(
         host: String,
@@ -375,19 +378,33 @@ object ServerConnectionScreen : Screen {
         Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.fillMaxWidth()) {
             Column(Modifier.weight(3f)) {
                 FieldLabel("connection_host_label")
-                TextInputComponent(inputValue = host, onChange = onHost, modifier = Modifier.fillMaxWidth())
+                TextInputComponent(
+                    inputValue = host,
+                    onChange = onHost,
+                    modifier = Modifier.fillMaxWidth(),
+                    fieldHeight = ICON_TILE_SIZE,
+                    bottomSpacing = 0.dp
+                )
             }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1.2f)) {
                 FieldLabel("connection_port_label")
-                TextInputComponent(inputValue = port, onChange = onPort, modifier = Modifier.fillMaxWidth())
+                TextInputComponent(
+                    inputValue = port,
+                    onChange = onPort,
+                    modifier = Modifier.fillMaxWidth(),
+                    fieldHeight = ICON_TILE_SIZE,
+                    bottomSpacing = 0.dp
+                )
             }
             Spacer(Modifier.width(12.dp))
             val label = Localization.getString("connection_manual_connect_btn")
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .size(48.dp)
+                    // Same size and right inset as the recent addresses' buttons inside their cards.
+                    .padding(end = CARD_HORIZONTAL_PADDING)
+                    .size(ICON_TILE_SIZE)
                     .clip(RoundedCornerShape(12.dp))
                     .background(Colors.PRIMARY.color)
                     .clickable(role = Role.Button, onClickLabel = label, onClick = onConnect)
@@ -581,7 +598,7 @@ object ServerConnectionScreen : Screen {
                 .fillMaxWidth()
                 .clip(CARD_SHAPE)
                 .background(Colors.SECONDARY.color)
-                .padding(horizontal = 14.dp, vertical = 12.dp),
+                .padding(horizontal = CARD_HORIZONTAL_PADDING, vertical = 12.dp),
             content = content
         )
     }
@@ -591,7 +608,7 @@ object ServerConnectionScreen : Screen {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .size(44.dp)
+                .size(ICON_TILE_SIZE)
                 .clip(RoundedCornerShape(12.dp))
                 .background(Colors.PRIMARY.color.copy(alpha = 0.15f))
                 .then(modifier)
@@ -671,6 +688,8 @@ object ServerConnectionScreen : Screen {
     }
 
     private val CARD_SHAPE = RoundedCornerShape(16.dp)
+    private val CARD_HORIZONTAL_PADDING = 14.dp
+    private val ICON_TILE_SIZE = 44.dp
     private val SUCCESS_BACKGROUND = Color(0xFFDDF4E4)
     private val SUCCESS_BORDER = Color(0xFF2E9E5B)
     private val SUCCESS_TEXT = Color(0xFF17603A)
