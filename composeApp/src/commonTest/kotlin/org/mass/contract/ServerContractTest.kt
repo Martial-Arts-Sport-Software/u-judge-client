@@ -145,16 +145,19 @@ class ServerContractTest {
         assertEquals(ClockSyncResult.Synchronized(offsetMillis = 35, roundTripMillis = 130), sync)
     }
 
+    /**
+     * The generic `command` of `command_request` is deprecated by server ADR-009 and rejected as `unsupported_command`;
+     * the typed command is checked in [KerugiBoutContractTest]. The reply fixtures still settle a typed command.
+     */
     @Test
-    fun commandMatchesTheFixtureAndServerOutcomesSettleTheOutbox() = runTest {
-        val command = fixture("command_request")
+    fun commandReplyFixturesSettleATypedCommand() = runTest {
         val event = OutboxEvent(
-            eventId = command.string("eventId"),
-            clientSequence = command.getValue("sequence").jsonPrimitive.content.toLong(),
+            eventId = fixture("command_ack").string("eventId"),
+            clientSequence = 1,
             clientTimestampMillis = 0,
-            clientTimestamp = command.string("clientTimestamp"),
-            sessionId = command.string("sessionId"),
-            payload = command.getValue("payload").toString()
+            clientTimestamp = "2026-09-26T10:00:00Z",
+            sessionId = "session-contract",
+            payload = """{"type":"kerugi_score_command","sessionId":"session-contract","competitor":"BLUE","area":"HEAD"}"""
         )
 
         val acknowledged = ScriptedSocket("command_ack")
@@ -162,7 +165,7 @@ class ServerContractTest {
             RealtimeCommandResult.Accepted("event-contract"),
             RealtimeCommandClient(outbox()).send(event, acknowledged, nowMillis = 0)
         )
-        assertEquals(command, Json.parseToJsonElement(acknowledged.sent.single()).jsonObject)
+        assertEquals("kerugi_score_command", Json.parseToJsonElement(acknowledged.sent.single()).jsonObject.string("type"))
 
         assertEquals(
             RealtimeCommandResult.Rejected("event-contract", "event_id_conflict"),
