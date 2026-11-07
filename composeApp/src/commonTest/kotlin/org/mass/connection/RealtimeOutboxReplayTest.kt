@@ -76,6 +76,26 @@ class RealtimeOutboxReplayTest {
         assertEquals(listOf(first, second), outbox.pendingEvents())
     }
 
+    @Test
+    fun journalUnavailableStopsTheReplayWithoutRejectingAndKeepsTheSocket() = runTest {
+        val outbox = DurableEventOutbox(FakeStorage())
+        val first = event("event-1", 1)
+        val second = event("event-2", 2)
+        outbox.enqueue(first)
+        outbox.enqueue(second)
+        val socket = ResponseSocket("""{"type":"command_rejected","code":"journal_unavailable","eventId":"event-1"}""")
+        var terminal: RealtimeCommandResult? = null
+
+        val replayed = DueRealtimeOutboxReplay(outbox, RealtimeCommandClient(outbox) { terminal = it }) { 100 }
+            .replay(socket)
+
+        assertEquals(true, replayed)
+        assertEquals(1, socket.sent.size)
+        assertEquals(listOf(first, second), outbox.pendingEvents())
+        assertEquals(emptyList(), outbox.rejectedEvents())
+        assertEquals(null, terminal)
+    }
+
     private fun event(eventId: String, sequence: Long, timestampMillis: Long = 0) = OutboxEvent(
         eventId = eventId,
         clientSequence = sequence,

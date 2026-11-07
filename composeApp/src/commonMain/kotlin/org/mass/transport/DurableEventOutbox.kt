@@ -92,6 +92,11 @@ class DurableEventOutbox(
         .sortedBy { it.event.clientSequence }
         .map { RejectedOutboxEvent(it.event, it.reason) }
 
+    /** The earliest pending event by client sequence, due or not; later events wait behind it. */
+    fun nextPending(): PendingOutboxEvent? = records.filterIsInstance<Record.Pending>()
+        .minByOrNull { it.event.clientSequence }
+        ?.let { PendingOutboxEvent(it.event, it.attempt, it.nextAttemptAtMillis) }
+
     fun nextEventDue(nowMillis: Long): OutboxEvent? {
         val earliest = records.filterIsInstance<Record.Pending>().minByOrNull { it.event.clientSequence }
         return earliest?.event?.takeIf { earliest.nextAttemptAtMillis <= nowMillis }
