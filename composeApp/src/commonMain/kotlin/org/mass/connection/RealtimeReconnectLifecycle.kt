@@ -5,6 +5,7 @@ import kotlinx.coroutines.delay
 
 /**
  * Restores the authenticated realtime channel after its heartbeat reports a transport failure or the app restarts.
+ * Every socket follows handshake, clock sync and outbox replay before [onChannelReady], which starts the resync.
  * Transport failures are retried with bounded exponential backoff; a revoked credential or a changed server identity ends
  * the session, and any other handshake rejection stops retrying with its typed reason.
  */
@@ -13,6 +14,8 @@ class RealtimeReconnectLifecycle(
     private val realtimeClient: RealtimeClient,
     private val heartbeatLifecycle: HeartbeatLifecycle,
     private val outboxReplay: RealtimeOutboxReplay = RealtimeOutboxReplay { true },
+    /** Wraps a socket whose replay finished; the paired session routes pushes after the resync (server ADR-009). */
+    private val channelFactory: (RealtimeSocket) -> RealtimeRequestChannel = ::SerializedRealtimeRequestChannel,
     private val onChannelReady: (RealtimeRequestChannel) -> Unit = {},
     private val onChannelClosed: () -> Unit = {},
     private val isServerIdentityChanged: () -> Boolean = { false },
@@ -41,7 +44,7 @@ class RealtimeReconnectLifecycle(
             reconnect(store)
             return
         }
-        val channel = SerializedRealtimeRequestChannel(socket)
+        val channel = channelFactory(socket)
         onChannelReady(channel)
         heartbeatLifecycle.start(channel, store) {
             onChannelClosed()
