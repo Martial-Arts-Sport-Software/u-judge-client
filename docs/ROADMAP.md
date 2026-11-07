@@ -120,21 +120,25 @@ Android emulator `sdk_gphone16k_arm64` (Android 17, API 37) против `./grad
 
 | Расхождение | Инкремент |
 |-------------|-----------|
-| Kerugi/Tanbon tap отправляется как generic `command`, который server ACK-ит без scoring; `kerugi_score_command` требует competition, bracket, session, judge и device IDs, которых у client нет | I2a |
-| Server не публикует session snapshot или assignment (`DEV-008`); client не обрабатывает `session_state_updated`, `kerugi_score_updated` и `resync_response` | I2a |
-| Server не поддерживает Tanbon | I5 |
+| Client говорит по Kerugi bout contract server ADR-009 (`kerugi_bout`, snapshot, resync, `kerugi_score_command`, `judge_attention_command`, pushes по cursor), а server на `main` его ещё не реализует (`DEV-008`): такой server отклоняется при pairing из-за отсутствующей capability `kerugi_bout` | I2a |
+| Server не поддерживает Tanbon; client отправляет Tanbon tap как устаревший generic `command`, который server ADR-009 отклоняет как `unsupported_command` | I5 |
 
 ### Накопленное client-only доказательство
 
 Shared unit tests против fake responses. Это partial evidence: server integration и physical devices отсутствуют.
+Client-часть I2a ([u-judge-client#124](https://github.com/Martial-Arts-Sport-Software/u-judge-client/pull/124))
+реализует server ADR-009 по `contract/server-ref`; прогон на emulator против `./gradlew :desktop:run` ждёт server PR
+ветки `feat/i2a-kerugi-bout`, поэтому статусы I2a не отмечены.
 
 | Область | Подтверждено тестами | Открыто |
 |---------|----------------------|---------|
 | Discovery | Одна отменяемая mDNS scan job, дедупликация, удаление unavailable services, resolved/resolving статусы | Physical mDNS (I3) |
 | Metadata и pairing | Shared HTTP metadata/protocol/capability validation для mDNS и manual host/IP; pairing request с device identity, фамилией и platform; polling pending/accepted/rejected с отменой; delivery proof и credential в Android Keystore-backed storage и iOS Keychain | Physical devices и mDNS (I3) |
-| Realtime | Versioned handshake, four-timestamp clock sync, typed heartbeat lifecycle, reconnect со stored credential | Resync (I2a) |
-| Outbox | Platform-backed journal с event ID, client sequence, timestamp и retry metadata; ordered bounded backoff; terminal ACK/rejection; replay due commands после connect/reconnect; fault injection | App-kill против server (I2a) |
-| Kerugi/Tanbon controls | Durable typed command только в authenticated `running` matching session; feedback только для matching последнего event; semantic labels | Формат server `kerugi_score_command` и session snapshot (I2a); Tanbon на server (I5) |
+| Realtime | Versioned handshake, four-timestamp clock sync, typed heartbeat lifecycle, reconnect со stored credential; порядок handshake → clock_sync → replay → `resync_request` с held cursor; один reader маршрутизирует replies по `eventId`/`requestId`/type и pushes; capability `kerugi_bout` обязательна | Прогон против server ADR-009 (I2a) |
+| Session | `resync_response` заменяет состояние при любом cursor; pushes с cursor не больше held отбрасываются; update чужой сессии вызывает новый resync; `journal_unavailable` повторяется с backoff; потеря сокета сразу снимает синхронизацию | Прогон против server ADR-009 (I2a) |
+| Outbox | Platform-backed journal с event ID, client sequence, timestamp и retry metadata; ordered bounded backoff; terminal ACK/rejection; replay due commands после connect/reconnect; app kill с pending taps и replay до resync; `journal_unavailable` остаётся pending и повторяется с тем же ID, более поздний tap ждёт за ним; fault injection | App-kill против server (I2a) |
+| Kerugi controls | `kerugi_score_command` и `judge_attention_command` с audit context snapshot на момент tap; ввод только при подключении, snapshot на этом сокете, Kerugi, `running` и seat (сигнал также в `prepared`/`paused`); feedback только по reply своего `eventId`; экран показывает номер поединка, категорию, синего/красного, состояние, счёт, warnings и result от server; seat сохраняется после reconnect | Прогон 2-3 emulator-судей против server (I2a) |
+| Tanbon controls | Durable command только в synchronized `running` Tanbon session; feedback только для matching последнего event; semantic labels | Tanbon на server (I5) |
 | Технические дисциплины | Семь offline-режимов, критерии `0.1..1.0` с шагом `0.1`, независимые черновики `Save` без network request | `Send` и server totals (I5) |
 
 ## 2. Неделя 1: baseline и тестовая основа

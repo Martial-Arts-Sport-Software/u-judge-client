@@ -60,10 +60,10 @@
 |---------|-----------|---------|----------------------------------------------------------------|-----------------------------------------------------------------------------|
 | CLI-020 | Must      | Implemented | Клиент показывает девять дисциплинарных режимов              | Восемь дисциплин PDF 1 и продуктовая дисциплина Tanbon доступны по правилам режима |
 | CLI-021 | Must      | Partial | Hosinsool и Pair позволяют выбрать Juniors/Adults              | Выбор формирует корректное число технических критериев                      |
-| CLI-022 | Must      | Planned | Online-доступность проверяется server session                  | Судья не отправляет событие в дисциплину, не совпадающую с текущей сессией  |
-| CLI-023 | Must      | Planned | Client получает ID и номер текущей сессии                      | На экране нет hardcoded bout number                                         |
-| CLI-024 | Must      | Planned | Client показывает participant labels/colors от server          | Событие однозначно относится к blue/red участнику текущей сессии            |
-| CLI-025 | Must      | Planned | Client показывает `prepared`, `running`, `paused`, `completed` | События разрешены только в допустимом состоянии                             |
+| CLI-022 | Must      | Partial | Online-доступность проверяется server session                  | Судья не отправляет событие в дисциплину, не совпадающую с текущей сессией  |
+| CLI-023 | Must      | Partial | Client получает ID и номер текущей сессии                      | На экране нет hardcoded bout number                                         |
+| CLI-024 | Must      | Partial | Client показывает participant labels/colors от server          | Событие однозначно относится к blue/red участнику текущей сессии            |
+| CLI-025 | Must      | Partial | Client показывает `prepared`, `running`, `paused`, `completed` | События разрешены только в допустимом состоянии                             |
 | CLI-026 | Must      | Planned | Client сообщает готовность судьи                               | Оператор видит ready для конкретной сессии и judge slot                     |
 
 ## 5. Kerugi и Tanbon
@@ -74,10 +74,10 @@
 | CLI-031 | Must | Partial | Tanbon имеет `HEAD`/`BODY` для blue/red и `CROSS` | Пять кнопок создают правильные typed events |
 | CLI-032 | Must | Partial | Каждое физическое нажатие получает уникальный event ID | Два намеренных нажатия различаются, transport retry сохраняет ID |
 | CLI-033 | Must | Partial | Client отправляет client sequence и timestamp | Server может восстановить локальный порядок и clock offset |
-| CLI-034 | Must      | Planned | Client не вычисляет кворум и итоговый балл              | UI не объявляет score accepted до server ACK/state update; server разрешает конфликт score candidates по минимальной оценке |
+| CLI-034 | Must      | Partial | Client не вычисляет кворум и итоговый балл              | UI не объявляет score accepted до server ACK/state update; server разрешает конфликт score candidates по минимальной оценке |
 | CLI-035 | Must | Partial | Нажатие немедленно попадает в durable outbox | App kill до ACK не теряет событие |
 | CLI-036 | Must | Partial | Client отображает pending/accepted/rejected | Состояние каждого недавнего события понятно судье |
-| CLI-037 | Must      | Planned | Warning/attention отправляется отдельно от scoring      | Server получает judge, device, session и timestamp; счёт не меняется   |
+| CLI-037 | Must      | Partial | Warning/attention отправляется отдельно от scoring      | Server получает judge, device, session и timestamp; счёт не меняется   |
 | CLI-038 | Must | Partial | Offline Kerugi/Tanbon не генерирует официальные события | Боевые кнопки недоступны без server session |
 | CLI-039 | Should    | Planned | У кнопок есть настраиваемый haptic feedback             | Feedback на tap не выдаётся за ACK; accessibility settings учитываются |
 
@@ -108,7 +108,7 @@
 | CLI-061 | Must | Partial | Retry использует тот же event ID | Server применяет событие не более одного раза |
 | CLI-062 | Must | Partial | Retry применяет bounded exponential backoff | Client не создаёт request storm при недоступном server |
 | CLI-063 | Must | Implemented | WebSocket heartbeat обнаруживает разрыв | UI переходит в reconnecting в ограниченное protocol timeout время |
-| CLI-064 | Must      | Planned | После reconnect client отправляет cursor и получает resync | Session state сходится до разрешения новых действий                    |
+| CLI-064 | Must      | Partial | После reconnect client отправляет cursor и получает resync | Session state сходится до разрешения новых действий                    |
 | CLI-065 | Must | Partial | Event ordering сохраняется для одного client | Поздний ACK не удаляет более новое pending event |
 | CLI-066 | Must | Partial | Rejected terminal event не повторяется бесконечно | Outbox отмечает final rejection и показывает действие пользователю |
 | CLI-067 | Must      | Planned | Logout/смена server не удаляет pending events молча        | Требуется успешная доставка или явное подтверждённое discard с аудитом |
