@@ -30,6 +30,7 @@ import org.mass.State
 import org.mass.entities.TechniqueRating
 import org.mass.enums.Colors
 import org.mass.locale.Localization
+import org.mass.screens.KerugiBoutPresentation
 import org.mass.screens.TechniqueScreen
 import org.mass.ui.button.ButtonComponent
 import org.mass.ui.button.ButtonStyles
@@ -237,9 +238,9 @@ fun NavbarComponent(
                             ColorFilter.tint(Colors.PRIMARY.color)
                         else null
                     )
+                    // The bout number comes only from the server snapshot (`CLI-023`).
                     Text(
-                        text = Localization.getString("kerugi_bout") +
-                                " №${44}",
+                        text = KerugiBoutPresentation.boutTitle(State.session.snapshot),
                         style = MaterialTheme.typography.titleMedium
                     )
                     ButtonComponent(
