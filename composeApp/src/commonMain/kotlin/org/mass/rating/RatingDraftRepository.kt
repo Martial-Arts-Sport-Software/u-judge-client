@@ -22,18 +22,23 @@ interface RatingDraftStorage {
     fun save(value: String)
 }
 
+/**
+ * Local `Save` drafts (`CLI-072`): a draft belongs to its discipline, category and server session, `null` while no server
+ * session of the discipline is current. A draft is only loaded for the same session, so after a move to the next
+ * performance the draft of the previous one is never shown, edited or sent by accident.
+ */
 class RatingDraftRepository(private val storage: RatingDraftStorage) {
     private val drafts = decode(storage.load()).toMutableMap()
 
-    fun save(discipline: Disciplines, category: Categories, rating: TechniqueRating): Boolean {
+    fun save(discipline: Disciplines, category: Categories, rating: TechniqueRating, sessionId: String? = null): Boolean {
         val draft = RatingDraft.from(discipline, category, rating) ?: return false
-        drafts[DraftKey(discipline, category)] = draft
+        drafts[DraftKey(discipline, category, sessionId)] = draft
         persist()
         return true
     }
 
-    fun load(discipline: Disciplines, category: Categories): TechniqueRating? =
-        drafts[DraftKey(discipline, category)]?.toRating()
+    fun load(discipline: Disciplines, category: Categories, sessionId: String? = null): TechniqueRating? =
+        drafts[DraftKey(discipline, category, sessionId)]?.toRating()
 
     private fun persist() {
         storage.save(buildJsonArray {
@@ -41,6 +46,7 @@ class RatingDraftRepository(private val storage: RatingDraftStorage) {
                 add(buildJsonObject {
                     put("discipline", key.discipline.name)
                     put("category", key.category.name)
+                    put("sessionId", key.sessionId)
                     put("technique", buildJsonArray { draft.technique.forEach { add(JsonPrimitive(it)) } })
                     put("presentation", buildJsonArray { draft.presentation.forEach { add(JsonPrimitive(it)) } })
                     put("extraPoints", draft.extraPoints)
@@ -67,15 +73,17 @@ class RatingDraftRepository(private val storage: RatingDraftStorage) {
                 ?: return@mapNotNull null
             val extraPoints = value["extraPoints"]?.jsonPrimitive?.content?.toFloatOrNull() ?: return@mapNotNull null
             val totalScore = value["totalScore"]?.jsonPrimitive?.content?.toFloatOrNull() ?: return@mapNotNull null
+            // Drafts saved before sessions were known belong to no session.
+            val sessionId = value["sessionId"]?.jsonPrimitive?.contentOrNull
             RatingDraft(discipline, category, technique, presentation, extraPoints, totalScore)
                 .takeIf { it.toRating() != null }
-                ?.let { DraftKey(discipline, category) to it }
+                ?.let { DraftKey(discipline, category, sessionId) to it }
         }.toMap()
     } catch (_: Exception) {
         emptyMap()
     }
 
-    private data class DraftKey(val discipline: Disciplines, val category: Categories)
+    private data class DraftKey(val discipline: Disciplines, val category: Categories, val sessionId: String?)
 
     private data class RatingDraft(
         val discipline: Disciplines,

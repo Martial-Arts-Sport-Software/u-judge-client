@@ -53,6 +53,23 @@ class RatingDraftRepositoryTest {
     }
 
     @Test
+    fun aDraftBelongsToItsSessionAndIsNeverLoadedForAnotherOne() {
+        val storage = MemoryStorage()
+        val rating = TechniqueRating(
+            "pair",
+            TechniqueCriteria.Junior(0.2f, 0.3f, 0.4f, 0.5f),
+            PresentationCriteria.FreestylePair(0.6f, 0.7f, 0.8f, 0.9f)
+        )
+
+        assertTrue(RatingDraftRepository(storage).save(Disciplines.FREESTYLE_PAIR, Categories.JUNIORS, rating, "session-a"))
+
+        val restored = RatingDraftRepository(storage)
+        assertEquals(rating.totalScore, restored.load(Disciplines.FREESTYLE_PAIR, Categories.JUNIORS, "session-a")?.totalScore)
+        assertNull(restored.load(Disciplines.FREESTYLE_PAIR, Categories.JUNIORS, "session-b"))
+        assertNull(restored.load(Disciplines.FREESTYLE_PAIR, Categories.JUNIORS))
+    }
+
+    @Test
     fun restoresIndependentDraftsForEveryWeaponDiscipline() {
         val storage = MemoryStorage()
         val repository = RatingDraftRepository(storage)

@@ -68,7 +68,7 @@ object HosinsoolModeScreen : TechniqueScreen {
             && State.currentCategory != null
             && State.currentDiscipline != null
         ) {
-            State.currentRating = State.ratingDrafts.load(State.currentDiscipline!!, State.currentCategory!!) ?: TechniqueRating(
+            State.currentRating = State.ratingDrafts.load(State.currentDiscipline!!, State.currentCategory!!, State.ratingSessionId()) ?: TechniqueRating(
                 State.currentDiscipline.toString().lowercase(),
                 techniqueCriteria = if (State.currentCategory == Categories.JUNIORS)
                     TechniqueCriteria.Junior(0.1f, 0.1f, 0.1f, 0.1f)
@@ -351,7 +351,8 @@ object HosinsoolModeScreen : TechniqueScreen {
                                                                 State.ratingDrafts.save(
                                                                     State.currentDiscipline!!,
                                                                     State.currentCategory!!,
-                                                                    rating
+                                                                    rating,
+                                                                    State.ratingSessionId()
                                                                 )
                                                             }
                                                         )
