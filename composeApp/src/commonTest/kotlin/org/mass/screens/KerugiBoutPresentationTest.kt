@@ -36,7 +36,7 @@ class KerugiBoutPresentationTest {
         assertEquals("Поединок №12", KerugiBoutPresentation.boutTitle(snapshot))
         assertEquals("Поединок №—", KerugiBoutPresentation.boutTitle(null))
         assertEquals(
-            "Юноши 12-14 лет, 45 кг · Площадка 1 · Пауза · Место судьи 2",
+            "Юноши 12-14 лет, 45 кг · Площадка 1 · Пауза · Место судьи 1",
             KerugiBoutPresentation.details(snapshot)
         )
         assertEquals("На площадке ещё не начат поединок", KerugiBoutPresentation.details(null))

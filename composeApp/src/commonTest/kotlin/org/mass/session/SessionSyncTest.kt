@@ -10,7 +10,7 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.mass.connection.RealtimeRequestChannel
-import org.mass.contract.KerugiBoutContractExamples
+import org.mass.contract.ServerContractFixtures
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -31,8 +31,8 @@ class SessionSyncTest {
 
         assertEquals(listOf<Long?>(null), channel.cursors)
         assertTrue(store.isSynchronized)
-        assertEquals(SessionFixtures.snapshot(), store.snapshot)
-        assertEquals(118, store.cursor)
+        assertEquals(SessionFixtures.resyncFixtureSession(), store.snapshot)
+        assertEquals(124, store.cursor)
 
         // A reconnect detaches the old socket, so controls wait for the resync on the new one.
         val second = ResyncChannel { id -> listOf(response(id)) }
@@ -40,7 +40,7 @@ class SessionSyncTest {
         assertFalse(store.isSynchronized)
         runCurrent()
 
-        assertEquals(listOf<Long?>(118), second.cursors)
+        assertEquals(listOf<Long?>(124), second.cursors)
         assertTrue(store.isSynchronized)
     }
 
@@ -101,7 +101,7 @@ class SessionSyncTest {
         sync.onPush(json("""{"type":"session_state_updated","sessionId":"other","cursor":130,"state":"paused","result":null}"""))
         runCurrent()
 
-        assertEquals(listOf(null, 118L), channel.cursors)
+        assertEquals(listOf(null, 124L), channel.cursors)
         assertEquals(SessionPhase.RUNNING, store.snapshot?.state)
     }
 
@@ -112,14 +112,16 @@ class SessionSyncTest {
         sync.attach(ResyncChannel { id -> listOf(response(id)) })
         runCurrent()
 
-        sync.onPush(json(KerugiBoutContractExamples.sessionStateUpdated).with("cursor", 118))
+        sync.onPush(json(ServerContractFixtures.message("session_state_updated")).with("cursor", 124))
         assertEquals(SessionPhase.RUNNING, store.snapshot?.state)
-        sync.onPush(json(KerugiBoutContractExamples.kerugiScoreUpdated))
-        sync.onPush(json(KerugiBoutContractExamples.sessionStateUpdated).with("cursor", 125))
+        sync.onPush(json(ServerContractFixtures.message("kerugi_score_updated")).with("cursor", 126))
+        sync.onPush(json(ServerContractFixtures.message("session_state_updated")).with("cursor", 125))
+        assertEquals(SessionPhase.RUNNING, store.snapshot?.state)
+        sync.onPush(json(ServerContractFixtures.message("session_state_updated")).with("cursor", 127))
 
-        assertEquals(5, store.snapshot?.score?.blue)
+        assertEquals(12, store.snapshot?.score?.blue)
         assertEquals(SessionPhase.COMPLETED, store.snapshot?.state)
-        assertEquals(125, store.cursor)
+        assertEquals(127, store.cursor)
     }
 
     @Test
@@ -134,7 +136,7 @@ class SessionSyncTest {
         runCurrent()
 
         assertFalse(store.isSynchronized)
-        sync.onPush(json(KerugiBoutContractExamples.kerugiScoreUpdated))
+        sync.onPush(json(ServerContractFixtures.message("kerugi_score_updated")))
         assertEquals(3, store.snapshot?.score?.blue)
         assertNull(sync.failureCode)
     }
@@ -145,7 +147,7 @@ class SessionSyncTest {
     }
 
     private fun response(requestId: String) =
-        json(KerugiBoutContractExamples.resyncResponse).with("requestId", requestId).toString()
+        json(ServerContractFixtures.message("resync_response")).with("requestId", requestId).toString()
 
     private fun rejected(requestId: String, code: String) =
         """{"type":"resync_rejected","requestId":"$requestId","code":"$code"}"""

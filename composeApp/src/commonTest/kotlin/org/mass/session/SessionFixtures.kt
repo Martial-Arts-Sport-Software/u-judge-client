@@ -1,6 +1,6 @@
 package org.mass.session
 
-/** Session values of the server ADR-009 §3 example, shared by the session, combat and contract tests. */
+/** Session values of the server contract fixtures (ADR-009), shared by the session, combat and contract tests. */
 object SessionFixtures {
     const val SESSION_ID = "9c8b7a6d-5e4f-4d3c-8b2a-1f0e9d8c7b60"
     const val COMPETITION_ID = "3f6c1d2e-8a4b-4c7d-9e1f-0a2b3c4d5e60"
@@ -10,7 +10,7 @@ object SessionFixtures {
     const val JUDGE_ID = "2d4f6a8c-0e1b-4c3d-9e5f-7a9b1c3d5e70"
     const val DEVICE_ID = "android-contract"
 
-    val seat = JudgeSeat(number = 2, judgeId = JUDGE_ID, deviceId = DEVICE_ID)
+    val seat = JudgeSeat(number = 1, judgeId = JUDGE_ID, deviceId = DEVICE_ID)
 
     fun snapshot(
         sessionId: String = SESSION_ID,
@@ -40,10 +40,15 @@ object SessionFixtures {
             "Петров П. П. (Казань)",
             listOf(Athlete("Петров Пётр Петрович", "Казань"))
         ),
-        settings = BoutSettings(judgeCount = 3, quorum = 2, coincidenceWindowMillis = 1000),
+        settings = BoutSettings(judgeCount = 2, quorum = 2, coincidenceWindowMillis = 1000),
         seat = seat,
         score = score,
         result = null
+    )
+
+    /** The session of the `resync_response` fixture: running, 12:0, ten Gamjeom for red awaiting confirmation. */
+    fun resyncFixtureSession() = snapshot(
+        score = KerugiScore(12, 0, 0, 10, listOf(ScoreWarning("disqualification_pending", Competitor.RED, 10)), null)
     )
 
     /** A store with [session] applied on the current socket. */

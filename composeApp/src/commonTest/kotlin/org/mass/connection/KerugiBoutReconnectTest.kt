@@ -18,7 +18,7 @@ import org.mass.combat.KerugiCommandController
 import org.mass.combat.KerugiCommandOutcome
 import org.mass.combat.KerugiParticipant
 import org.mass.combat.KerugiTarget
-import org.mass.contract.KerugiBoutContractExamples
+import org.mass.contract.ServerContractFixtures
 import org.mass.session.SessionFixtures
 import org.mass.session.SessionStateStore
 import org.mass.session.SessionSync
@@ -85,7 +85,7 @@ class KerugiBoutReconnectTest {
         server.releaseResync()
         runCurrent()
 
-        assertEquals(JsonPrimitive(118), reconnected.received.single { it.type() == "resync_request" }["cursor"])
+        assertEquals(JsonPrimitive(124), reconnected.received.single { it.type() == "resync_request" }["cursor"])
         assertEquals(KerugiAvailability.AVAILABLE, app.controller.availability)
         val tap = assertIs<KerugiCommandOutcome.Pending>(app.controller.submit(KerugiParticipant.RED, KerugiTarget.BODY))
         runCurrent()
@@ -102,13 +102,13 @@ class KerugiBoutReconnectTest {
         runCurrent()
 
         val socket = server.sockets.single()
-        socket.push(KerugiBoutContractExamples.kerugiScoreUpdated)
+        socket.push(ServerContractFixtures.message("kerugi_score_updated").replace("\"cursor\":124", "\"cursor\":126"))
         socket.push(
-            """{"type":"session_state_updated","sessionId":"${SessionFixtures.SESSION_ID}","cursor":125,"state":"paused","result":null}"""
+            """{"type":"session_state_updated","sessionId":"${SessionFixtures.SESSION_ID}","cursor":127,"state":"paused","result":null}"""
         )
         runCurrent()
 
-        assertEquals(5, app.session.snapshot?.score?.blue)
+        assertEquals(12, app.session.snapshot?.score?.blue)
         assertEquals(KerugiAvailability.NOT_RUNNING, app.controller.availability)
         app.stop()
     }
@@ -202,7 +202,7 @@ class KerugiBoutReconnectTest {
         }
 
         private fun resyncResponse(requestId: String) = JsonObject(
-            Json.parseToJsonElement(KerugiBoutContractExamples.resyncResponse).jsonObject +
+            Json.parseToJsonElement(ServerContractFixtures.message("resync_response")).jsonObject +
                 ("requestId" to JsonPrimitive(requestId))
         ).toString()
     }
