@@ -61,7 +61,7 @@ class KerugiBoutContractTest {
 
         assertIs<ConnectionState.MetadataValidated>(validate(metadata))
         assertEquals(
-            ConnectionFailure.MissingRequiredCapabilities(setOf("kerugi_bout")),
+            ConnectionFailure.MissingRequiredCapabilities(setOf("kerugi_bout", "tanbon_bout", "technical_performance")),
             assertIs<ConnectionState.Rejected>(validate(metadata.copy(capabilities = setOf("metadata")))).failure
         )
     }
