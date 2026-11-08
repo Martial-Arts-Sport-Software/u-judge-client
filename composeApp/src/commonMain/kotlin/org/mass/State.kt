@@ -73,6 +73,9 @@ object State {
     var realtimeCommands: RealtimeCommandDispatcher? = null
     val isOffline: Boolean
         get() = connection.state == ConnectionState.Offline
+
+    /** The server session a rating draft belongs to: the current one when it is of the chosen discipline (`CLI-072`). */
+    fun ratingSessionId(): String? = session.snapshot?.takeIf { it.discipline == currentDiscipline }?.sessionId
     var isAnimating by mutableStateOf(false)
 
     fun initializePairingIdentity(context: Any?) {

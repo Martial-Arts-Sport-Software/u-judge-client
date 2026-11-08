@@ -30,6 +30,9 @@ sealed interface KerugiCommandOutcome {
     data class Accepted(val eventId: String) : KerugiCommandOutcome
     data class Rejected(val eventId: String, val code: String) : KerugiCommandOutcome
     data object Unavailable : KerugiCommandOutcome
+
+    /** The tap was made on a bout that is no longer the current one: nothing was created (`CLI-072`). */
+    data object StaleSession : KerugiCommandOutcome
 }
 
 /** Why the controls are disabled, in the order of server ADR-009 §10.5; [AVAILABLE] when they are enabled. */
@@ -40,14 +43,18 @@ enum class KerugiAvailability {
     NO_BOUT,
     OTHER_DISCIPLINE,
     NOT_SEATED,
-    NOT_RUNNING
+    NOT_RUNNING,
+
+    /** The tap was made on a bout that is no longer the court's current one (server ADR-010 §7, `CLI-072`). */
+    STALE_SESSION
 }
 
 /**
  * Creates durable Kerugi commands for a seated judge of the server bout. Scoring is enabled only while connected, with a
  * snapshot applied on this socket, a Kerugi session in `running` and a seat; the attention signal also in `prepared` and
- * `paused`. Every command copies its audit context from the snapshot current at the tap, and its feedback changes only
- * on the server reply for its own event ID.
+ * `paused`, «Готов» only in `prepared`. Every command copies its audit context from the snapshot current at the tap, a tap
+ * on a bout that is no longer current creates nothing, and its feedback changes only on the server reply for its own
+ * event ID.
  */
 class KerugiCommandController(
     private val connection: ConnectionStateStore,
@@ -65,6 +72,23 @@ class KerugiCommandController(
     var latestAttention by mutableStateOf<KerugiCommandOutcome?>(null)
         private set
 
+    /** Feedback for the latest ready signal (`CLI-026`). */
+    var latestReady by mutableStateOf<KerugiCommandOutcome?>(null)
+        private set
+
+    /** The session the latest feedback belongs to; after a move to the next bout the old feedback is not shown. */
+    private var feedbackSessionId by mutableStateOf<String?>(null)
+
+    /** The feedback of [latestOutcome], [latestAttention] and [latestReady] that belongs to the current bout. */
+    val currentOutcome: KerugiCommandOutcome?
+        get() = latestOutcome.takeIf { feedbackIsCurrent() }
+
+    val currentAttention: KerugiCommandOutcome?
+        get() = latestAttention.takeIf { feedbackIsCurrent() }
+
+    val currentReady: KerugiCommandOutcome?
+        get() = latestReady.takeIf { feedbackIsCurrent() }
+
     /** Taps and signals of any session still waiting for a server reply, including ones restored after a restart. */
     var pendingCount by mutableStateOf(outbox.pendingEvents().size)
         private set
@@ -78,8 +102,20 @@ class KerugiCommandController(
     val isAttentionAvailable: Boolean
         get() = availability(ATTENTION_PHASES) == KerugiAvailability.AVAILABLE
 
-    fun submit(participant: KerugiParticipant, target: KerugiTarget): KerugiCommandOutcome {
-        val outcome = enqueue(SCORE_PHASES, SCORE_COMMAND) {
+    /** «Готов» is offered while the bout waits for its start (`CLI-026`, server ADR-010 §9). */
+    val isReadyAvailable: Boolean
+        get() = availability(READY_PHASES) == KerugiAvailability.AVAILABLE
+
+    /**
+     * A tap on the bout the screen showed as [shownSessionId]. A tap made on a bout that is no longer the current one, for
+     * example during the move to the next bout, creates no command (`CLI-072`).
+     */
+    fun submit(
+        participant: KerugiParticipant,
+        target: KerugiTarget,
+        shownSessionId: String? = session.snapshot?.sessionId
+    ): KerugiCommandOutcome {
+        val outcome = enqueue(SCORE_PHASES, SCORE_COMMAND, shownSessionId) {
             put("competitor", participant.name)
             put("area", target.name)
         }
@@ -88,25 +124,44 @@ class KerugiCommandController(
     }
 
     /** The judge's warning/attention signal, separate from scoring (`CLI-037`). */
-    fun signalAttention(): KerugiCommandOutcome {
-        val outcome = enqueue(ATTENTION_PHASES, ATTENTION_COMMAND) {}
+    fun signalAttention(shownSessionId: String? = session.snapshot?.sessionId): KerugiCommandOutcome {
+        val outcome = enqueue(ATTENTION_PHASES, ATTENTION_COMMAND, shownSessionId) {}
         latestAttention = outcome
         return outcome
     }
+
+    /** The judge reports ready for the bout of its seat (`CLI-026`, server ADR-010 §9). */
+    fun signalReady(shownSessionId: String? = session.snapshot?.sessionId): KerugiCommandOutcome {
+        val outcome = enqueue(READY_PHASES, READY_COMMAND, shownSessionId) {}
+        latestReady = outcome
+        return outcome
+    }
+
+    /** Availability of scoring for the bout the screen showed as [shownSessionId]. */
+    fun availabilityFor(shownSessionId: String?): KerugiAvailability = availability(SCORE_PHASES, shownSessionId)
 
     /** Updates feedback only for the matching latest action, never for an unrelated replay. */
     fun recordTerminalOutcome(result: RealtimeCommandResult) {
         pendingCount = outbox.pendingEvents().size
         latestOutcome = latestOutcome.settledBy(result)
         latestAttention = latestAttention.settledBy(result)
+        latestReady = latestReady.settledBy(result)
     }
+
+    private fun feedbackIsCurrent() = feedbackSessionId == null || feedbackSessionId == session.snapshot?.sessionId
 
     private fun enqueue(
         phases: Set<SessionPhase>,
         type: String,
+        shownSessionId: String?,
         fields: JsonObjectBuilder.() -> Unit
     ): KerugiCommandOutcome {
-        if (availability(phases) != KerugiAvailability.AVAILABLE) return KerugiCommandOutcome.Unavailable
+        feedbackSessionId = session.snapshot?.sessionId
+        when (availability(phases, shownSessionId)) {
+            KerugiAvailability.AVAILABLE -> Unit
+            KerugiAvailability.STALE_SESSION -> return KerugiCommandOutcome.StaleSession
+            else -> return KerugiCommandOutcome.Unavailable
+        }
         val connected = connection.state as ConnectionState.ConnectedIdle
         val audit = requireNotNull(session.snapshot?.auditContext())
         val localTimestampMillis = nowMillis()
@@ -128,11 +183,15 @@ class KerugiCommandController(
         return KerugiCommandOutcome.Pending(event)
     }
 
-    private fun availability(phases: Set<SessionPhase>): KerugiAvailability {
+    private fun availability(
+        phases: Set<SessionPhase>,
+        shownSessionId: String? = session.snapshot?.sessionId
+    ): KerugiAvailability {
         if (connection.state !is ConnectionState.ConnectedIdle) return KerugiAvailability.NOT_CONNECTED
         if (!session.isSynchronized) return KerugiAvailability.SYNCHRONIZING
         val snapshot = session.snapshot ?: return KerugiAvailability.NO_BOUT
         return when {
+            snapshot.sessionId != shownSessionId -> KerugiAvailability.STALE_SESSION
             snapshot.discipline != Disciplines.KERUGI -> KerugiAvailability.OTHER_DISCIPLINE
             snapshot.seat == null -> KerugiAvailability.NOT_SEATED
             snapshot.state !in phases -> KerugiAvailability.NOT_RUNNING
@@ -169,8 +228,10 @@ class KerugiCommandController(
     private companion object {
         const val SCORE_COMMAND = "kerugi_score_command"
         const val ATTENTION_COMMAND = "judge_attention_command"
+        const val READY_COMMAND = "judge_ready_command"
         val SCORE_PHASES = setOf(SessionPhase.RUNNING)
         val ATTENTION_PHASES = setOf(SessionPhase.PREPARED, SessionPhase.RUNNING, SessionPhase.PAUSED)
+        val READY_PHASES = setOf(SessionPhase.PREPARED)
 
         @OptIn(ExperimentalUuidApi::class)
         fun newEventId(): String = Uuid.random().toString()

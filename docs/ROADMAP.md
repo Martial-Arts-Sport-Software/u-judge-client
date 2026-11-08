@@ -121,6 +121,7 @@ Android emulator `sdk_gphone16k_arm64` (Android 17, API 37) против `./grad
 | Расхождение | Инкремент |
 |-------------|-----------|
 | Client говорит по Kerugi bout contract server ADR-009 (`kerugi_bout`, snapshot, resync, `kerugi_score_command`, `judge_attention_command`, pushes по cursor), а server на `main` его ещё не реализует (`DEV-008`): такой server отклоняется при pairing из-за отсутствующей capability `kerugi_bout` | I2a |
+| Client показывает таймер и отправляет `judge_ready_command` по server ADR-010, которого на server `main` ещё нет; без `timer` экран показывает только состояние | I2b |
 | Server не поддерживает Tanbon; client отправляет Tanbon tap как устаревший generic `command`, который server ADR-009 отклоняет как `unsupported_command` | I5 |
 
 ### Накопленное client-only доказательство
@@ -130,6 +131,10 @@ Client-часть I2a ([u-judge-client#124](https://github.com/Martial-Arts-Spor
 реализует server ADR-009 и проходит contract fixtures server
 [u-judge-server#135](https://github.com/Martial-Arts-Sport-Software/u-judge-server/pull/135) по `contract/server-ref`;
 прогон 2-3 emulator-судей против `./gradlew :desktop:run` ещё не выполнен, поэтому статусы I2a не отмечены.
+Client-часть I2b ([u-judge-client#127](https://github.com/Martial-Arts-Sport-Software/u-judge-client/pull/127), issue
+[#126](https://github.com/Martial-Arts-Sport-Software/u-judge-client/issues/126)) реализует server ADR-010 и проходит
+fixtures server [u-judge-server#138](https://github.com/Martial-Arts-Sport-Software/u-judge-server/pull/138) по
+`contract/server-ref`; прогона против server ещё нет, поэтому статусы I2b не отмечены.
 
 | Область | Подтверждено тестами | Открыто |
 |---------|----------------------|---------|
@@ -139,6 +144,7 @@ Client-часть I2a ([u-judge-client#124](https://github.com/Martial-Arts-Spor
 | Session | `resync_response` заменяет состояние при любом cursor; pushes с cursor не больше held отбрасываются; update чужой сессии вызывает новый resync; `journal_unavailable` повторяется с backoff; потеря сокета сразу снимает синхронизацию | Прогон против server ADR-009 (I2a) |
 | Outbox | Platform-backed journal с event ID, client sequence, timestamp и retry metadata; ordered bounded backoff; terminal ACK/rejection; replay due commands после connect/reconnect; app kill с pending taps и replay до resync; `journal_unavailable` остаётся pending и повторяется с тем же ID, более поздний tap ждёт за ним; fault injection | App-kill против server (I2a) |
 | Kerugi controls | `kerugi_score_command` и `judge_attention_command` с audit context snapshot на момент tap; ввод только при подключении, snapshot на этом сокете, Kerugi, `running` и seat (сигнал также в `prepared`/`paused`); feedback только по reply своего `eventId`; экран показывает номер поединка, категорию, синего/красного, состояние, счёт, warnings и result от server; seat сохраняется после reconnect | Прогон 2-3 emulator-судей против server (I2a) |
+| Время боя и ход сетки (I2b) | Период и оставшееся время из `session.timer`, `session_state_updated.timer` и `kerugi_timer_updated` с отсчётом по server time; следующий поединок сетки приходит новым snapshot на том же сокете, feedback прошлого поединка не показывается; tap по устаревшему поединку или без места ничего не создаёт; `judge_ready_command` только в `prepared`; черновики `Save` привязаны к сессии (`KerugiBoutProgressionTest`, `KerugiBoutContractTest`, `RatingDraftRepositoryTest`) | Прогон emulator-судей против server (I2b), `Send` (I5), восстановление активного flow после process recreation (`CLI-075`) |
 | Tanbon controls | Durable command только в synchronized `running` Tanbon session; feedback только для matching последнего event; semantic labels | Tanbon на server (I5) |
 | Технические дисциплины | Семь offline-режимов, критерии `0.1..1.0` с шагом `0.1`, независимые черновики `Save` без network request | `Send` и server totals (I5) |
 

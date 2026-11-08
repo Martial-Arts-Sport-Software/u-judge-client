@@ -42,6 +42,36 @@ data class KerugiScore(
 
 data class BoutResult(val winner: Competitor?, val reason: String)
 
+/** A round or the break before the next round (server ADR-010 §2). */
+enum class BoutPeriod(val wireName: String) {
+    ROUND("round"),
+    BREAK("break");
+
+    companion object {
+        fun fromWire(value: String): BoutPeriod? = entries.firstOrNull { it.wireName == value }
+    }
+}
+
+/**
+ * The bout clock of server ADR-010 §5. [round] is the round being fought, or for a break the round after it; while the
+ * clock runs, [remainingMillis] is the time left at [runningSinceMillis] (server time), so the client counts down itself.
+ */
+data class BoutTimer(
+    val period: BoutPeriod,
+    val round: Int,
+    val goldenRound: Boolean,
+    val durationMillis: Long,
+    val remainingMillis: Long,
+    val running: Boolean,
+    val runningSinceMillis: Long?
+) {
+    /** The time left at [serverNowMillis], never below zero and never above the time left when the clock started. */
+    fun remainingAt(serverNowMillis: Long): Long {
+        val since = runningSinceMillis?.takeIf { running } ?: return remainingMillis
+        return (remainingMillis - (serverNowMillis - since)).coerceIn(0, remainingMillis)
+    }
+}
+
 /** Audit IDs copied into every command from the snapshot current at the tap (server ADR-009 §6). */
 data class AuditContext(
     val competitionId: String,
@@ -70,7 +100,9 @@ data class SessionSnapshot(
     val settings: BoutSettings,
     val seat: JudgeSeat?,
     val score: KerugiScore?,
-    val result: BoutResult?
+    val result: BoutResult?,
+    /** Null only for a server without the clock of ADR-010. */
+    val timer: BoutTimer? = null
 ) {
     init {
         require(sessionId.isNotBlank())

@@ -69,7 +69,7 @@ object FreestyleModeScreen : TechniqueScreen {
             && State.currentCategory != null
             && State.currentDiscipline != null
         ) {
-            State.currentRating = State.ratingDrafts.load(State.currentDiscipline!!, State.currentCategory!!) ?: TechniqueRating(
+            State.currentRating = State.ratingDrafts.load(State.currentDiscipline!!, State.currentCategory!!, State.ratingSessionId()) ?: TechniqueRating(
                 State.currentDiscipline.toString().lowercase(),
                 techniqueCriteria = when(State.currentDiscipline) {
                     Disciplines.FREESTYLE_GROUP -> TechniqueCriteria.Group()
@@ -614,7 +614,8 @@ object FreestyleModeScreen : TechniqueScreen {
                                                                 State.ratingDrafts.save(
                                                                     State.currentDiscipline!!,
                                                                     State.currentCategory!!,
-                                                                    rating
+                                                                    rating,
+                                                                    State.ratingSessionId()
                                                                 )
                                                             }
                                                         )

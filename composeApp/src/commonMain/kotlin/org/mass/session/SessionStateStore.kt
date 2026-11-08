@@ -52,7 +52,11 @@ class SessionStateStore {
             is SessionPush.Snapshot -> snapshot = message.session
             is SessionPush.StateUpdated -> {
                 if (current?.sessionId != message.sessionId) return PushOutcome.SESSION_MISMATCH
-                snapshot = current.copy(state = message.state, result = message.result)
+                snapshot = current.copy(state = message.state, result = message.result, timer = message.timer ?: current.timer)
+            }
+            is SessionPush.TimerUpdated -> {
+                if (current?.sessionId != message.sessionId) return PushOutcome.SESSION_MISMATCH
+                snapshot = current.copy(timer = message.timer)
             }
             is SessionPush.ScoreUpdated -> {
                 if (current?.sessionId != message.sessionId) return PushOutcome.SESSION_MISMATCH

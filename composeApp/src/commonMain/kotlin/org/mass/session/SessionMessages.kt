@@ -6,11 +6,13 @@ import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.long
 import kotlinx.serialization.json.put
+import kotlin.time.Instant
 
-/** Server pushes that change the session after the socket is subscribed (server ADR-009 §3, §5, §9). */
+/** Server pushes that change the session after the socket is subscribed (server ADR-009 §3, §5, §9; ADR-010 §5). */
 sealed interface SessionPush {
     val cursor: Long
 
@@ -20,7 +22,16 @@ sealed interface SessionPush {
         val sessionId: String,
         override val cursor: Long,
         val state: SessionPhase,
-        val result: BoutResult?
+        val result: BoutResult?,
+        /** The timer after the transition (server ADR-010 §5). */
+        val timer: BoutTimer? = null
+    ) : SessionPush
+
+    /** The clock changed without a state change (server ADR-010 §5). */
+    data class TimerUpdated(
+        val sessionId: String,
+        override val cursor: Long,
+        val timer: BoutTimer
     ) : SessionPush
 
     data class ScoreUpdated(
@@ -55,7 +66,13 @@ object SessionMessages {
                 sessionId = body.string("sessionId"),
                 cursor = body.integer("cursor"),
                 state = body.phase("state"),
-                result = body.nullable("result")?.let(::result)
+                result = body.nullable("result")?.let(::result),
+                timer = body.optionalTimer()
+            )
+            "kerugi_timer_updated" -> SessionPush.TimerUpdated(
+                sessionId = body.string("sessionId"),
+                cursor = body.integer("cursor"),
+                timer = timer(body.objectAt("timer"))
             )
             "kerugi_score_updated" -> SessionPush.ScoreUpdated(
                 sessionId = body.string("sessionId"),
@@ -109,7 +126,23 @@ object SessionMessages {
         },
         // The score object is discipline-specific; only the Kerugi shape is known in I2a.
         score = if (body.string("discipline") == "kerugi") score(body.objectAt("score")) else null,
-        result = body.nullable("result")?.let(::result)
+        result = body.nullable("result")?.let(::result),
+        timer = body.optionalTimer()
+    )
+
+    /** `timer` came with server ADR-010; a server without it sends none, and a malformed one invalidates the message. */
+    private fun JsonObject.optionalTimer(): BoutTimer? = get("timer")?.let { timer(it as JsonObject) }
+
+    private fun timer(body: JsonObject) = BoutTimer(
+        period = requireNotNull(BoutPeriod.fromWire(body.string("period"))),
+        round = body.integer("round").toInt(),
+        goldenRound = (body.getValue("goldenRound") as JsonPrimitive).boolean,
+        durationMillis = body.integer("durationMillis"),
+        remainingMillis = body.integer("remainingMillis"),
+        running = (body.getValue("running") as JsonPrimitive).boolean,
+        runningSinceMillis = body.nullable("runningSince")?.let {
+            Instant.parse((it as JsonPrimitive).text()).toEpochMilliseconds()
+        }
     )
 
     private fun side(body: JsonObject) = BoutSide(
