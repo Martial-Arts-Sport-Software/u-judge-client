@@ -10,7 +10,14 @@ import org.mass.connection.RealtimeCommandDispatcher
 import org.mass.connection.RealtimeCommandResult
 import org.mass.connection.RealtimeSocket
 import org.mass.connection.SerializedRealtimeRequestChannel
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.mass.session.SessionFixtures
+import org.mass.session.SessionPhase
 import org.mass.session.SessionStateStore
 import org.mass.transport.DurableEventOutbox
 import org.mass.transport.EventOutboxStorage
@@ -44,16 +51,20 @@ class TanbonCommandControllerTest {
         assertEquals((0L..4L).toList(), events.map { it.clientSequence })
         assertEquals("1970-01-01T00:00:01.250Z", events.first().clientTimestamp)
         assertEquals("session-1", events.first().sessionId)
+        val bodies = events.map { Json.parseToJsonElement(it.payload).jsonObject }
+        assertEquals(List(5) { "tanbon_score_command" }, bodies.map { it.getValue("type").jsonPrimitive.content })
         assertEquals(
-            listOf(
-                "{\"type\":\"tanbon_score\",\"participant\":\"BLUE\",\"target\":\"HEAD\"}",
-                "{\"type\":\"tanbon_score\",\"participant\":\"RED\",\"target\":\"HEAD\"}",
-                "{\"type\":\"tanbon_score\",\"participant\":\"BLUE\",\"target\":\"BODY\"}",
-                "{\"type\":\"tanbon_score\",\"participant\":\"NEUTRAL\",\"target\":\"CROSS\"}",
-                "{\"type\":\"tanbon_score\",\"participant\":\"RED\",\"target\":\"BODY\"}"
-            ),
-            events.map { it.payload }
+            listOf("BLUE" to "HEAD", "RED" to "HEAD", "BLUE" to "BODY", null to "CROSS", "RED" to "BODY"),
+            bodies.map { body ->
+                (body.getValue("competitor") as? JsonPrimitive)?.contentOrNull to body.getValue("area").jsonPrimitive.content
+            }
         )
+        assertEquals(JsonNull, bodies[3].getValue("competitor"), "CROSS sends competitor null")
+        bodies.forEach { body ->
+            assertEquals("session-1", body.getValue("sessionId").jsonPrimitive.content)
+            assertEquals(SessionFixtures.JUDGE_ID, body.getValue("judgeId").jsonPrimitive.content)
+            assertEquals(SessionFixtures.DEVICE_ID, body.getValue("deviceId").jsonPrimitive.content)
+        }
         assertEquals(events, DurableEventOutbox(storage).pendingEvents())
     }
 
@@ -71,6 +82,20 @@ class TanbonCommandControllerTest {
         assertFalse(controller.isAvailable)
         assertEquals(TanbonCommandOutcome.Unavailable, controller.submit(TanbonAction.Cross))
         assertEquals(emptyList(), DurableEventOutbox(storage).pendingEvents())
+    }
+
+    @Test
+    fun aKerugiBoutOrAnUnseatedDeviceKeepsTheTanbonButtonsDisabled() {
+        listOf(
+            SessionFixtures.synchronizedStore(SessionFixtures.snapshot(discipline = "kerugi")),
+            SessionFixtures.synchronizedStore(SessionFixtures.snapshot(discipline = "tanbon", seat = null)),
+            SessionFixtures.synchronizedStore(SessionFixtures.snapshot(discipline = "tanbon", state = SessionPhase.PAUSED))
+        ).forEach { session ->
+            val controller = TanbonCommandController(
+                connectedStore(0), session, DurableEventOutbox(FakeStorage()), nowMillis = { 1_000 }, eventId = { "event-1" }
+            )
+            assertFalse(controller.isAvailable)
+        }
     }
 
     @Test
