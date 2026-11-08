@@ -71,12 +71,13 @@ fun WarningPopupComponent() {
                     },
                 )
                 Spacer(Modifier.weight(0.5f))
+                // The judge's attention signal reaches the operator as `judge_attention_command` (`CLI-037`).
                 ButtonComponent(
                     modifier = Modifier.weight(2f),
-                    text = Localization.getString(
-                        "settings_start_fight"
-                    ),
+                    text = Localization.getString("kerugi_attention_send"),
+                    enabled = State.kerugiCommands.isAttentionAvailable,
                     onclick = {
+                        State.kerugiCommands.signalAttention()
                         State.currentPopupMode = Popup.Modes.NONE
                     },
                 )

@@ -26,16 +26,11 @@ import org.mass.connection.PairingResult
 import org.mass.connection.PairingStatusClient
 import org.mass.connection.PairingStatusResult
 import org.mass.connection.RealtimeClient
-import org.mass.connection.RealtimeCommandClient
-import org.mass.connection.RealtimeCommandResult
 import org.mass.connection.RealtimeHandshakeRequest
 import org.mass.connection.RealtimeHandshakeResult
 import org.mass.connection.RealtimeSocket
 import org.mass.connection.RealtimeSocketOpener
 import org.mass.connection.ServerMetadataClient
-import org.mass.transport.DurableEventOutbox
-import org.mass.transport.EventOutboxStorage
-import org.mass.transport.OutboxEvent
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -145,31 +140,6 @@ class ServerContractTest {
         assertEquals(ClockSyncResult.Synchronized(offsetMillis = 35, roundTripMillis = 130), sync)
     }
 
-    @Test
-    fun commandMatchesTheFixtureAndServerOutcomesSettleTheOutbox() = runTest {
-        val command = fixture("command_request")
-        val event = OutboxEvent(
-            eventId = command.string("eventId"),
-            clientSequence = command.getValue("sequence").jsonPrimitive.content.toLong(),
-            clientTimestampMillis = 0,
-            clientTimestamp = command.string("clientTimestamp"),
-            sessionId = command.string("sessionId"),
-            payload = command.getValue("payload").toString()
-        )
-
-        val acknowledged = ScriptedSocket("command_ack")
-        assertEquals(
-            RealtimeCommandResult.Accepted("event-contract"),
-            RealtimeCommandClient(outbox()).send(event, acknowledged, nowMillis = 0)
-        )
-        assertEquals(command, Json.parseToJsonElement(acknowledged.sent.single()).jsonObject)
-
-        assertEquals(
-            RealtimeCommandResult.Rejected("event-contract", "event_id_conflict"),
-            RealtimeCommandClient(outbox()).send(event, ScriptedSocket("command_rejected"), nowMillis = 0)
-        )
-    }
-
     private fun respondingWith(name: String) = HttpClient(MockEngine {
         respond(ServerContractFixtures.message(name), HttpStatusCode.OK)
     })
@@ -177,12 +147,6 @@ class ServerContractTest {
     private fun fixture(name: String): JsonObject = Json.parseToJsonElement(ServerContractFixtures.message(name)).jsonObject
 
     private fun JsonObject.string(key: String) = getValue(key).jsonPrimitive.content
-
-    private fun outbox() = DurableEventOutbox(object : EventOutboxStorage {
-        private var value: String? = null
-        override fun load() = value
-        override fun save(value: String) { this.value = value }
-    })
 
     /** Answers each client message with the next server fixture. */
     private class ScriptedSocket(vararg fixtures: String) : RealtimeSocket {

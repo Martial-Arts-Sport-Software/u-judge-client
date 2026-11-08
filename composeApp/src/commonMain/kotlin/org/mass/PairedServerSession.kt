@@ -21,9 +21,11 @@ import org.mass.connection.RealtimeCommandClient
 import org.mass.connection.RealtimeCommandDispatcher
 import org.mass.connection.RealtimeReconnectLifecycle
 import org.mass.connection.ReconnectCredentialRepository
+import org.mass.connection.RoutingRealtimeChannel
 import org.mass.connection.ServerTrust
 import org.mass.connection.createHttpClient
 import org.mass.connection.createReconnectCredentialStorage
+import org.mass.session.SessionSync
 
 /**
  * The realtime session with the paired server, owned by the app rather than a screen: it survives navigation, is restored
@@ -35,6 +37,9 @@ object PairedServerSession {
     private lateinit var credentials: ReconnectCredentialRepository
     private var reconnectLifecycle: RealtimeReconnectLifecycle? = null
     private var transport: HttpClient? = null
+
+    /** Resyncs the bout after every reconnect and applies the server pushes (server ADR-009). */
+    val sessionSync = SessionSync(scope, State.session)
 
     /** The stored pairing, observable by the UI; null when the device must pair again. */
     var pairedServer: PairedServer? by mutableStateOf(null)
@@ -77,6 +82,7 @@ object PairedServerSession {
             stop()
             credentials.forget()
             pairedServer = null
+            State.session.clear()
             State.connection.dispatch(ConnectionEvent.UseOffline)
         }
     }
@@ -84,19 +90,31 @@ object PairedServerSession {
     private fun build(server: PairedServer): Pair<RealtimeClient, RealtimeReconnectLifecycle> {
         val trust = ServerTrust(server.spkiSha256)
         val httpClient = createHttpClient(trust).also { transport = it }
-        val dispatcher = RealtimeCommandDispatcher(scope, RealtimeCommandClient(State.eventOutbox))
+        // One command client for replay and live taps: every terminal reply reaches the feedback of its own event.
+        val commandClient = RealtimeCommandClient(State.eventOutbox) { result ->
+            State.kerugiCommands.recordTerminalOutcome(result)
+            State.tanbonCommands.recordTerminalOutcome(result)
+        }
+        val dispatcher = RealtimeCommandDispatcher(scope, State.eventOutbox, commandClient)
         State.realtimeCommands = dispatcher
         val realtimeClient = RealtimeClient(Url(server.endpoint), KtorRealtimeSocketOpener(httpClient))
         val lifecycle = RealtimeReconnectLifecycle(
             reconnectCredentialRepository = credentials,
             realtimeClient = realtimeClient,
             heartbeatLifecycle = HeartbeatLifecycle(scope),
-            outboxReplay = DueRealtimeOutboxReplay(
-                State.eventOutbox,
-                RealtimeCommandClient(State.eventOutbox, State.kerugiCommands::recordTerminalOutcome)
-            ),
-            onChannelReady = dispatcher::activate,
-            onChannelClosed = dispatcher::deactivate,
+            outboxReplay = DueRealtimeOutboxReplay(State.eventOutbox, commandClient),
+            // Handshake, clock sync and replay read replies in turn; then one reader routes replies and pushes.
+            channelFactory = { socket ->
+                RoutingRealtimeChannel(socket, scope, sessionSync::onPush, onClosed = { sessionSync.detach(it) })
+            },
+            onChannelReady = { channel ->
+                sessionSync.attach(channel)
+                dispatcher.activate(channel)
+            },
+            onChannelClosed = {
+                dispatcher.deactivate()
+                sessionSync.detach()
+            },
             isServerIdentityChanged = { trust.identityChanged }
         )
         reconnectLifecycle = lifecycle

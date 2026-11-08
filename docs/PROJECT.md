@@ -227,8 +227,8 @@ Rejected
 ## 9. Текущее состояние
 
 Раздел описывает состояние `main`. Статусы требований, доказательства и следующий инкремент ведутся в
-[roadmap](ROADMAP.md#инкременты-поставки). Client ещё не прогонялся против настоящего server: Kerugi/Tanbon tap
-отправляется как generic `command`, который server подтверждает без scoring; это закрывает инкремент I2a.
+[roadmap](ROADMAP.md#инкременты-поставки). Client реализует Kerugi bout contract server ADR-009, но ещё не прогонялся
+против server с этим контрактом; это закрывает инкремент I2a.
 
 ### 9.1. Реализовано
 
@@ -244,16 +244,16 @@ Rejected
 - mDNS discovery `_u-judge._tcp.local.` с дедупликацией по service key, удалением unavailable service и единственной отменяемой scan job;
 - локализованный список площадок с понятными именем, адресом и статусом доступности; площадка в состоянии resolving недоступна для выбора.
 - явная connection state machine: выбор mDNS-площадки не даёт paired/online access.
-- отдельный shared session state хранит immutable server snapshot и `prepared`/`running`/`paused`/`completed` независимо от navigation; server snapshot transport остаётся pending.
+- отдельный shared session state хранит server bout snapshot (`prepared`/`running`/`paused`/`completed`/`cancelled`, стороны, seat, счёт, result) независимо от navigation; `resync_request` после replay и pushes по cursor поддерживают его по server ADR-009.
 - shared durable outbox: platform-backed journal сохраняет event ID, client sequence, timestamp, payload, retry metadata и terminal rejection; unit tests покрывают recreation, matching ACK и ordered bounded retry.
 
 ### 9.2. Частично или не реализовано
 
 - Выбор resolved mDNS-площадки строит endpoint из адреса/порта, проверяет metadata и отправляет `POST /v1/pairing-requests` с device identity, нормализованной фамилией судьи и platform. Shared Ktor client выполняет versioned `/v1/realtime` handshake, принимает typed accepted/rejected response и authenticated clock sync до перехода в `ConnectedIdle`; reconnect credential storage использует Android Keystore-backed storage и iOS Keychain, а shared reconnect lifecycle после heartbeat failure повторно выполняет authenticated handshake и clock sync. После HTTP pairing acceptance connection screen запускает этот lifecycle со stored credential и останавливает его при уходе с экрана; credential issuance, pairing-status push и TLS/manual fallback pending;
-- server pairing approval, protocol version и текущий bout не получаются;
-- кнопки Kerugi и Tanbon создают durable typed commands только в authenticated `running` matching session, с unique ID, monotonic client sequence и clock-adjusted timestamp; Tanbon поддерживает blue/red `HEAD`/`BODY` и neutral `CROSS`. Они немедленно dispatch через serialized authenticated socket channel и меняют pending на localized accepted/rejected только для matching последнего event. Server integration и reconnect physical proof остаются pending;
+- текущий bout получается только от server с контрактом ADR-009, которого на server `main` ещё нет;
+- кнопки Kerugi создают `kerugi_score_command`, а warning-popup - `judge_attention_command` с unique ID, monotonic client sequence, clock-adjusted timestamp и audit context snapshot; ввод разрешён только назначенному судье синхронизированного `running` Kerugi-поединка, feedback меняется только по `command_ack`/`command_rejected` своего event, `journal_unavailable` повторяется с backoff. Tanbon поддерживает blue/red `HEAD`/`BODY` и neutral `CROSS` до server Tanbon (I5). Прогон против server и physical reconnect proof остаются pending;
 - `Save` локально сохраняет criteria, extra points и total в независимый черновик для каждого из семи технических экранов и восстанавливает draft после restart; `Send` остаётся недоступна без active online session и final rating transport;
-- Kerugi и Tanbon typed combat events wire to the durable outbox and serialized authenticated socket channel; authenticated initial/reconnect lifecycle replays due durable commands in client sequence before heartbeat and persists terminal ACK/rejection, while server integration proof and resync remain pending;
+- Kerugi и Tanbon combat events wire to the durable outbox; authenticated initial/reconnect lifecycle replays due durable commands in client sequence before the resync, then one reader routes replies and server pushes; server integration proof remains pending;
 - глобальный singleton `State` всё ещё хранит navigation/UI/domain state; connection lifecycle и server-owned session lifecycle выделены в отдельные state stores;
 - v1 minimum iOS version is 18; iOS 18 and iOS 26 require physical-device smoke coverage.
 - Android 5.1/TZ55 compatibility is deferred to a separate lightweight client track after v1.

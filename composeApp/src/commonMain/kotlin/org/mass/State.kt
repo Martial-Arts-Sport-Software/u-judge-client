@@ -45,6 +45,9 @@ import kotlin.random.Random
  * @property isAnimating flag for ui animations. True if some animation/transition is active, false otherwise
  */
 object State {
+    const val KERUGI_BOUT_CAPABILITY = "kerugi_bout"
+    val REQUIRED_SERVER_CAPABILITIES = setOf(KERUGI_BOUT_CAPABILITY)
+
     var density: Density? = null
     var navController: NavHostController? = null
     var judgeSurname by mutableStateOf("")
@@ -58,7 +61,8 @@ object State {
     var currentPopupMode by mutableStateOf(Popup.Modes.NONE)
     val availableServers = ServerDiscoveryStore<DiscoveredService> { it.key }
     var selectedServer: DiscoveredService? by mutableStateOf(null)
-    val connection = ConnectionStateStore()
+    /** An I2a client judges server bouts only, so it requires the Kerugi bout contract (server ADR-009 §1). */
+    val connection = ConnectionStateStore(requiredCapabilities = REQUIRED_SERVER_CAPABILITIES)
     val session = SessionStateStore()
     lateinit var pairingIdentity: PairingIdentityRepository
     lateinit var recentServers: RecentServersRepository

@@ -10,7 +10,7 @@ import org.mass.connection.ConnectionStateStore
 import org.mass.connection.RealtimeCommandDispatcher
 import org.mass.connection.RealtimeCommandResult
 import org.mass.enums.Disciplines
-import org.mass.session.SessionState
+import org.mass.session.SessionPhase
 import org.mass.session.SessionStateStore
 import org.mass.transport.DurableEventOutbox
 import org.mass.transport.OutboxEvent
@@ -65,7 +65,7 @@ class TanbonCommandController(
         )
         return TanbonCommandOutcome.Pending(event).also { outcome ->
             latestOutcome = outcome
-            dispatcher()?.dispatch(event, ::recordTerminalOutcome)
+            dispatcher()?.dispatch()
         }
     }
 
@@ -83,12 +83,14 @@ class TanbonCommandController(
                     pending
                 }
             }
+            is RealtimeCommandResult.Retry,
             RealtimeCommandResult.InvalidResponse -> pending
         }
     }
 
-    private fun activeSession() = (session.state as? SessionState.Running)?.snapshot
-        ?.takeIf { it.discipline == Disciplines.TANBON }
+    /** The server has no Tanbon session until I5, so these controls stay disabled against a real server. */
+    private fun activeSession() = session.snapshot
+        ?.takeIf { session.isSynchronized && it.state == SessionPhase.RUNNING && it.discipline == Disciplines.TANBON }
 
     private fun TanbonAction.payload() = buildJsonObject {
         put("type", "tanbon_score")

@@ -19,6 +19,8 @@ class DueRealtimeOutboxReplay(
             when (commandClient.send(event, socket, nowMillis())) {
                 is RealtimeCommandResult.Accepted,
                 is RealtimeCommandResult.Rejected -> Unit
+                // The journal is down: later events wait behind this one, which the dispatcher retries after backoff.
+                is RealtimeCommandResult.Retry -> return true
                 RealtimeCommandResult.InvalidResponse -> return false
             }
         }

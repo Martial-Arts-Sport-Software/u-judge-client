@@ -10,9 +10,7 @@ import org.mass.connection.RealtimeCommandDispatcher
 import org.mass.connection.RealtimeCommandResult
 import org.mass.connection.RealtimeSocket
 import org.mass.connection.SerializedRealtimeRequestChannel
-import org.mass.enums.Disciplines
-import org.mass.session.SessionPhase
-import org.mass.session.SessionSnapshot
+import org.mass.session.SessionFixtures
 import org.mass.session.SessionStateStore
 import org.mass.transport.DurableEventOutbox
 import org.mass.transport.EventOutboxStorage
@@ -79,9 +77,11 @@ class TanbonCommandControllerTest {
     fun matchingAcknowledgementUpdatesFeedbackAndRemovesTheDurableCommand() = runTest {
         val storage = FakeStorage()
         val outbox = DurableEventOutbox(storage)
-        val dispatcher = RealtimeCommandDispatcher(this, RealtimeCommandClient(outbox), nowMillis = { 1_000 })
+        lateinit var controller: TanbonCommandController
+        val client = RealtimeCommandClient(outbox) { controller.recordTerminalOutcome(it) }
+        val dispatcher = RealtimeCommandDispatcher(this, outbox, client, nowMillis = { 1_000 })
         dispatcher.activate(SerializedRealtimeRequestChannel(ResponseSocket("""{"type":"command_ack","eventId":"event-1"}""")))
-        val controller = TanbonCommandController(
+        controller = TanbonCommandController(
             connectedStore(0), runningTanbonSession(), outbox, { 1_000 }, { "event-1" }
         ) { dispatcher }
 
@@ -96,9 +96,11 @@ class TanbonCommandControllerTest {
     fun terminalRejectionRemainsDurableAndShowsRejectedFeedback() = runTest {
         val storage = FakeStorage()
         val outbox = DurableEventOutbox(storage)
-        val dispatcher = RealtimeCommandDispatcher(this, RealtimeCommandClient(outbox), nowMillis = { 1_000 })
+        lateinit var controller: TanbonCommandController
+        val client = RealtimeCommandClient(outbox) { controller.recordTerminalOutcome(it) }
+        val dispatcher = RealtimeCommandDispatcher(this, outbox, client, nowMillis = { 1_000 })
         dispatcher.activate(SerializedRealtimeRequestChannel(ResponseSocket("""{"type":"command_rejected","eventId":"event-1","code":"invalid_session"}""")))
-        val controller = TanbonCommandController(
+        controller = TanbonCommandController(
             connectedStore(0), runningTanbonSession(), outbox, { 1_000 }, { "event-1" }
         ) { dispatcher }
 
@@ -113,9 +115,11 @@ class TanbonCommandControllerTest {
     fun transportFailureKeepsPendingFeedbackAndTheOriginalDurableCommandForReplay() = runTest {
         val storage = FakeStorage()
         val outbox = DurableEventOutbox(storage)
-        val dispatcher = RealtimeCommandDispatcher(this, RealtimeCommandClient(outbox), nowMillis = { 1_000 })
+        lateinit var controller: TanbonCommandController
+        val client = RealtimeCommandClient(outbox) { controller.recordTerminalOutcome(it) }
+        val dispatcher = RealtimeCommandDispatcher(this, outbox, client, nowMillis = { 1_000 })
         dispatcher.activate(SerializedRealtimeRequestChannel(FailingSocket()))
-        val controller = TanbonCommandController(
+        controller = TanbonCommandController(
             connectedStore(0), runningTanbonSession(), outbox, { 1_000 }, { "event-1" }
         ) { dispatcher }
 
@@ -146,18 +150,8 @@ class TanbonCommandControllerTest {
         dispatch(ConnectionEvent.AcceptPairing("device-1", clockOffsetMillis))
     }
 
-    private fun runningTanbonSession() = SessionStateStore().apply {
-        update(
-            SessionSnapshot(
-                sessionId = "session-1",
-                discipline = Disciplines.TANBON,
-                boutLabel = "1",
-                blueParticipantLabel = "Blue",
-                redParticipantLabel = "Red"
-            ),
-            SessionPhase.RUNNING
-        )
-    }
+    private fun runningTanbonSession() =
+        SessionFixtures.synchronizedStore(SessionFixtures.snapshot(sessionId = "session-1", discipline = "tanbon"))
 
     private fun metadata() = org.mass.connection.ServerMetadata(
         protocolMajor = 1,
