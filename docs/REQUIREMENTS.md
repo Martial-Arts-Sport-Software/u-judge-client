@@ -64,7 +64,7 @@
 | CLI-023 | Must      | Partial | Client получает ID и номер текущей сессии                      | На экране нет hardcoded bout number                                         |
 | CLI-024 | Must      | Partial | Client показывает participant labels/colors от server          | Событие однозначно относится к blue/red участнику текущей сессии            |
 | CLI-025 | Must      | Partial | Client показывает `prepared`, `running`, `paused`, `completed` | События разрешены только в допустимом состоянии                             |
-| CLI-026 | Must      | Planned | Client сообщает готовность судьи                               | Оператор видит ready для конкретной сессии и judge slot                     |
+| CLI-026 | Must      | Partial | Client сообщает готовность судьи                               | Оператор видит ready для конкретной сессии и judge slot                     |
 
 ## 5. Kerugi и Tanbon
 
@@ -120,7 +120,7 @@
 |---------|-----------|---------|-------------------------------------------------------------------------|--------------------------------------------------------------------------|
 | CLI-070 | Must      | Implemented | Connection представлено state machine, а не boolean                  | Невозможны одновременно offline/connected или paired/no-server состояния |
 | CLI-071 | Must | Implemented | Session state отделено от navigation state | Возврат назад не завершает серверную сессию неявно |
-| CLI-072 | Must      | Planned | Rating draft имеет ID дисциплины, категории и сессии                    | Черновик другой сессии не отправляется случайно                          |
+| CLI-072 | Must      | Partial | Rating draft имеет ID дисциплины, категории и сессии                    | Черновик другой сессии не отправляется случайно                          |
 | CLI-073 | Must | Implemented | Ошибки типизированы и локализованы | UI различает discovery, pairing, transport, validation и protocol errors |
 | CLI-074 | Must | Partial | Loading/action jobs отменяются по lifecycle | Уход с экрана не оставляет лишние scans, reconnects или sends |
 | CLI-075 | Must      | Planned | Значимый state восстанавливается после configuration/process recreation | Android recreation и iOS lifecycle не сбрасывают active flow             |
