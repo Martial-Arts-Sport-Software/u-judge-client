@@ -21,8 +21,23 @@ android {
             useLegacyPackaging = true
         }
     }
+    signingConfigs {
+        // The pilot release key never lives in the repository: it comes from the environment of the build (I7).
+        val keystore = providers.environmentVariable("UJUDGE_RELEASE_KEYSTORE").orNull
+        if (keystore != null) {
+            create("release") {
+                storeFile = file(keystore)
+                storePassword = providers.environmentVariable("UJUDGE_RELEASE_KEYSTORE_PASSWORD").get()
+                keyAlias = providers.environmentVariable("UJUDGE_RELEASE_KEY_ALIAS").get()
+                keyPassword = providers.environmentVariable("UJUDGE_RELEASE_KEY_PASSWORD").get()
+            }
+        }
+    }
     buildTypes {
         getByName("release") {
+            // Without the release key the minified APK is signed with the build machine's debug key, so it installs
+            // for a smoke test; each CI runner has its own debug key, so such an APK cannot update another one.
+            signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
