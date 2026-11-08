@@ -87,5 +87,11 @@ class KerugiBoutPresentationTest {
             ),
             KerugiBoutPresentation.notices(snapshot)
         )
+        assertEquals(
+            listOf("Победитель: Синий (дисквалификация соперника)"),
+            KerugiBoutPresentation.notices(
+                SessionFixtures.snapshot().copy(result = BoutResult(Competitor.BLUE, "disqualification"))
+            )
+        )
     }
 }

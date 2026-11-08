@@ -56,8 +56,14 @@ object KerugiBoutPresentation {
             Localization.getString("kerugi_disqualified").replace("%s", sideName(it))
         }
         val result = snapshot.result?.let { result ->
-            result.winner?.let { Localization.getString("kerugi_result_winner").replace("%s", sideName(it)) }
+            val winner = result.winner?.let { Localization.getString("kerugi_result_winner").replace("%s", sideName(it)) }
                 ?: Localization.getString("kerugi_result_no_winner")
+            // The opponent of a confirmed disqualification wins; other reasons need no extra text in I2a.
+            if (result.reason == "disqualification") {
+                winner + " " + Localization.getString("kerugi_result_by_disqualification")
+            } else {
+                winner
+            }
         }
         return warnings + listOfNotNull(disqualified, result)
     }
