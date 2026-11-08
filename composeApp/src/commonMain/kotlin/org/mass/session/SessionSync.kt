@@ -87,7 +87,7 @@ class SessionSync(
             when {
                 channel !== current -> return
                 decoded is ResyncReply.Response && decoded.requestId == id -> {
-                    store.applyResync(decoded.cursor, decoded.session)
+                    store.applyResync(decoded.cursor, decoded.session, decoded.technical, decoded.otherSessionId)
                     return
                 }
                 decoded is ResyncReply.Rejected && decoded.code == SessionMessages.RESYNC_JOURNAL_UNAVAILABLE -> {

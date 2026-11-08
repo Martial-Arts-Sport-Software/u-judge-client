@@ -12,11 +12,20 @@ import kotlinx.serialization.json.long
 import kotlinx.serialization.json.put
 import kotlin.time.Instant
 
-/** Server pushes that change the session after the socket is subscribed (server ADR-009 §3, §5, §9; ADR-010 §5). */
+/** Server pushes that change the session after the socket is subscribed (server ADR-009 §3, §5, §9; ADR-010 §5; ADR-011 §3, §10). */
 sealed interface SessionPush {
     val cursor: Long
 
-    data class Snapshot(override val cursor: Long, val session: SessionSnapshot?) : SessionPush
+    /**
+     * A new current session: [session] is a Kerugi or Tanbon bout, [technical] a technical performance and
+     * [otherSessionId] a session of a discipline this client does not know; at most one is set.
+     */
+    data class Snapshot(
+        override val cursor: Long,
+        val session: SessionSnapshot?,
+        val technical: TechnicalSnapshot? = null,
+        val otherSessionId: String? = null
+    ) : SessionPush
 
     data class StateUpdated(
         val sessionId: String,
@@ -34,15 +43,28 @@ sealed interface SessionPush {
         val timer: BoutTimer
     ) : SessionPush
 
+    /** `kerugi_score_updated` or `tanbon_score_updated`: the same score shape. */
     data class ScoreUpdated(
         val sessionId: String,
         override val cursor: Long,
         val score: KerugiScore
     ) : SessionPush
+
+    data class TechnicalScoreUpdated(
+        val sessionId: String,
+        override val cursor: Long,
+        val score: TechnicalScore
+    ) : SessionPush
 }
 
 sealed interface ResyncReply {
-    data class Response(val requestId: String, val cursor: Long, val session: SessionSnapshot?) : ResyncReply
+    data class Response(
+        val requestId: String,
+        val cursor: Long,
+        val session: SessionSnapshot?,
+        val technical: TechnicalSnapshot? = null,
+        val otherSessionId: String? = null
+    ) : ResyncReply
     data class Rejected(val requestId: String?, val code: String) : ResyncReply
 }
 
@@ -61,7 +83,9 @@ object SessionMessages {
 
     fun decodePush(body: JsonObject): SessionPush? = decoding {
         when (body.string("type")) {
-            "session_snapshot" -> SessionPush.Snapshot(body.integer("cursor"), body.session("session"))
+            "session_snapshot" -> body.court("session").let { court ->
+                SessionPush.Snapshot(body.integer("cursor"), court.bout(), court.technical(), court.other())
+            }
             "session_state_updated" -> SessionPush.StateUpdated(
                 sessionId = body.string("sessionId"),
                 cursor = body.integer("cursor"),
@@ -74,10 +98,15 @@ object SessionMessages {
                 cursor = body.integer("cursor"),
                 timer = timer(body.objectAt("timer"))
             )
-            "kerugi_score_updated" -> SessionPush.ScoreUpdated(
+            "kerugi_score_updated", "tanbon_score_updated" -> SessionPush.ScoreUpdated(
                 sessionId = body.string("sessionId"),
                 cursor = body.integer("cursor"),
                 score = score(body.objectAt("score"))
+            )
+            "technical_score_updated" -> SessionPush.TechnicalScoreUpdated(
+                sessionId = body.string("sessionId"),
+                cursor = body.integer("cursor"),
+                score = technicalScore(body.objectAt("score"))
             )
             else -> null
         }
@@ -85,11 +114,15 @@ object SessionMessages {
 
     fun decodeResyncReply(body: JsonObject): ResyncReply? = decoding {
         when (body.string("type")) {
-            "resync_response" -> ResyncReply.Response(
-                requestId = body.string("requestId"),
-                cursor = body.integer("cursor"),
-                session = body.session("session")
-            )
+            "resync_response" -> body.court("session").let { court ->
+                ResyncReply.Response(
+                    requestId = body.string("requestId"),
+                    cursor = body.integer("cursor"),
+                    session = court.bout(),
+                    technical = court.technical(),
+                    otherSessionId = court.other()
+                )
+            }
             "resync_rejected" -> ResyncReply.Rejected(
                 requestId = body.nullable("requestId")?.let { (it as JsonPrimitive).text() },
                 code = body.string("code")
@@ -98,7 +131,82 @@ object SessionMessages {
         }
     }
 
-    private fun JsonObject.session(key: String): SessionSnapshot? = nullable(key)?.let { snapshot(it as JsonObject) }
+    /** The session body decoded by its `discipline` (server ADR-011 §6). */
+    private fun JsonObject.court(key: String): CourtSession? = nullable(key)?.let { element ->
+        val body = element as JsonObject
+        val discipline = body.string("discipline")
+        when {
+            discipline in BOUT_DISCIPLINES -> CourtSession.Bout(snapshot(body))
+            TechnicalDiscipline.ofCode(discipline) != null -> CourtSession.Technical(technical(body))
+            else -> CourtSession.Unknown(body.string("sessionId"), discipline)
+        }
+    }
+
+    private fun CourtSession?.bout() = (this as? CourtSession.Bout)?.snapshot
+
+    private fun CourtSession?.technical() = (this as? CourtSession.Technical)?.snapshot
+
+    private fun CourtSession?.other() = (this as? CourtSession.Unknown)?.sessionId
+
+    private fun technical(body: JsonObject): TechnicalSnapshot {
+        val settings = body.objectAt("settings")
+        val criteria = body.objectAt("criteria")
+        return TechnicalSnapshot(
+            sessionId = body.string("sessionId"),
+            disciplineCode = body.string("discipline"),
+            competitionId = body.string("competitionId"),
+            peerId = body.string("peerId"),
+            courtId = body.string("courtId"),
+            courtNumber = body.integer("courtNumber").toInt(),
+            bracketId = body.string("bracketId"),
+            categoryTitle = body.string("categoryTitle"),
+            performanceNumber = body.integer("performanceNumber").toInt(),
+            state = body.phase("state"),
+            entry = side(body.objectAt("entry")),
+            judgeCount = settings.integer("judgeCount").toInt(),
+            formula = settings.string("formula"),
+            techniqueCriteria = criteria.integer("technique").toInt(),
+            presentationCriteria = criteria.integer("presentation").toInt(),
+            deductionStepTenths = criteria.integer("deductionStepTenths").toInt(),
+            seat = body.nullable("seat")?.let {
+                val seat = it as JsonObject
+                JudgeSeat(seat.integer("number").toInt(), seat.string("judgeId"), seat.string("deviceId"))
+            },
+            sent = body.nullable("sent")?.let {
+                val sent = it as JsonObject
+                SentVector(
+                    eventId = sent.string("eventId"),
+                    techniqueTenths = sent.integers("techniqueTenths"),
+                    presentationTenths = sent.integers("presentationTenths"),
+                    deductionTenths = sent.integer("deductionTenths").toInt(),
+                    totalTenths = sent.integer("totalTenths").toInt()
+                )
+            },
+            score = technicalScore(body.objectAt("score"))
+        )
+    }
+
+    private fun technicalScore(body: JsonObject) = TechnicalScore(
+        submittedSeats = body.integers("submittedSeats"),
+        result = body.nullable("result")?.let {
+            val result = it as JsonObject
+            TechnicalResult(
+                totalTenths = result.integer("totalTenths").toInt(),
+                aggregateTenths = result.integer("aggregateTenths").toInt(),
+                adjustmentTenths = result.integer("adjustmentTenths").toInt(),
+                divisor = result.integer("divisor").toInt(),
+                formula = result.string("formula")
+            )
+        }
+    )
+
+    private fun JsonObject.integers(key: String): List<Int> = (getValue(key) as JsonArray).map { element ->
+        val value = element as JsonPrimitive
+        require(!value.isString)
+        value.int
+    }
+
+    private val BOUT_DISCIPLINES = setOf("kerugi", "tanbon")
 
     private fun snapshot(body: JsonObject): SessionSnapshot = SessionSnapshot(
         sessionId = body.string("sessionId"),
@@ -124,8 +232,8 @@ object SessionMessages {
             val seat = it as JsonObject
             JudgeSeat(seat.integer("number").toInt(), seat.string("judgeId"), seat.string("deviceId"))
         },
-        // The score object is discipline-specific; only the Kerugi shape is known in I2a.
-        score = if (body.string("discipline") == "kerugi") score(body.objectAt("score")) else null,
+        // Kerugi and Tanbon share the score shape (server ADR-011 §3).
+        score = score(body.objectAt("score")),
         result = body.nullable("result")?.let(::result),
         timer = body.optionalTimer()
     )
