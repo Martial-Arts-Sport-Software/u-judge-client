@@ -81,3 +81,12 @@ jobs:
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=
           ls "$RUNNER_TEMP/iosApp.xcarchive/Products/Applications"
 
+  secrets:
+    name: Secrets check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Scan tracked files and the full history
+        run: scripts/check-secrets.sh
