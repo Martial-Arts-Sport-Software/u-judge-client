@@ -46,7 +46,18 @@ Server на `main` ещё не реализует ADR-009; это и остал�
 ```
 
 GitHub Actions запускает эти проверки для каждого push и pull request: Android tests/APK на Ubuntu,
-iOS framework compilation на macOS и сверку contract fixtures с `u-judge-server` на commit из `contract/server-ref`.
+iOS framework compilation на macOS и сверку contract fixtures с `u-judge-server` на commit из `contract/server-ref`, а также
+minified release APK (артефакт `android-release-apk`), unsigned iOS archive и проверку секретов `scripts/check-secrets.sh`.
+
+Release APK. Ключ пилота не хранится в репозитории: задайте `UJUDGE_RELEASE_KEYSTORE` (путь к keystore),
+`UJUDGE_RELEASE_KEYSTORE_PASSWORD`, `UJUDGE_RELEASE_KEY_ALIAS` и `UJUDGE_RELEASE_KEY_PASSWORD`. Без них APK подписывается
+debug-ключом машины сборки: он ставится для smoke-теста, но не обновляет APK, подписанный другим ключом.
+
+```shell
+./gradlew :androidApp:assembleRelease   # androidApp/build/outputs/apk/release/androidApp-release.apk
+```
+
+TestFlight build подписывает и загружает владелец (шаги в [roadmap](docs/ROADMAP.md#9-недели-10-11-release-hardening)).
 После изменения server contract обновите ref и выполните:
 
 ```shell
