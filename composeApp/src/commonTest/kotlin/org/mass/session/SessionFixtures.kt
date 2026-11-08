@@ -18,7 +18,8 @@ object SessionFixtures {
         state: SessionPhase = SessionPhase.RUNNING,
         seat: JudgeSeat? = this.seat,
         boutNumber: Int = 7,
-        score: KerugiScore? = KerugiScore(3, 1, 0, 1, emptyList(), null)
+        score: KerugiScore? = KerugiScore(3, 1, 0, 1, emptyList(), null),
+        timer: BoutTimer? = null
     ) = SessionSnapshot(
         sessionId = sessionId,
         disciplineCode = discipline,
@@ -43,12 +44,20 @@ object SessionFixtures {
         settings = BoutSettings(judgeCount = 2, quorum = 2, coincidenceWindowMillis = 1000),
         seat = seat,
         score = score,
-        result = null
+        result = null,
+        timer = timer
     )
+
+    /** Round 1 of a 12-14 bout (1:30) before «Бой», as in the `session_snapshot` fixture (server ADR-010 §5). */
+    val preparedTimer = BoutTimer(BoutPeriod.ROUND, 1, false, 90_000, 90_000, running = false, runningSinceMillis = null)
+
+    /** Round 1 running since 10:15:30Z, as in the `resync_response` fixture. */
+    val runningTimer = preparedTimer.copy(running = true, runningSinceMillis = 1_794_132_930_000)
 
     /** The session of the `resync_response` fixture: running, 12:0, ten Gamjeom for red awaiting confirmation. */
     fun resyncFixtureSession() = snapshot(
-        score = KerugiScore(12, 0, 0, 10, listOf(ScoreWarning("disqualification_pending", Competitor.RED, 10)), null)
+        score = KerugiScore(12, 0, 0, 10, listOf(ScoreWarning("disqualification_pending", Competitor.RED, 10)), null),
+        timer = runningTimer
     )
 
     /** A store with [session] applied on the current socket. */

@@ -3,6 +3,8 @@ package org.mass.screens
 import org.mass.combat.KerugiAvailability
 import org.mass.combat.KerugiCommandOutcome
 import org.mass.locale.Localization
+import org.mass.session.BoutPeriod
+import org.mass.session.BoutTimer
 import org.mass.session.Competitor
 import org.mass.session.SessionPhase
 import org.mass.session.SessionSnapshot
@@ -23,6 +25,22 @@ object KerugiBoutPresentation {
             state(snapshot.state),
             snapshot.seat?.let { Localization.getString("kerugi_seat") + " " + it.number }
         ).joinToString(" · ")
+    }
+
+    /** «Раунд 1», «Перерыв», «Отдых перед дополнительным раундом» or «Дополнительный раунд» (server ADR-010 §5). */
+    fun period(timer: BoutTimer?): String? = timer?.let {
+        when {
+            it.period == BoutPeriod.ROUND && it.goldenRound -> Localization.getString("kerugi_period_golden_round")
+            it.period == BoutPeriod.ROUND -> Localization.getString("kerugi_period_round").replace("%s", it.round.toString())
+            it.goldenRound -> Localization.getString("kerugi_period_golden_break")
+            else -> Localization.getString("kerugi_period_break")
+        }
+    }
+
+    /** The time left as `m:ss` at [serverNowMillis], rounded up so 0:00 shows only when the time is over. */
+    fun clock(timer: BoutTimer?, serverNowMillis: Long): String? = timer?.let {
+        val seconds = (it.remainingAt(serverNowMillis) + 999) / 1_000
+        "${seconds / 60}:${(seconds % 60).toString().padStart(2, '0')}"
     }
 
     fun sideName(competitor: Competitor): String = Localization.getString(
@@ -58,11 +76,11 @@ object KerugiBoutPresentation {
         val result = snapshot.result?.let { result ->
             val winner = result.winner?.let { Localization.getString("kerugi_result_winner").replace("%s", sideName(it)) }
                 ?: Localization.getString("kerugi_result_no_winner")
-            // The opponent of a confirmed disqualification wins; other reasons need no extra text in I2a.
-            if (result.reason == "disqualification") {
-                winner + " " + Localization.getString("kerugi_result_by_disqualification")
-            } else {
-                winner
+            // The final score needs no extra text; a reason the client does not know shows the winner only.
+            when (result.reason) {
+                "disqualification", "golden_round", "preference" ->
+                    winner + " " + Localization.getString("kerugi_result_by_${result.reason}")
+                else -> winner
             }
         }
         return warnings + listOfNotNull(disqualified, result)
@@ -83,6 +101,7 @@ object KerugiBoutPresentation {
         is KerugiCommandOutcome.Accepted -> Localization.getString("combat_event_accepted")
         is KerugiCommandOutcome.Rejected -> rejection(outcome.code) ?: Localization.getString("combat_event_rejected")
         KerugiCommandOutcome.Unavailable -> Localization.getString("combat_event_unavailable")
+        KerugiCommandOutcome.StaleSession -> Localization.getString("kerugi_availability_stale_session")
         null -> null
     }
 
@@ -92,6 +111,17 @@ object KerugiBoutPresentation {
         is KerugiCommandOutcome.Rejected -> Localization.getString("kerugi_attention_rejected") +
             (rejection(outcome.code)?.let { " $it" } ?: "")
         KerugiCommandOutcome.Unavailable -> Localization.getString("kerugi_attention_unavailable")
+        KerugiCommandOutcome.StaleSession -> Localization.getString("kerugi_availability_stale_session")
+        null -> null
+    }
+
+    fun readyFeedback(outcome: KerugiCommandOutcome?): String? = when (outcome) {
+        is KerugiCommandOutcome.Pending -> Localization.getString("kerugi_ready_pending")
+        is KerugiCommandOutcome.Accepted -> Localization.getString("kerugi_ready_accepted")
+        is KerugiCommandOutcome.Rejected -> Localization.getString("kerugi_ready_rejected") +
+            (rejection(outcome.code)?.let { " $it" } ?: "")
+        KerugiCommandOutcome.Unavailable -> Localization.getString("kerugi_ready_unavailable")
+        KerugiCommandOutcome.StaleSession -> Localization.getString("kerugi_availability_stale_session")
         null -> null
     }
 

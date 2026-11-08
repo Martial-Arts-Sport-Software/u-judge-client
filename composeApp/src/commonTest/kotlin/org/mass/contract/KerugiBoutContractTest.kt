@@ -26,7 +26,9 @@ import org.mass.connection.RealtimeCommandResult
 import org.mass.connection.RealtimeRequestChannel
 import org.mass.connection.ServerMetadata
 import org.mass.connection.ServerMetadataClient
+import org.mass.session.BoutPeriod
 import org.mass.session.BoutResult
+import org.mass.session.BoutTimer
 import org.mass.session.Competitor
 import org.mass.session.KerugiScore
 import org.mass.session.ResyncReply
@@ -70,7 +72,11 @@ class KerugiBoutContractTest {
 
         assertEquals(118, push.cursor)
         assertEquals(
-            SessionFixtures.snapshot(state = SessionPhase.PREPARED, score = KerugiScore(0, 0, 0, 0, emptyList(), null)),
+            SessionFixtures.snapshot(
+                state = SessionPhase.PREPARED,
+                score = KerugiScore(0, 0, 0, 0, emptyList(), null),
+                timer = SessionFixtures.preparedTimer
+            ),
             push.session
         )
     }
@@ -105,7 +111,11 @@ class KerugiBoutContractTest {
     fun stateAndScorePushFixturesDecode() {
         assertEquals(
             SessionPush.StateUpdated(
-                SessionFixtures.SESSION_ID, 125, SessionPhase.COMPLETED, BoutResult(Competitor.BLUE, "final_score")
+                SessionFixtures.SESSION_ID,
+                125,
+                SessionPhase.COMPLETED,
+                BoutResult(Competitor.BLUE, "final_score"),
+                SessionFixtures.preparedTimer.copy(round = 2, remainingMillis = 0)
             ),
             SessionMessages.decodePush(fixture("session_state_updated"))
         )
@@ -120,9 +130,49 @@ class KerugiBoutContractTest {
     }
 
     @Test
+    fun timerPushFixtureDecodes() {
+        assertEquals(
+            SessionPush.TimerUpdated(
+                SessionFixtures.SESSION_ID,
+                127,
+                BoutTimer(BoutPeriod.BREAK, 2, false, 60_000, 0, running = false, runningSinceMillis = null)
+            ),
+            SessionMessages.decodePush(fixture("kerugi_timer_updated"))
+        )
+    }
+
+    @Test
+    fun readySignalIsEncodedExactlyAsTheFixture() = runTest {
+        val command = fixture("judge_ready_command")
+        val outbox = outbox()
+        // The fixture carries sequence 2: two earlier commands of this device.
+        listOf("earlier-1", "earlier-2").forEach {
+            outbox.enqueueNew(it, 0, "2026-11-08T10:15:00Z", SessionFixtures.SESSION_ID, "{}")
+            outbox.acknowledge(it)
+        }
+        val controller = KerugiCommandController(
+            connection = ConnectionStateStore().apply {
+                dispatch(ConnectionEvent.ResumePairedServer(SessionFixtures.DEVICE_ID))
+                dispatch(ConnectionEvent.AcceptPairing(SessionFixtures.DEVICE_ID, clockOffsetMillis = 0))
+            },
+            session = SessionFixtures.synchronizedStore(SessionFixtures.snapshot(state = SessionPhase.PREPARED)),
+            outbox = outbox,
+            nowMillis = { Instant.parse(command.text("clientTimestamp")).toEpochMilliseconds() },
+            eventId = { command.text("eventId") }
+        )
+        val event = assertIs<KerugiCommandOutcome.Pending>(controller.signalReady()).event
+        val channel = CapturingChannel("""{"type":"command_ack","eventId":"${command.text("eventId")}"}""")
+
+        RealtimeCommandClient(outbox).send(event, channel, nowMillis = 0)
+
+        assertEquals(command, json(channel.sent.single()))
+    }
+
+    @Test
     fun serverMessagesMayGainFieldsButNotLoseListedOnes() {
         val update = fixture("session_state_updated")
-        assertIs<SessionPush.StateUpdated>(SessionMessages.decodePush(JsonObject(update + ("timer" to json("""{"a":1}""")))))
+        assertIs<SessionPush.StateUpdated>(SessionMessages.decodePush(JsonObject(update + ("next" to json("""{"a":1}""")))))
+        assertEquals(null, SessionMessages.decodePush(JsonObject(update + ("timer" to json("""{"a":1}""")))))
         assertEquals(null, SessionMessages.decodePush(JsonObject(update - "result")))
         assertEquals(null, SessionMessages.decodePush(JsonObject(update + ("cursor" to JsonPrimitive("125")))))
         assertEquals(null, SessionMessages.decodePush(json("""{"type":"kerugi_timer_updated","cursor":1}""")))
