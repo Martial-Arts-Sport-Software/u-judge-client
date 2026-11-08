@@ -40,6 +40,14 @@ jobs:
       - uses: gradle/actions/wrapper-validation@v5
       - uses: gradle/actions/setup-gradle@v5
       - run: ./gradlew :composeApp:testAndroidHostTest :androidApp:assembleDebug
+      # Minified release APK (R8). Without the UJUDGE_RELEASE_* key it is signed with the runner's debug key: it
+      # installs for a smoke test but cannot update an APK from another runner (docs/ROADMAP.md, I7).
+      - name: Build the release APK
+        run: ./gradlew :androidApp:assembleRelease
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-release-apk
+          path: androidApp/build/outputs/apk/release/*.apk
 
   ios:
     name: iOS framework compilation
@@ -53,3 +61,32 @@ jobs:
       - uses: gradle/actions/wrapper-validation@v5
       - uses: gradle/actions/setup-gradle@v5
       - run: ./gradlew :composeApp:compileKotlinIosArm64 :composeApp:compileKotlinIosSimulatorArm64
+
+  ios-archive:
+    name: iOS archive (unsigned)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@v5
+      # Compiles and archives the Xcode app with the Release framework; signing and TestFlight upload are done by the
+      # owner in Xcode with the team's certificate (docs/ROADMAP.md, I7).
+      - name: Archive the iOS app without signing
+        run: |
+          xcodebuild archive -project iosApp/iosApp.xcodeproj -scheme iosApp -configuration Release \
+            -destination 'generic/platform=iOS' -archivePath "$RUNNER_TEMP/iosApp.xcarchive" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=
+          ls "$RUNNER_TEMP/iosApp.xcarchive/Products/Applications"
+
+  secrets:
+    name: Secrets check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Scan tracked files and the full history
+        run: scripts/check-secrets.sh

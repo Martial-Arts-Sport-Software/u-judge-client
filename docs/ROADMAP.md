@@ -279,6 +279,25 @@ semantics audit различает все критические действи�
 - Проверить отсутствие credentials и rating payload в логах.
 - Прогнать совместимость с release server installer, не IDE run target.
 
+Автоматизировано в I7 ([#129](https://github.com/Martial-Arts-Sport-Software/u-judge-client/issues/129), server
+[u-judge-server#142](https://github.com/Martial-Arts-Sport-Software/u-judge-server/issues/142)): CI собирает minified
+release APK и unsigned iOS archive и проверяет секреты в файлах и истории. Прогон нашёл отсутствующий файл правил R8,
+без которого release не собирался. Release APK (debug-ключ, 26 MB) установлен и запущен на emulator `sdk_gphone16k_arm64`
+(Android 17, API 37) до экрана входа без ошибок; unsigned archive собран локально (Xcode 27.1). Уязвимые библиотеки из
+Dependabot alerts относятся к classpath Gradle-плагинов, в release APK их нет. Это не доказательство `CLI-105` и
+`CLI-106`: они требуют pilot devices.
+
+Шаги владельца:
+
+- [ ] Создать release keystore вне репозитория, задать `UJUDGE_RELEASE_*` (локально или secrets CI), собрать
+  `:androidApp:assembleRelease`, установить APK на Honor 50 Lite и пройти discovery, pairing и бой против installer
+  server (`CLI-105`).
+- [ ] TestFlight: в Xcode выбрать команду разработчика, заменить `PRODUCT_BUNDLE_IDENTIFIER` `judging-app-client` на
+  зарегистрированный bundle ID, Product → Archive, Distribute App → TestFlight; ответить на вопрос об экспортном
+  шифровании (в `Info.plist` нет `ITSAppUsesNonExemptEncryption`); установить на iPhone 15, разрешить Local Network и
+  пройти discovery, pairing и бой после чистой установки (`CLI-106`).
+- [ ] Upgrade поверх предыдущей сборки и сохранение фамилии, credential и outbox.
+
 ### Gate C7
 
 APK и TestFlight устанавливаются на всех инвентаризированных устройствах, discovery/pairing работает

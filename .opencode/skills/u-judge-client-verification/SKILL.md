@@ -22,6 +22,9 @@ description: Use when testing, releasing, packaging, or changing Gradle, depende
 - Run `./gradlew :composeApp:testAndroidHostTest` after shared model changes.
 - Run `./gradlew :composeApp:iosSimulatorArm64Test` when iOS simulator testing is available.
 - For transport or combat changes, run the increment scenario on an Android emulator against a real server and record it in the PR.
+- For release build, signing, R8 or Xcode project changes, run `./gradlew :androidApp:assembleRelease` and the unsigned
+  `xcodebuild archive` from `.github/workflows/verify.yml`; install the release APK on an emulator and start it.
+- Keep `scripts/check-secrets.sh` green; the release keystore comes only from `UJUDGE_RELEASE_*` environment variables.
 - Run `git diff --check` before committing.
 
 ## Toolchain rules
