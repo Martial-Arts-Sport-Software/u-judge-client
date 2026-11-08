@@ -8,6 +8,7 @@ import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
@@ -77,6 +78,9 @@ enum class Modes {
 internal fun rangeInputStepValues(showSlider: Boolean, steps: Int): List<Int> =
     if (showSlider) (1..steps).toList() else (0..steps).toList()
 
+/** True while the rating on screen is final: every range input ignores changes. */
+val LocalRatingLocked = compositionLocalOf { false }
+
 /**
  * Renders range input for criterion rating
  * @param currentValue initial value on render
@@ -102,6 +106,8 @@ fun RangeInputComponent(
     text: String = ""
 ) {
     val context = getContext()
+    // A rating whose final Send is pending or acknowledged cannot change (`CLI-051`).
+    val locked = LocalRatingLocked.current
     var trackSize by remember { mutableStateOf(IntSize.Zero) }
     val markSizeDp by remember(trackSize) {
             derivedStateOf {
@@ -155,12 +161,12 @@ fun RangeInputComponent(
     LaunchedEffect(state) {
         snapshotFlow { state.isAnimationRunning }
             .collect { running ->
-                if (!running) onValueChange(state.currentValue / 10f)
+                if (!running && !locked) onValueChange(state.currentValue / 10f)
             }
     }
 
     LaunchedEffect(isDragged) {
-        if (!isDragged) onValueChange(state.currentValue / 10f)
+        if (!isDragged && !locked) onValueChange(state.currentValue / 10f)
     }
 
     var lastVibrationStep by remember { mutableStateOf(-1) }
@@ -242,7 +248,7 @@ fun RangeInputComponent(
                             .clickable(
                                 interactionSource = null,
                                 indication = null,
-                                enabled = showSlider,
+                                enabled = showSlider && !locked,
                                 onClick = {
                                     vibrate(context)
                                     coroutineScope.launch {
@@ -347,7 +353,7 @@ fun RangeInputComponent(
                             .anchoredDraggable(
                                 state,
                                 Orientation.Horizontal,
-                                enabled = showSlider,
+                                enabled = showSlider && !locked,
                                 interactionSource = interactionSource
                             ),
                         painter = painterResource(Res.drawable.range_input_point),

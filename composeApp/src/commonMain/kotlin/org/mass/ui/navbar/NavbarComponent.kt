@@ -124,7 +124,7 @@ fun NavbarComponent(
                                 .background(Colors.GREEN.color),
                             style = ButtonStyles.Solid,
                             text = "+0.3",
-                            enabled = rating.extraPoints < 0f,
+                            enabled = !rating.locked && rating.extraPoints < 0f,
                             onclick = {
                                 if (rating.extraPoints > -0.3f) rating.extraPoints = 0f
                                 else rating.extraPoints += 0.3f
@@ -139,7 +139,7 @@ fun NavbarComponent(
                                 .background(Colors.RED.color),
                             style = ButtonStyles.Solid,
                             text = "-0.3",
-                            enabled = rating.totalScore >= 0.3f,
+                            enabled = !rating.locked && rating.totalScore >= 0.3f,
                             onclick = { rating.extraPoints -= 0.3f }
                         )
                     } else Spacer(Modifier.weight(3f))

@@ -23,7 +23,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,7 +44,9 @@ import org.mass.enums.Categories
 import org.mass.enums.Colors
 import org.mass.locale.Localization
 import org.mass.ui.input.Modes
+import org.mass.ui.input.LocalRatingLocked
 import org.mass.ui.input.RangeInputComponent
+import org.mass.ui.rating.TechnicalSendComponent
 import org.mass.ui.navbar.NavbarComponent
 import org.mass.ui.navbar.NavbarStyles
 import org.mass.ui.popup.SettingsPopupComponent
@@ -64,6 +68,7 @@ object HosinsoolModeScreen : TechniqueScreen {
 
     @Composable
     override fun Load() {
+        TechnicalPerformanceBinding.bind(State.currentDiscipline)
         if (State.currentRating == null
             && State.currentCategory != null
             && State.currentDiscipline != null
@@ -82,6 +87,10 @@ object HosinsoolModeScreen : TechniqueScreen {
 
         if (State.currentRating != null) {
             val rating by remember(State.currentRating) { mutableStateOf(State.currentRating as TechniqueRating) }
+            // Read-only once the final Send is pending or acknowledged (`CLI-051`).
+            val readOnly = State.technicalSends.isReadOnly()
+            SideEffect { rating.locked = readOnly }
+            CompositionLocalProvider(LocalRatingLocked provides readOnly) {
             Column(Modifier
                 .fillMaxWidth(0.9f)
                 .fillMaxHeight(0.9f)
@@ -357,13 +366,8 @@ object HosinsoolModeScreen : TechniqueScreen {
                                                             }
                                                         )
                                                         Spacer(Modifier.width(15.dp))
-                                                        ButtonComponent(
-                                                            modifier = Modifier.weight(1f),
-                                                            style = ButtonStyles.Secondary,
-                                                            text = Localization.getString("hosinsool-result-send-btn"),
-                                                            onclick = {},
-                                                            enabled = false
-                                                        )
+                                                        // The final Send of server ADR-011 §7 (`CLI-048`-`CLI-053`).
+                                                        TechnicalSendComponent(rating, Modifier.weight(1f))
                                                     }
                                                 }
                                             }
@@ -381,6 +385,7 @@ object HosinsoolModeScreen : TechniqueScreen {
                         }
                     }
                 }
+            }
             }
         }
     }
