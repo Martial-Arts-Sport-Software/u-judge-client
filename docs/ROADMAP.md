@@ -127,8 +127,9 @@ Android emulator `sdk_gphone16k_arm64` (Android 17, API 37) против `./grad
 
 Shared unit tests против fake responses. Это partial evidence: server integration и physical devices отсутствуют.
 Client-часть I2a ([u-judge-client#124](https://github.com/Martial-Arts-Sport-Software/u-judge-client/pull/124))
-реализует server ADR-009 по `contract/server-ref`; прогон на emulator против `./gradlew :desktop:run` ждёт server PR
-ветки `feat/i2a-kerugi-bout`, поэтому статусы I2a не отмечены.
+реализует server ADR-009 и проходит contract fixtures server
+[u-judge-server#135](https://github.com/Martial-Arts-Sport-Software/u-judge-server/pull/135) по `contract/server-ref`;
+прогон 2-3 emulator-судей против `./gradlew :desktop:run` ещё не выполнен, поэтому статусы I2a не отмечены.
 
 | Область | Подтверждено тестами | Открыто |
 |---------|----------------------|---------|
