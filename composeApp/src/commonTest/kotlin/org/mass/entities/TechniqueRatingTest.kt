@@ -5,15 +5,16 @@ import kotlin.test.assertEquals
 
 class TechniqueRatingTest {
     @Test
-    fun totalScoreRoundsToOneDecimalPlace() {
+    fun totalScoreIsTheSumOfTenthsMinusTheJudgesDeduction() {
         val rating = TechniqueRating(
             id = "rating-1",
-            techniqueCriteria = TechniqueCriteria.Junior(),
-            presentationCriteria = PresentationCriteria.Hosinsool(),
-            exPoints = 0.25f
+            techniqueCriteria = TechniqueCriteria.Junior(0.7f, 0.8f, 0.9f, 0.6f),
+            presentationCriteria = PresentationCriteria.Hosinsool(0.7f, 0.8f, 0.8f, 0.9f),
+            exPoints = -0.3f
         )
 
-        assertEquals(1.1f, rating.totalScore)
+        assertEquals(59, rating.totalTenths)
+        assertEquals(5.9f, rating.totalScore)
     }
 
     @Test
@@ -26,9 +27,17 @@ class TechniqueRatingTest {
 
         technique.wristHold = 0.5f
         presentation.harmony = 0.7f
-        rating.extraPoints = 0.25f
+        rating.extraPoints = -0.3f
 
-        assertEquals(2.1f, rating.totalScore)
+        assertEquals(1.5f, rating.totalScore)
+    }
+
+    @Test
+    fun positiveExtraPointsAreNotAJudgeBonus() {
+        // Bonuses are the arbiter's adjustments on the desktop (server ADR-011 §8), never part of the judge's vector.
+        val rating = TechniqueRating("rating-1", TechniqueCriteria.Junior(), PresentationCriteria.Hosinsool(), exPoints = 0.3f)
+
+        assertEquals(0.8f, rating.totalScore)
     }
 
     @Test

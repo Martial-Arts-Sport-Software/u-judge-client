@@ -22,6 +22,7 @@ import org.mass.entities.Rating
 import org.mass.enums.Categories
 import org.mass.enums.Disciplines
 import org.mass.rating.RatingDraftRepository
+import org.mass.rating.TechnicalSendController
 import org.mass.rating.createRatingDraftStorage
 import org.mass.session.SessionStateStore
 import org.mass.transport.DurableEventOutbox
@@ -46,7 +47,11 @@ import kotlin.random.Random
  */
 object State {
     const val KERUGI_BOUT_CAPABILITY = "kerugi_bout"
-    val REQUIRED_SERVER_CAPABILITIES = setOf(KERUGI_BOUT_CAPABILITY)
+    const val TANBON_BOUT_CAPABILITY = "tanbon_bout"
+    const val TECHNICAL_PERFORMANCE_CAPABILITY = "technical_performance"
+
+    /** An I5 client judges Kerugi, Tanbon and technical performances of the server (server ADR-009 §1, ADR-011 §1). */
+    val REQUIRED_SERVER_CAPABILITIES = setOf(KERUGI_BOUT_CAPABILITY, TANBON_BOUT_CAPABILITY, TECHNICAL_PERFORMANCE_CAPABILITY)
 
     var density: Density? = null
     var navController: NavHostController? = null
@@ -61,7 +66,6 @@ object State {
     var currentPopupMode by mutableStateOf(Popup.Modes.NONE)
     val availableServers = ServerDiscoveryStore<DiscoveredService> { it.key }
     var selectedServer: DiscoveredService? by mutableStateOf(null)
-    /** An I2a client judges server bouts only, so it requires the Kerugi bout contract (server ADR-009 §1). */
     val connection = ConnectionStateStore(requiredCapabilities = REQUIRED_SERVER_CAPABILITIES)
     val session = SessionStateStore()
     lateinit var pairingIdentity: PairingIdentityRepository
@@ -70,6 +74,7 @@ object State {
     lateinit var eventOutbox: DurableEventOutbox
     lateinit var kerugiCommands: KerugiCommandController
     lateinit var tanbonCommands: TanbonCommandController
+    lateinit var technicalSends: TechnicalSendController
     var realtimeCommands: RealtimeCommandDispatcher? = null
     val isOffline: Boolean
         get() = connection.state == ConnectionState.Offline
@@ -101,6 +106,7 @@ object State {
             eventOutbox = DurableEventOutbox(createEventOutboxStorage(context))
             kerugiCommands = KerugiCommandController(connection, session, eventOutbox) { realtimeCommands }
             tanbonCommands = TanbonCommandController(connection, session, eventOutbox) { realtimeCommands }
+            technicalSends = TechnicalSendController(connection, session, eventOutbox) { realtimeCommands }
         }
     }
 

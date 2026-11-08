@@ -184,8 +184,8 @@ object TanbonModeScreen : Screen {
                                         "combat_event_rejected_${latestOutcome.code}"
                                     ).takeUnless { it.startsWith("combat_event_rejected_") }
                                         ?: Localization.getString("combat_event_rejected")
-                                    TanbonCommandOutcome.Unavailable -> Localization.getString("combat_event_unavailable")
-                                    null -> Localization.getString("combat_event_unavailable")
+                                    TanbonCommandOutcome.Unavailable -> Localization.getString("tanbon_event_unavailable")
+                                    null -> if (commands.isAvailable) "" else Localization.getString("tanbon_event_unavailable")
                                 },
                                 style = MaterialTheme.typography.bodySmall,
                                 textAlign = TextAlign.Center,

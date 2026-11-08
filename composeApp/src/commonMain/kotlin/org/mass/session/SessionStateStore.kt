@@ -24,9 +24,16 @@ enum class PushOutcome {
  * one (server ADR-009 §3-§5, `CLI-064`).
  */
 class SessionStateStore {
-    /** The court's current bout, or null when the court has no bout yet. */
+    /** The court's current bout, or null when the court has no bout yet or its current session is a performance. */
     var snapshot by mutableStateOf<SessionSnapshot?>(null)
         private set
+
+    /** The court's current technical performance (server ADR-011 §6), or null. */
+    var technical by mutableStateOf<TechnicalSnapshot?>(null)
+        private set
+
+    /** A current session of a discipline this client does not know; its controls stay disabled. */
+    private var otherSessionId: String? = null
 
     /** Cursor of the last snapshot or update applied; null after an app start. */
     var cursor by mutableStateOf<Long?>(null)
@@ -37,10 +44,21 @@ class SessionStateStore {
         private set
 
     /** Replaces the whole session state with a `resync_response`, even when its cursor is lower. */
-    fun applyResync(cursor: Long, session: SessionSnapshot?) {
+    fun applyResync(
+        cursor: Long,
+        session: SessionSnapshot?,
+        technical: TechnicalSnapshot? = null,
+        otherSessionId: String? = null
+    ) {
         this.cursor = cursor
-        snapshot = session
+        replace(session, technical, otherSessionId)
         isSynchronized = true
+    }
+
+    private fun replace(session: SessionSnapshot?, technical: TechnicalSnapshot?, otherSessionId: String?) {
+        snapshot = session
+        this.technical = technical
+        this.otherSessionId = otherSessionId
     }
 
     fun applyPush(message: SessionPush): PushOutcome {
@@ -48,11 +66,16 @@ class SessionStateStore {
         val held = cursor
         if (held != null && message.cursor <= held) return PushOutcome.STALE
         val current = snapshot
+        val performance = technical
         when (message) {
-            is SessionPush.Snapshot -> snapshot = message.session
-            is SessionPush.StateUpdated -> {
-                if (current?.sessionId != message.sessionId) return PushOutcome.SESSION_MISMATCH
-                snapshot = current.copy(state = message.state, result = message.result, timer = message.timer ?: current.timer)
+            is SessionPush.Snapshot -> replace(message.session, message.technical, message.otherSessionId)
+            is SessionPush.StateUpdated -> when (message.sessionId) {
+                current?.sessionId ->
+                    snapshot = current.copy(state = message.state, result = message.result, timer = message.timer ?: current.timer)
+                performance?.sessionId -> technical = performance.copy(state = message.state)
+                // A known session of an unknown discipline: nothing to apply, but no resync either.
+                otherSessionId -> Unit
+                else -> return PushOutcome.SESSION_MISMATCH
             }
             is SessionPush.TimerUpdated -> {
                 if (current?.sessionId != message.sessionId) return PushOutcome.SESSION_MISMATCH
@@ -61,6 +84,10 @@ class SessionStateStore {
             is SessionPush.ScoreUpdated -> {
                 if (current?.sessionId != message.sessionId) return PushOutcome.SESSION_MISMATCH
                 snapshot = current.copy(score = message.score)
+            }
+            is SessionPush.TechnicalScoreUpdated -> {
+                if (performance?.sessionId != message.sessionId) return PushOutcome.SESSION_MISMATCH
+                technical = performance.copy(score = message.score)
             }
         }
         cursor = message.cursor
@@ -74,6 +101,7 @@ class SessionStateStore {
 
     /** Forgets the session together with the pairing. */
     fun clear() {
+        replace(null, null, null)
         snapshot = null
         cursor = null
         isSynchronized = false

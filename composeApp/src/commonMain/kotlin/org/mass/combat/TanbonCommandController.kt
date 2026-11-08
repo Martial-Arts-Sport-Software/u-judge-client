@@ -10,6 +10,7 @@ import org.mass.connection.ConnectionStateStore
 import org.mass.connection.RealtimeCommandDispatcher
 import org.mass.connection.RealtimeCommandResult
 import org.mass.enums.Disciplines
+import org.mass.session.AuditContext
 import org.mass.session.SessionPhase
 import org.mass.session.SessionStateStore
 import org.mass.transport.DurableEventOutbox
@@ -34,7 +35,11 @@ sealed interface TanbonCommandOutcome {
     data object Unavailable : TanbonCommandOutcome
 }
 
-/** Creates durable Tanbon commands only while an authenticated Tanbon session is running. */
+/**
+ * Creates durable `tanbon_score_command`s (server ADR-011 §3) for a seated judge of the server's Tanbon bout, only while
+ * connected, synchronized and `running`. Every command copies its audit context from the snapshot current at the tap;
+ * `CROSS` carries `competitor: null`.
+ */
 class TanbonCommandController(
     private val connection: ConnectionStateStore,
     private val session: SessionStateStore,
@@ -49,20 +54,26 @@ class TanbonCommandController(
     val isAvailable: Boolean
         get() = activeSession() != null && connection.state is ConnectionState.ConnectedIdle
 
+    /** Taps of any session still waiting for a server reply. */
+    var pendingCount by mutableStateOf(outbox.pendingEvents().size)
+        private set
+
     fun submit(action: TanbonAction): TanbonCommandOutcome {
         val session = activeSession() ?: return TanbonCommandOutcome.Unavailable.also { latestOutcome = it }
         val connected = connection.state as? ConnectionState.ConnectedIdle
             ?: return TanbonCommandOutcome.Unavailable.also { latestOutcome = it }
         val localTimestampMillis = nowMillis()
+        val audit = requireNotNull(session.auditContext())
         val event = outbox.enqueueNew(
             eventId = eventId(),
             clientTimestampMillis = localTimestampMillis,
             clientTimestamp = Instant.fromEpochMilliseconds(
                 localTimestampMillis + connected.clockOffsetMillis
             ).toString(),
-            sessionId = session.sessionId,
-            payload = action.payload()
+            sessionId = audit.sessionId,
+            payload = action.payload(audit)
         )
+        pendingCount = outbox.pendingEvents().size
         return TanbonCommandOutcome.Pending(event).also { outcome ->
             latestOutcome = outcome
             dispatcher()?.dispatch()
@@ -71,6 +82,7 @@ class TanbonCommandController(
 
     /** Updates feedback only for the latest physical Tanbon action, never for an unrelated replay. */
     fun recordTerminalOutcome(result: RealtimeCommandResult) {
+        pendingCount = outbox.pendingEvents().size
         val pending = latestOutcome as? TanbonCommandOutcome.Pending ?: return
         latestOutcome = when (result) {
             is RealtimeCommandResult.Accepted -> {
@@ -88,38 +100,35 @@ class TanbonCommandController(
         }
     }
 
-    /** The server has no Tanbon session until I5, so these controls stay disabled against a real server. */
-    private fun activeSession() = session.snapshot
-        ?.takeIf { session.isSynchronized && it.state == SessionPhase.RUNNING && it.discipline == Disciplines.TANBON }
+    /** A synchronized, running Tanbon bout in which this device has a seat (server ADR-009 §10.5). */
+    private fun activeSession() = session.snapshot?.takeIf {
+        session.isSynchronized && it.state == SessionPhase.RUNNING && it.discipline == Disciplines.TANBON && it.seat != null
+    }
 
-    private fun TanbonAction.payload() = buildJsonObject {
-        put("type", "tanbon_score")
-        when (this@payload) {
-            TanbonAction.BlueHead -> {
-                put("participant", "BLUE")
-                put("target", "HEAD")
-            }
-            TanbonAction.BlueBody -> {
-                put("participant", "BLUE")
-                put("target", "BODY")
-            }
-            TanbonAction.RedHead -> {
-                put("participant", "RED")
-                put("target", "HEAD")
-            }
-            TanbonAction.RedBody -> {
-                put("participant", "RED")
-                put("target", "BODY")
-            }
-            TanbonAction.Cross -> {
-                put("participant", "NEUTRAL")
-                put("target", "CROSS")
-            }
+    private fun TanbonAction.payload(audit: AuditContext) = buildJsonObject {
+        put("type", COMMAND)
+        put("competitionId", audit.competitionId)
+        put("peerId", audit.peerId)
+        put("courtId", audit.courtId)
+        put("bracketId", audit.bracketId)
+        put("sessionId", audit.sessionId)
+        put("judgeId", audit.judgeId)
+        put("deviceId", audit.deviceId)
+        val (competitor, area) = when (this@payload) {
+            TanbonAction.BlueHead -> "BLUE" to "HEAD"
+            TanbonAction.BlueBody -> "BLUE" to "BODY"
+            TanbonAction.RedHead -> "RED" to "HEAD"
+            TanbonAction.RedBody -> "RED" to "BODY"
+            TanbonAction.Cross -> null to "CROSS"
         }
+        put("competitor", competitor)
+        put("area", area)
     }.toString()
 
     @OptIn(ExperimentalUuidApi::class)
     private companion object {
+        const val COMMAND = "tanbon_score_command"
+
         fun newEventId(): String = Uuid.random().toString()
     }
 }

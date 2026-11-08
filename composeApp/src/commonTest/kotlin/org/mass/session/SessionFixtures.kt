@@ -60,6 +60,49 @@ object SessionFixtures {
         timer = runningTimer
     )
 
+    const val PERFORMANCE_ID = "1b2c3d4e-5f60-4718-8a9b-0c1d2e3f4a50"
+    const val PERFORMANCE_BRACKET_ID = "7a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c41"
+    const val PERFORMANCE_JUDGE_ID = "6e5d4c3b-2a19-4807-9f6e-5d4c3b2a1900"
+
+    /** The performance of the `technical_session_snapshot` fixture (server ADR-011 §6). */
+    fun technical(
+        sessionId: String = PERFORMANCE_ID,
+        discipline: String = "hosinsool",
+        state: SessionPhase = SessionPhase.PREPARED,
+        seat: JudgeSeat? = JudgeSeat(number = 1, judgeId = PERFORMANCE_JUDGE_ID, deviceId = DEVICE_ID),
+        techniqueCriteria: Int = 4,
+        sent: SentVector? = null,
+        score: TechnicalScore = TechnicalScore(emptyList(), null)
+    ) = TechnicalSnapshot(
+        sessionId = sessionId,
+        disciplineCode = discipline,
+        competitionId = COMPETITION_ID,
+        peerId = PEER_ID,
+        courtId = COURT_ID,
+        courtNumber = 1,
+        bracketId = PERFORMANCE_BRACKET_ID,
+        categoryTitle = "Приёмы самообороны · 2013-2011 г.р. Юноши",
+        performanceNumber = 12,
+        state = state,
+        entry = BoutSide(
+            "entry-5",
+            "Иванов И. И. (Москва) / Петров П. П. (Москва)",
+            listOf(Athlete("Иванов Иван Иванович", "Москва"), Athlete("Петров Пётр Петрович", "Москва"))
+        ),
+        judgeCount = 2,
+        formula = "mean",
+        techniqueCriteria = techniqueCriteria,
+        presentationCriteria = 4,
+        deductionStepTenths = 3,
+        seat = seat,
+        sent = sent,
+        score = score
+    )
+
+    /** A store whose current session is [performance], applied on the current socket. */
+    fun technicalStore(performance: TechnicalSnapshot = technical(state = SessionPhase.RUNNING), cursor: Long = 205) =
+        SessionStateStore().apply { applyResync(cursor, null, performance) }
+
     /** A store with [session] applied on the current socket. */
     fun synchronizedStore(session: SessionSnapshot? = snapshot(), cursor: Long = 118) = SessionStateStore().apply {
         applyResync(cursor, session)

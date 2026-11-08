@@ -94,6 +94,7 @@ object PairedServerSession {
         val commandClient = RealtimeCommandClient(State.eventOutbox) { result ->
             State.kerugiCommands.recordTerminalOutcome(result)
             State.tanbonCommands.recordTerminalOutcome(result)
+            State.technicalSends.recordTerminalOutcome(result)
         }
         val dispatcher = RealtimeCommandDispatcher(scope, State.eventOutbox, commandClient)
         State.realtimeCommands = dispatcher
